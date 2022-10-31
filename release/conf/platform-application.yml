@@ -1,0 +1,135 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: platform
+  boot:
+    admin:
+      client:
+        # 启动注册到监控中心(设置true则需要启动monitor项目)
+        enabled: false
+        #监控中心地址,多个以逗号隔开,并把localhost换成ip
+        url: http://192.168.254.128:9091
+        instance:
+          prefer-ip: true
+        register-once: false
+        username: admin
+        password: 123456
+  redis:
+    #字典缓存订阅的主题
+    topic: refreshDictionary
+    #是否使用Redis, 分布式锁注解和防止表单重复提交注解依赖Redis,请按需配置
+    enabled: false
+    #redis服务器的ip
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    jedis:
+      pool:
+        max-active: 8
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/haoliang1?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    username: root
+    password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      # 连接池名称
+      pool-name: MyHikariCP
+      #最小空闲连接，默认值10，小于0或大于maximum-pool-size，都会重置为maximum-pool-size
+      minimum-idle: 10
+      #连接池最大连接数，默认是10 (cpu核数量 * 2 + 硬盘数量)
+      maximum-pool-size: 30
+      #空闲连接超时时间，默认值600000（10分钟），大于等于max-lifetime且max-lifetime>0，会被重置为0；不等于0且小于10秒，会被重置为10秒。
+      idle-timeout: 600000
+      #连接最大存活时间，不等于0且小于30秒，会被重置为默认值30分钟.设置应该比mysql设置的超时时间短
+      max-lifetime: 1800000
+      #连接超时时间：毫秒，小于250毫秒，否则被重置为默认值30秒
+      connection-timeout: 30000
+      #用于测试连接是否可用的查询语句
+      connection-test-query: SELECT 1
+  jpa:
+    database: mysql
+    show-sql: false
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        enable_lazy_load_no_trans: true
+
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+    deserialization:
+      accept_empty_string_as_null_object: true
+
+#########################  java Web Token 配置  #########################
+jwt:
+  # 加密密钥
+  secret: iwqjhda8232bjgh432[cicada-smile]
+  # token有效时长(单位: 秒) 设置为一天
+  expire: 86400
+  #请求头参数
+  tokenName: token
+
+######################  Actuator 监控端点的配置项  ######################
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+#########################  登录配置 ####################################
+login:
+  #是否开启密码错误锁定
+  enableErrorLock: true
+  #锁定时间(单位:秒) 默认设置3分钟
+  lockTime: 180
+  #登录错误几次开始锁定
+  maxErrorNumber: 3
+  captcha:
+    #是否启动验证码
+    enable: false
+    # 验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母
+    type: RANDOM
+    #图像干扰策略  line=线段干扰 circle=圆圈干扰 shear=扭曲干扰  random=随机策略
+    category: RANDOM
+    # 数字验证码位数
+    numberLength: 1
+    # 字符验证码长度
+    charLength: 4
+    #失效时间(单位:分钟)
+    expirationTime: 1
+
+#########################  应用其它配置   ############################
+app:
+  #文件存储根路径
+  rootPath: /docker/server/data/
+  #服务名称
+  serverName: HaoLiang
+  #是否加载redisson的RateLimit限流相关Bean   依赖reids
+  enableRateLimit: true
+  #限流模式  single=单实例限流,all=全局限流(分布式限流)
+  rateLimitModel: all
+  #是否加载表单去重提交验证  依赖reids
+  enableRepeatSubmit: true
+  #是否启动分布式锁  依赖reids
+  enableRedisLock: true
+  #过滤不需要security验证的接口
+  securityExcludes:
+    - /user/login
+    - /test/**
+    - /apidoc/**
+    - /actuator
+    - /actuator/**
+    - /captchaImage

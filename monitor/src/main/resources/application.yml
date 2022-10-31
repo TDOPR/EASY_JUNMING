@@ -1,0 +1,44 @@
+server:
+  port: 9091
+
+spring:
+  security:
+    user:
+      name: admin
+      password: 123456
+  application:
+    name: monitor
+  boot:
+    admin:
+      #配置页面显示的title和导航头部显示
+      ui:
+        title: SringBoot Server Monitor
+        brand: <span>SringBoot Server Monitor</span>
+      monitor:
+        default-timeout: 30000ms
+      #客户端配置
+      client:
+        # 启动注册到监控中心
+        enabled: true
+        #监控中心地址,多个以逗号隔开,并把localhost换成ip
+        url: http://localhost:9091
+        instance:
+          prefer-ip: true
+        register-once: false
+        username: admin
+        password: 123456
+
+logging:
+  config: classpath:logback-spring.xml
+
+# Actuator 监控端点的配置项
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+
