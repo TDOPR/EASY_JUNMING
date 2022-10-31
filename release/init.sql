@@ -1,5 +1,5 @@
-CREATE DATABASE haoliang;
-use haoliang;
+CREATE DATABASE easytrade;
+use easytrade;
 
 /**
  * 角色表
