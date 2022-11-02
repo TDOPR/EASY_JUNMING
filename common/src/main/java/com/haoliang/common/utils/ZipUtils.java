@@ -10,9 +10,9 @@ import java.util.zip.ZipOutputStream;
  * @CreateTime 2019/08-/3 22:09
  * @description zip压缩操作工具类
  **/
-public class ZipUtil {
+public class ZipUtils {
 
-    private ZipUtil(){ }
+    private ZipUtils(){ }
 
     private static boolean compress(File f, String baseDir, ZipOutputStream zos) {
         if (!f.exists()) {

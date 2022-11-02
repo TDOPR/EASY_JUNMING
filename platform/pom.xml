@@ -8,7 +8,7 @@
         <version>1.0.0</version>
     </parent>
 
-    <groupId>com.ljm.boot</groupId>
+    <groupId>com.haoliang.easytrade</groupId>
     <artifactId>platform</artifactId>
     <version>1.0.0</version>
 
@@ -21,26 +21,19 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
+            <groupId>com.haoliang.easytrade</groupId>
+            <artifactId>business</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.haoliang.single</groupId>
-            <artifactId>business</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
         <!--mysql驱动 -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-        </dependency>
-
-        <!--java web token -->
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
         </dependency>
 
         <!--spring Security-->

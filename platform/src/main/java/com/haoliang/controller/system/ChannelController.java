@@ -1,12 +1,14 @@
 package com.haoliang.controller.system;
 
 
-import com.haoliang.model.SysChannel;
-import com.haoliang.service.SysChannelService;
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.model.SysChannel;
+import com.haoliang.service.SysChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -39,7 +41,7 @@ public class ChannelController {
 
     @OperationLog(module = "渠道管理",description = "刷新渠道层级和顺序")
     @PostMapping("/reload")
-    public JsonResult reload(@RequestBody java.util.List<SysChannel> sysChannelList){
+    public JsonResult reload(@RequestBody List<SysChannel> sysChannelList){
         return channelService.reload(sysChannelList);
     }
 

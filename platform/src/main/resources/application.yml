@@ -63,14 +63,6 @@ spring:
 mybatis-plus:
   # xml扫描，多个目录用逗号或者分号分隔（告诉 Mapper 所对应的 XML 文件位置）
   mapper-locations: classpath:/mapper/*.xml
-  type-aliases-package: com.haoliang.model
-  # 以下配置均有默认值,可以不设置
-  global-config:
-    db-config:
-      #字段策略 IGNORED:"忽略判断"  NOT_NULL:"非 NULL 判断")  NOT_EMPTY:"非空判断"
-      field-strategy: NOT_EMPTY
-      #数据库类型
-      db-type: MYSQL
   configuration:
     # 是否开启自动驼峰命名规则映射:从数据库列名到Java属性驼峰命名的类似映射
     map-underscore-to-camel-case: false
@@ -151,3 +143,4 @@ app:
     - /actuator
     - /actuator/**
     - /captchaImage
+    - /wallet/**

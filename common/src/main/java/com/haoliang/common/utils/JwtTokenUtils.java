@@ -1,12 +1,12 @@
-package com.haoliang.config;
+package com.haoliang.common.utils;
 
+import com.haoliang.common.config.GlobalConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Clock;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClock;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
@@ -14,46 +14,27 @@ import java.util.Date;
  * @author Dominick Li
  * @description java web token 配置类
  **/
-@org.springframework.boot.context.properties.ConfigurationProperties(prefix = "jwt")
-@Component
 @Slf4j
-public class JwtTokenConfig {
+public class JwtTokenUtils {
 
-    private String secret;
-    private long expire;
+    public static final String TOKEN_NAME="token";
 
-    public String getSecret() {
-        return secret;
-    }
-
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public long getExpire() {
-        return expire;
-    }
-
-    public void setExpire(long expire) {
-        this.expire = expire;
-    }
-
-    private Clock clock = DefaultClock.INSTANCE;
+    private static final Clock clock = DefaultClock.INSTANCE;
 
     /**
      * 根据身份ID标识，生成Token
      */
-    public String getToken(Integer identityId, String roleName,String username) {
+    public static String getToken(Integer identityId, String roleName,String username) {
         Date nowDate = new Date();
         //过期时间
-        Date expireDate = new Date(nowDate.getTime() + expire * 1000);
+        Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
         return Jwts.builder()
                 .setHeaderParam("type", "JWT")
                 //放入唯一标识,可以是用户名或者Id
                 .setSubject(identityId.toString())
                 .setIssuedAt(nowDate)
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(SignatureAlgorithm.HS512, GlobalConfig.getTokenSecret())
                 //自定义属性 放入用户拥有请求权限
                 .claim("role", roleName)
                 .claim("userName", username)
@@ -63,9 +44,9 @@ public class JwtTokenConfig {
     /**
      * 根据token获取身份信息
      */
-    public Claims getTokenClaim(String token) {
+    public static Claims getTokenClaim(String token) {
         try {
-            return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+            return Jwts.parser().setSigningKey(GlobalConfig.getTokenSecret()).parseClaimsJws(token).getBody();
         } catch (Exception e) {
             log.error("getTokenClaim error:{}", e.getMessage());
             return null;
@@ -75,7 +56,7 @@ public class JwtTokenConfig {
     /**
      * 判断token是否失效
      */
-    public boolean isTokenExpired(String token) {
+    public static boolean isTokenExpired(String token) {
         try {
             final Date expiration = getExpirationDateFromToken(token);
             return expiration.before(clock.now());
@@ -87,32 +68,32 @@ public class JwtTokenConfig {
     /**
      * 根据token获取username
      */
-    public Integer getUserIdFromToken(String token) {
+    public static Integer getUserIdFromToken(String token) {
         return Integer.parseInt(getClaimFromToken(token, Claims::getSubject));
     }
 
     /**
      * 根据token获取角色
      */
-    public String getRoleCodeFromToken(String token) {
+    public static String getRoleCodeFromToken(String token) {
         return getTokenClaim(token).get("role").toString().toLowerCase();
     }
 
     /**
      * 根据token获取用户名
      */
-    public String getUserNameFromToken(String token) {
+    public static String getUserNameFromToken(String token) {
         return getTokenClaim(token).get("userName").toString();
     }
 
     /**
      * 根据token获取失效时间
      */
-    public Date getExpirationDateFromToken(String token) {
+    public static Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public <T> T getClaimFromToken(String token, java.util.function.Function<Claims, T> claimsResolver) {
+    public static <T> T getClaimFromToken(String token, java.util.function.Function<Claims, T> claimsResolver) {
         final Claims claims = getTokenClaim(token);
         return claimsResolver.apply(claims);
     }

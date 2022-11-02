@@ -1,13 +1,11 @@
 package com.haoliang.security;
 
-import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.common.utils.RedisUtils;
 import com.haoliang.config.DictionaryParam;
-import com.haoliang.config.JwtTokenConfig;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -29,18 +27,14 @@ import java.io.IOException;
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
 
-    @Autowired
-    private JwtTokenConfig jwtTokenConfig;
-
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String token = request.getHeader(GlobalConfig.getTokenName());
+        final String token = request.getHeader(JwtTokenUtils.TOKEN_NAME);
         //当前请求中包含令牌
         if (!StringUtils.isEmpty(token)) {
-            Claims claims = jwtTokenConfig.getTokenClaim(token);
+            Claims claims = JwtTokenUtils.getTokenClaim(token);
             if (claims != null) {
-                if (!jwtTokenConfig.isTokenExpired(token) && org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (!JwtTokenUtils.isTokenExpired(token) && org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() == null) {
                     boolean flag=true;
                     if(DictionaryParam.isEnableSso()){
                         flag=token.equals(RedisUtils.getCacheObject(CacheKeyPrefixConstants.TOKEN+claims.getSubject()));

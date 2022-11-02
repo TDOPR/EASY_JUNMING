@@ -1,6 +1,5 @@
 package com.haoliang.common.utils;
 
-import com.haoliang.common.config.GlobalConfig;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,7 +29,7 @@ public class PointUtils {
 
         Map<String, Object> requestParams = new HashMap<>(paramNames.length);
         for (int i = 0; i < paramNames.length; i++) {
-            if (paramNames[i].equals(GlobalConfig.getTokenName())) {
+            if (paramNames[i].equals(JwtTokenUtils.TOKEN_NAME)) {
                 //过滤token参数
                 continue;
             }

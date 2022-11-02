@@ -7,7 +7,7 @@
         <artifactId>easytrade</artifactId>
         <version>1.0.0</version>
     </parent>
-    <groupId>com.haoliang</groupId>
+    <groupId>com.haoliang.easytrade</groupId>
     <artifactId>test</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>test</name>
@@ -18,7 +18,7 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.haoliang.single</groupId>
+            <groupId>com.haoliang.easytrade</groupId>
             <artifactId>common</artifactId>
             <version>1.0.0</version>
         </dependency>

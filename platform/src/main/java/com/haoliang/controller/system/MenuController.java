@@ -2,12 +2,14 @@ package com.haoliang.controller.system;
 
 
 import com.alibaba.fastjson.JSONObject;
-import com.haoliang.model.SysMenu;
-import com.haoliang.service.SysMenuService;
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.model.SysMenu;
+import com.haoliang.service.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -29,7 +31,7 @@ public class MenuController {
 
     @OperationLog(module = "菜单管理", description = "刷新菜单层级和顺序")
     @PostMapping("/reloadMenu")
-    public JsonResult reloadMenu(@RequestBody java.util.List<SysMenu> sysMenus, @RequestHeader String token) {
+    public JsonResult reloadMenu(@RequestBody List<SysMenu> sysMenus, @RequestHeader String token) {
         return sysMenuService.reloadMenu(sysMenus, token);
     }
 

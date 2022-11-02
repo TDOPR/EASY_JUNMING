@@ -12,20 +12,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class GlobalConfig {
 
-    private static String tokenName;
 
     private static RateType rateType;
 
     private static long tokenExpire;
 
-    public static String getTokenName() {
-        return tokenName;
-    }
-
-    @Value("${jwt.tokenName}")
-    public  void setTokenName(String tokenName) {
-        GlobalConfig.tokenName = tokenName;
-    }
+    private static String tokenSecret;
 
     public static RateType getRateType() {
         return rateType;
@@ -42,5 +34,14 @@ public class GlobalConfig {
     @Value("${jwt.expire}")
     public  void setTokenExpire(long tokenExpire) {
         GlobalConfig.tokenExpire = tokenExpire;
+    }
+
+    public static String getTokenSecret() {
+        return tokenSecret;
+    }
+
+    @Value("${jwt.secret}")
+    public  void setTokenSecret(String tokenSecret) {
+        GlobalConfig.tokenSecret = tokenSecret;
     }
 }

@@ -7,22 +7,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.vo.PageVO;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.common.utils.StringUtil;
-import com.haoliang.config.JwtTokenConfig;
 import com.haoliang.enums.RoleTypeEnum;
 import com.haoliang.mapper.SysMenuMapper;
 import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysRoleMenuMapper;
 import com.haoliang.mapper.SysUserMapper;
-import com.haoliang.model.bo.SysRoleBO;
 import com.haoliang.model.SysMenu;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.SysRoleMenu;
+import com.haoliang.model.bo.SysRoleBO;
 import com.haoliang.model.vo.RoleVO;
 import com.haoliang.model.vo.SelectVO;
 import com.haoliang.service.SysRoleService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,9 +44,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Resource
     private SysMenuMapper sysMenuMapper;
-
-    @Autowired
-    private JwtTokenConfig jwtTokenConfig;
 
     @Override
     public JsonResult queryByCondition(PageParam<SysRole> pageParam) {
@@ -123,7 +119,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Override
     public JsonResult getMenuListByToken(String token) {
-        String roleCode = jwtTokenConfig.getRoleCodeFromToken(token);
+        String roleCode = JwtTokenUtils.getRoleCodeFromToken(token);
         SysRole sysRole = this.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, roleCode));
         return JsonResult.successResult(getMenuListByRole(sysRole.getId()));
     }

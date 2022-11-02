@@ -14,7 +14,7 @@ import com.haoliang.common.utils.AESUtil;
 import com.haoliang.common.utils.DateUtil;
 import com.haoliang.common.utils.RedisUtils;
 import com.haoliang.common.utils.excel.ExcelUtil;
-import com.haoliang.config.JwtTokenConfig;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.config.LoginConfig;
 import com.haoliang.enums.RoleTypeEnum;
 import com.haoliang.mapper.SysUserMapper;
@@ -56,9 +56,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Autowired
     private SysLoginLogService sysLoginLogService;
 
-    @Autowired
-    private JwtTokenConfig jwtTokenConfig;
-
     @Resource
     private SysUserMapper sysUserMapper;
 
@@ -92,7 +89,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
 
         String roleCode = RoleTypeEnum.valueOf(sysUser.getRoleId()).getName();
-        String token=jwtTokenConfig.getToken(sysUser.getId(), roleCode.toUpperCase(), sysUser.getUsername());
+        String token= JwtTokenUtils.getToken(sysUser.getId(), roleCode.toUpperCase(), sysUser.getUsername());
         RedisUtils.setCacheObject(CacheKeyPrefixConstants.TOKEN+sysUser.getId(),token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp));
 

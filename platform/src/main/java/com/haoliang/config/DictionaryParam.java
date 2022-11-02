@@ -1,10 +1,8 @@
 package com.haoliang.config;
 
-
 import com.haoliang.enums.DictionaryKeyEnum;
 
 import java.util.HashMap;
-
 
 public class DictionaryParam {
 
@@ -49,6 +47,5 @@ public class DictionaryParam {
     public static Integer getThresholdSize() {
         return Integer.parseInt(DICTIONARY_PARAM.get(DictionaryKeyEnum.THRESHOLD_SIZE.getKey()));
     }
-
 
 }

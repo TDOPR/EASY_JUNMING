@@ -1,17 +1,20 @@
 package com.haoliang.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haoliang.config.JwtTokenConfig;
+import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.mapper.SysMenuMapper;
 import com.haoliang.mapper.SysRoleMenuMapper;
 import com.haoliang.model.SysMenu;
-import com.haoliang.common.model.JsonResult;
+import com.haoliang.model.SysRole;
 import com.haoliang.service.SysMenuService;
+import com.haoliang.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,14 +24,14 @@ import java.util.List;
 @Service
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
 
-    @Autowired
-    private JwtTokenConfig jwtTokenConfig;
-
     @Resource
     private SysMenuMapper sysMenuMapper;
 
     @Resource
     private SysRoleMenuMapper sysRoleMenuMapper;
+
+    @Autowired
+    private SysRoleService sysRoleService;
 
     @Override
     public JsonResult findAll() {
@@ -58,10 +61,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             }
         }
         this.saveOrUpdateBatch(saveSysMenuList);
-        String roleCode = jwtTokenConfig.getRoleCodeFromToken(token);
-        //TODO 根据角色编码查出所有菜单 SysRole sysRole = sysRoleRepository.findTopByRoleCode(roleCode);
-        //return JsonResult.successResult(sysRoleService.getMenuListByRole(sysRole));
-        return null;
+        String roleCode = JwtTokenUtils.getRoleCodeFromToken(token);
+        return JsonResult.successResult(sysRoleService.getMenuListByRole(sysRoleService.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode,roleCode)).getId()));
     }
 
 
