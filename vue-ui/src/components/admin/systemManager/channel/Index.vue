@@ -265,7 +265,7 @@ export default {
             });
             return;
           }
-          this.$ajax.get("/api/channel/"+this.checkRigthRow.rowData.id).then((res) => {
+          this.$ajax.delete("/api/channel/"+this.checkRigthRow.rowData.id).then((res) => {
                 if (res.code == 200) {
                     this.$notify({
                         title: "提示",
@@ -331,7 +331,7 @@ export default {
           }
         },
         getAllMenus(row,length){
-            this.$ajax.get("/api/channel/findAll").then(res=>{
+            this.$ajax.get("/api/channel/").then(res=>{
                 if(res.code==200){
                   this.menuList=res.data
                 }

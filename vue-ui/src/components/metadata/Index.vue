@@ -316,7 +316,7 @@ export default {
       }
       this.loading = true;
       this.$ajax
-        .post("/api/meta/queryByCondition", this.condition)
+        .post("/api/meta/pagelist", this.condition)
         .then((res) => {
           this.loading = false;
           if (res.code == 200) {

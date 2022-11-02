@@ -19,7 +19,7 @@ public class BaseModelNoModifyTime{
     private static final long serialVersionUID = 2863256929817929825L;
 
     /**
-     * id主键，需要手动set Id, 推荐使用雪花算法生成的id， uuid作为主键查询效率低
+     * 唯一标识
      */
     @TableId(type = IdType.ASSIGN_ID)
     @JsonFormat(shape = JsonFormat.Shape.STRING)

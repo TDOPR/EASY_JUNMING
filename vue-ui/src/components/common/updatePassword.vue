@@ -35,7 +35,7 @@
     };
       return {
         user:{ 
-            userId: this.$utils.getSessionStorage("user").id
+           
         },
         loading: false,   //点击识别后,挑战到查询页面
     rules: {
@@ -64,7 +64,7 @@
           }
           this.loading=true;
           console.log("success submit!!");
-           this.$ajax.post('/api/user/updatePasswordBO', this.user).then(res => {
+           this.$ajax.post('/api/user/updatePassword', this.user).then(res => {
           if (res.code == 200) {
             this.$notify({
               title: '提示',

@@ -19,7 +19,7 @@
         LEFT JOIN sys_role sr ON sr.id=s.roleId
         LEFT JOIN sys_channel sc ON sc.id=s.channelId
         WHERE
-           sr.roleCode!='admin'
+           sr.roleCode!='admin' and deleted=0
         <if test="username!=null and username!=''">
             AND s.username  LIKE CONCAT('%',#{username},'%')
         </if>

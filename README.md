@@ -31,6 +31,6 @@ npm run dev
 
 # 4.生成本地接口文档到resource/static目录下
 在父工程命令行执行下面命令
-mvn smart-doc:markdown -Dfile.encoding=UTF-8  -pl :system -am
-访问地址: http://localhost:4612/api.html
+mvn smart-doc:markdown -Dfile.encoding=UTF-8  -pl :platform -am
+访问地址: http://localhost:9090/apidoc/api.html
 

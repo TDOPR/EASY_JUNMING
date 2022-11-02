@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 日志管理
  * @author Dominick Li
- * @description 日志管理
  **/
 @RestController
 @RequestMapping("/admin")
@@ -46,13 +46,20 @@ public class LogController {
     @Autowired
     private SysLoginLogService sysLoginLogService;
 
+    /**
+     * 分页查询登录日志
+     */
     @PostMapping("/loginlog/queryByCondition")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public JsonResult loginlogList(@RequestBody PageParam<SysLoginLog> pageParam) {
+    public JsonResult<PageVO<SysLoginLog>> loginlogList(@RequestBody PageParam<SysLoginLog> pageParam) {
         IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 
+    /**
+     * 批量删除登录日志
+     * @param idList id数组  格式[1,2,3]
+     */
     @OperationLog(module = "登录日志", description = "批量删除")
     @PostMapping("/loginlog/deleteByIds")
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -60,6 +67,10 @@ public class LogController {
         return JsonResult.build(sysLoginLogService.removeByIds(JSONArray.parseArray(idList, Integer.class)));
     }
 
+    /**
+     * 导出登录日志
+     * @return 文件二进制流
+     */
     @PostMapping("/loginlog/export")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void exportLoginLog(@RequestBody PageParam<SysLoginLog> pageParam, HttpServletResponse response) {
@@ -72,13 +83,20 @@ public class LogController {
         ExcelUtil.exportData(ExportLoginLogVO.class, "登录日志", exportLoginLogVOList, response);
     }
 
+    /**
+     * 分页查询操作日志
+     */
     @PostMapping("/operationlog/queryByCondition")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public JsonResult operationlogList(@RequestBody PageParam<SysOperationLog> pageParam) {
+    public JsonResult<PageVO<SysOperationLog>> operationlogList(@RequestBody PageParam<SysOperationLog> pageParam) {
         IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 
+    /**
+     * 导出操作日志
+     * @return 文件二进制流
+     */
     @PostMapping("/operationlog/export")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void exportOperationlog(@RequestBody PageParam<SysOperationLog> pageParam, HttpServletResponse response) {
@@ -91,13 +109,20 @@ public class LogController {
         ExcelUtil.exportData(ExportOperationLogVO.class, "操作日志", exportOperationLogVOList, response);
     }
 
+    /**
+     * 分页查询错误日志
+     */
     @PostMapping("/errorlog/queryByCondition")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public JsonResult errorlogList(@RequestBody PageParam<SysErrorLog> pageParam) {
+    public JsonResult<PageVO<SysErrorLog>> errorlogList(@RequestBody PageParam<SysErrorLog> pageParam) {
         IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 
+    /**
+     * 批量删除错误日志
+     * @param idList id数组
+     */
     @OperationLog(module = "错误日志", description = "批量删除")
     @PostMapping("/errorlog/deleteByIds")
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -105,6 +130,10 @@ public class LogController {
         return JsonResult.build(sysErrorLogService.removeByIds(JSONObject.parseArray(idList, Integer.class)));
     }
 
+    /**
+     * 批量导出错误日志
+     * @return 文件二进制流
+     */
     @PostMapping("/errorlog/export")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void exportErrorlog(@RequestBody PageParam<SysErrorLog> pageParam, HttpServletResponse response) {

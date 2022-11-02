@@ -13,7 +13,7 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
 
     List<SysMenu> findAllByParentIdAndRoleIdOrderBySortIndexAsc(@Param("roleId")Integer roleId);
 
-    List<String> findMenuNameById(@Param("idList")List<Integer> menuIdList);
+    String findMenuNameById(@Param("menuId")Integer menuId);
 
     Integer findMaxSortIndex();
 }

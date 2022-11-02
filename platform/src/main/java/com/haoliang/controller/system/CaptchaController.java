@@ -1,4 +1,4 @@
-package com.haoliang.controller;
+package com.haoliang.controller.system;
 
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.Duration;
 
 /**
- * 验证码操作处理
+ * 验证码
  */
 @Slf4j
 @RestController
@@ -35,7 +35,7 @@ public class CaptchaController {
      * 生成验证码
      */
     @GetMapping("/captchaImage")
-    public JsonResult getCode() {
+    public JsonResult<CaptchaVO> getCode() {
         // 保存验证码信息
         String uuid = IdUtil.simpleUUID();
         String verifyKey = CacheKeyPrefixConstants.CAPTCHA_CODE + uuid;

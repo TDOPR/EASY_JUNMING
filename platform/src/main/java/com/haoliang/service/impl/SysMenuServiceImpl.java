@@ -67,22 +67,15 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
 
     @Override
-    public JsonResult deleteByIdList(List<Integer> idList) {
-        List<Integer> existsMenuIdList = sysRoleMenuMapper.findAllByMenuId(idList);
-        StringBuilder stringBuilder = new StringBuilder();
-        if (existsMenuIdList.size() > 0) {
-            List<String> menuNameList=sysMenuMapper.findMenuNameById(existsMenuIdList);
-            menuNameList.forEach(menu -> stringBuilder.append(menu).append(","));
-            idList.removeAll(existsMenuIdList);
+    public JsonResult deleteById(Integer id) {
+        Integer existsId = sysRoleMenuMapper.findAllByMenuId(id);
+        if (existsId!=null) {
+            String menuName=sysMenuMapper.findMenuNameById(existsId);
+            return JsonResult.failureResult("["+menuName+"]已被角色使用,不能删除!");
+        }else{
+            this.removeById(id);
+            return JsonResult.successResult();
         }
-        if (idList.size() > 0) {
-            this.removeByIds(idList);
-        }
-        if (stringBuilder.length() != 0) {
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            stringBuilder.append("已被角色使用,不能被删除");
-            return JsonResult.failureResult(stringBuilder.toString());
-        }
-        return JsonResult.successResult();
+
     }
 }

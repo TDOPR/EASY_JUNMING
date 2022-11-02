@@ -57,10 +57,7 @@
         FROM
             sys_menu
         WHERE
-            id IN
-        <foreach collection="idList" item="id" separator="," open="(" close=")">
-            #{id}
-        </foreach>
+            id =#{menuId}
     </select>
 
     <select id="findMaxSortIndex" resultType="java.lang.Integer">

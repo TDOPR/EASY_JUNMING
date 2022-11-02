@@ -1,9 +1,9 @@
 package com.haoliang.controller.system;
 
 
-import com.alibaba.fastjson.JSONObject;
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.SysMenu;
 import com.haoliang.service.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +13,8 @@ import java.util.List;
 
 
 /**
+ * 菜单管理
  * @author Dominick Li
- * @description 菜单管理
  **/
 @RestController
 @RequestMapping("/menu")
@@ -23,27 +23,42 @@ public class MenuController {
     @Autowired
     private SysMenuService sysMenuService;
 
+    /**
+     * 查询所有菜单
+     */
+    @GetMapping("/")
+    public JsonResult findAll() {
+        return sysMenuService.findAll();
+    }
+
+    /**
+     * 添加或修改
+     */
     @OperationLog(module = "菜单管理", description = "添加或修改")
-    @PostMapping("/saveMenu")
+    @PostMapping("/")
     public JsonResult saveMenu(@RequestBody SysMenu sysMenu) {
         return JsonResult.build(sysMenuService.saveOrUpdate(sysMenu));
     }
 
+    /**
+     * 刷新菜单层级和顺序
+     */
     @OperationLog(module = "菜单管理", description = "刷新菜单层级和顺序")
     @PostMapping("/reloadMenu")
-    public JsonResult reloadMenu(@RequestBody List<SysMenu> sysMenus, @RequestHeader String token) {
+    public JsonResult reloadMenu(@RequestBody List<SysMenu> sysMenus, @RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
         return sysMenuService.reloadMenu(sysMenus, token);
     }
 
+    /**
+     * 删除
+     * @param id 菜单Id
+     */
     @OperationLog(module = "菜单管理", description = "批量删除")
-    @PostMapping("/deleteByIds")
-    public JsonResult deleteByIds(@RequestBody String idList) {
-        return sysMenuService.deleteByIdList(JSONObject.parseArray(idList, Integer.class));
+    @DeleteMapping("/{id}")
+    public JsonResult deleteById(@PathVariable Integer id) {
+        return sysMenuService.deleteById(id);
     }
 
-    @GetMapping("/findAll")
-    public JsonResult findAll() {
-        return sysMenuService.findAll();
-    }
+
 
 }

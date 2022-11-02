@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.haoliang.common.base.BaseModelCID;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 /**
@@ -12,9 +13,9 @@ import lombok.Data;
  **/
 @Data
 @TableName("meta_column")
+@NoArgsConstructor
 public class MetaColumn extends BaseModelCID {
 
-    public MetaColumn(){}
 
     public MetaColumn(String columnName, String columnCode, String dataType, Long metaId) {
         this.columnName = columnName;

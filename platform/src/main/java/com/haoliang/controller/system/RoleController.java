@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * 角色管理
  * @author Dominick Li
- * @description 角色操作
  **/
 @RestController
 @RequestMapping("/role")
@@ -22,19 +22,26 @@ public class RoleController {
     private SysRoleService roleService;
 
     /**
-     * 分页查询所有
+     * 分页查询
      */
-    @PostMapping("/queryByCondition")
+    @PostMapping("/pagelist")
     public JsonResult queryByCondition(@RequestBody PageParam<SysRole> pageParam) {
         return roleService.queryByCondition(pageParam);
     }
 
+    /**
+     * 批量删除
+     * @param idList 角色Id数组
+     */
     @OperationLog(module = "角色管理", description = "批量删除")
     @PostMapping("/delete")
     public JsonResult deleteByIds(@RequestBody String idList) {
         return JsonResult.build(roleService.removeByIds(JSONObject.parseArray(idList, Integer.class)));
     }
 
+    /**
+     * 新增或修改
+     */
     @OperationLog(module = "角色管理", description = "新增或修改")
     @PostMapping("/")
     public JsonResult save(@RequestBody SysRoleBO sysRoleBO) {
@@ -42,7 +49,7 @@ public class RoleController {
     }
 
     /**
-     * 获取添加用户需要的信息
+     * 获取添加用户需要的下拉列表信息
      */
     @GetMapping("/getSelectList")
     public JsonResult getRoleAndChannel() {

@@ -96,7 +96,7 @@
         }
       },
       getAllMenus(row,length){
-        this.$ajax.get("/api/menu/findAll").then(res=>{
+        this.$ajax.get("/api/menu/").then(res=>{
           if(res.code==200){
             if(JSON.stringify(this.refdata)!="{}"){
               res.data.forEach(item=>{

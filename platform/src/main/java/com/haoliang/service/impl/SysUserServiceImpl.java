@@ -89,12 +89,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
 
         String roleCode = RoleTypeEnum.valueOf(sysUser.getRoleId()).getName();
-        String token= JwtTokenUtils.getToken(sysUser.getId(), roleCode.toUpperCase(), sysUser.getUsername());
-        RedisUtils.setCacheObject(CacheKeyPrefixConstants.TOKEN+sysUser.getId(),token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
+        String token = JwtTokenUtils.getToken(sysUser.getId(), roleCode.toUpperCase(), sysUser.getUsername());
+        RedisUtils.setCacheObject(CacheKeyPrefixConstants.TOKEN + sysUser.getId(), token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp));
 
         List<SysMenu> sysMenuList = sysRoleService.getMenuListByRole(sysUser.getRoleId());
-        return JsonResult.successResult(new TokenVO(token, sysUser, roleCode, sysMenuList));
+        return JsonResult.successResult(new TokenVO(token, roleCode, sysMenuList));
     }
 
     @Override
@@ -109,6 +109,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             sysUser.setPassword(AESUtil.encrypt(sysUser.getPassword(), sysUser.getSalt()));
             this.save(sysUser);
         } else {
+            if (exists == null) {
+                exists = this.getById(sysUser.getId());
+            }
             exists.setRoleId(sysUser.getRoleId());
             exists.setName(sysUser.getName());
             exists.setUsername(sysUser.getUsername());

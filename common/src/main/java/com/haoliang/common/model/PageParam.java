@@ -20,24 +20,48 @@ import java.util.Map;
 @Data
 public class PageParam<T> {
 
-
+    /**
+     * 分页对象
+     * @ignore
+     */
     private Page<T> page;
 
-    //查询条件构造器
+    /**
+     * 查询条件构造器
+     * @ignore
+     */
     private QueryWrapper<T> queryWrapper;
 
+    /**
+     * 当前页
+     */
     private Integer currentPage;
 
+    /**
+     * 每页显示的数量
+     */
     private Integer pageSize = 10;
 
+    /**
+     * 开始时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date beginDate;
 
+    /**
+     * 结束时间
+     */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date endDate;
 
+    /**
+     * 等值查询条件存储
+     */
     private Map<String, Object> eq = new HashMap<>();
 
+    /**
+     * 模糊查询条件存储
+     */
     private Map<String, String> like = new HashMap<>();
 
     public Page<T> getPage() {

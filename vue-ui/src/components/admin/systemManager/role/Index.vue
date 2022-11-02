@@ -242,7 +242,7 @@ export default {
     getDataList() {
       this.loading = true;
       this.$ajax
-        .post("/api/role/queryByCondition", this.condition)
+        .post("/api/role/pagelist", this.condition)
         .then((res) => {
           if (res.code == 200) {
             this.tabelData = res.data.content;

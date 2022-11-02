@@ -9,8 +9,8 @@
           <div class="rightT">
             用户名:
             {{
-              this.$utils.getSessionStorage("user")
-                ? this.$utils.getSessionStorage("user").username
+              this.$utils.getSessionStorage("username")
+                ? this.$utils.getSessionStorage("username")
                 : ""
             }}
             <el-dropdown @command="handleCommand">

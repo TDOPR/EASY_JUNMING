@@ -18,7 +18,7 @@ public  class BaseModelCID  {
     private static final long serialVersionUID = 2863256929817929824L;
 
     /**
-     * 唯一标识  修改时候需要该参数
+     * 唯一标识
      */
     @TableId(type = IdType.AUTO)
     private Integer id;

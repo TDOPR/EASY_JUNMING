@@ -3,6 +3,7 @@ package com.haoliang.model;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.haoliang.common.base.BaseModelCID;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Dominick Li
@@ -10,9 +11,9 @@ import lombok.Data;
  **/
 @Data
 @TableName("sys_role")
+@NoArgsConstructor
 public class SysRole extends BaseModelCID {
 
-    public SysRole() { }
 
     public SysRole(String roleName, String roleCode) {
         this.roleName = roleName;
@@ -20,10 +21,12 @@ public class SysRole extends BaseModelCID {
     }
     /**
      * 角色名称
+     * @required
      */
     private String roleName;
     /**
      * 角色编码
+     * @required
      */
     private String roleCode;
 

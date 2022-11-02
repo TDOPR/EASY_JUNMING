@@ -24,7 +24,6 @@ spring:
     #redis服务器的ip
     host: 127.0.0.1
     port: 6379
-    password: 123456
     jedis:
       pool:
         max-active: 8
@@ -100,7 +99,7 @@ login:
   maxErrorNumber: 3
   captcha:
     #是否启动验证码
-    enable: false
+    enable: true
     # 验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母
     type: RANDOM
     #图像干扰策略  line=线段干扰 circle=圆圈干扰 shear=扭曲干扰  random=随机策略

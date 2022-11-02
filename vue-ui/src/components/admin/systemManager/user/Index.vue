@@ -373,7 +373,7 @@ export default {
       }
       this.loading = true;
       this.$ajax
-        .post("/api/user/queryByCondition", this.condition)
+        .post("/api/user/pagelist", this.condition)
         .then((res) => {
           if (res.code == 200) {
             this.tabelData = res.data.content;

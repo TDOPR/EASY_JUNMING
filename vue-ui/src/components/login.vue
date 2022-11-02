@@ -44,7 +44,7 @@ import Vue from "vue";
 export default {
   data() {
     return {
-      captchaEnabled: false,
+      captchaEnabled: true,
       capsTooltip: false,
       username: "",
       password: "",
@@ -102,7 +102,7 @@ export default {
         .then((res) => {
           if (res.code == 200) {
             this.$utils.setSessionStorage("token", res.data.token);
-            this.$utils.setSessionStorage("user", res.data.user);
+            this.$utils.setSessionStorage("username", this.username);
             this.$utils.setSessionStorage("roleMenus", res.data.menus);
             this.$utils.setSessionStorage("roleCode", res.data.roleCode);
             let msg = "登录成功";

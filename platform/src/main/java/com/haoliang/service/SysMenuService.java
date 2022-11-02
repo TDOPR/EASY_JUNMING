@@ -19,6 +19,6 @@ public interface SysMenuService extends IService<SysMenu> {
 
     JsonResult reloadMenu(List<SysMenu> sysMenus, String token);
 
-    JsonResult deleteByIdList(List<Integer> parseArray);
+    JsonResult deleteById(Integer id);
 
 }

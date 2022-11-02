@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
-import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.model.MetaInfo;
 import com.haoliang.service.MetaInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +23,9 @@ public class MetaController {
     /**
      * 分页查询的元数据列表
      */
-    @PostMapping("/queryByCondition")
+    @PostMapping("/pagelist")
     public JsonResult findAll(@RequestBody PageParam<MetaInfo> pageParam) {
         return metaInfoService.findAll(pageParam);
-        //return JsonResult.successResult(new PageVO(metaInfoService.page(pageParam.getPage(),pageParam.getQueryWrapper())));
     }
 
     @OperationLog(module = "元数据管理",description = "添加或修改")

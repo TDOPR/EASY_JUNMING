@@ -3,6 +3,7 @@ package com.haoliang.model;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.haoliang.common.base.BaseModelCIDNoModifyTime;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author Dominick Li
@@ -10,6 +11,7 @@ import lombok.Data;
  **/
 @Data
 @TableName("sys_loginlog" )
+@NoArgsConstructor
 public class SysLoginLog extends BaseModelCIDNoModifyTime {
 
 
@@ -22,8 +24,6 @@ public class SysLoginLog extends BaseModelCIDNoModifyTime {
      * 登录Ip地址
      */
     private String ipAddr;
-
-    public SysLoginLog(){}
 
     public SysLoginLog(String username, String ipAddr){
         this.ipAddr=ipAddr;

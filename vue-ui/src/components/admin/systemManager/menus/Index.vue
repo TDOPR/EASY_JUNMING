@@ -360,29 +360,14 @@ export default {
       });
     },
     getAllMenus(row, length) {
-      this.$ajax.get("/api/menu/findAll").then((res) => {
+      this.$ajax.get("/api/menu/").then((res) => {
         if (res.code == 200) {
           this.menuList = res.data;
         }
       });
     },
     deleteSelected(row) {
-      let ids;
-      if (row.id) {
-        ids = [row.id];
-      } else {
-        if (this.selectedIds.length == 0) {
-          this.$notify({
-            title: "提示",
-            message: "您未选择数据",
-            type: "warning",
-            duration: 1500,
-          });
-          return;
-        }
-        ids = this.selectedIds.map((item) => item.id);
-      }
-      this.$ajax.post("/api/menu/deleteByIds", ids).then((res) => {
+      this.$ajax.delete("/api/menu/"+row.id).then((res) => {
         if (res.code == 200) {
           this.$notify({
             title: "提示",

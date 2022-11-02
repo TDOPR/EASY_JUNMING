@@ -107,7 +107,7 @@ export default {
     }
   },
   mounted() {
-    this.$ajax.get("/api/channel/findAll").then((res) => {
+    this.$ajax.get("/api/channel/").then((res) => {
       if (res.code == 200) {
         if (this.isAdd) {
           this.checkIdList[0] = res.data[0].id;

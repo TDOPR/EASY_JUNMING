@@ -14,8 +14,14 @@ public class CaptchaVO {
         this.captchaImagel = captchaImagel;
     }
 
+    /**
+     * 验证码Id
+     */
     private String uuid;
 
+    /**
+     * 验证码base64数据
+     */
     private String captchaImagel;
 
 }

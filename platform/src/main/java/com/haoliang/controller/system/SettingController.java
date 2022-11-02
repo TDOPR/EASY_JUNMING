@@ -12,8 +12,8 @@ import java.util.Map;
 
 
 /**
+ * 系统设置
  * @author Dominick Li
- * @description 系统设置
  **/
 @RestController
 @RequestMapping("/admin")

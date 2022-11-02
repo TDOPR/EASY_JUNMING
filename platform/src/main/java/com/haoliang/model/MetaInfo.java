@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.haoliang.common.base.BaseModel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
@@ -14,10 +15,8 @@ import java.util.List;
  **/
 @Data
 @TableName("meta_info")
+@NoArgsConstructor
 public class MetaInfo extends BaseModel {
-
-    public MetaInfo() {
-    }
 
     public MetaInfo(Long id, String metaName, String tableCode, boolean increment, String tableDescription, List<MetaColumn> metaColumnList) {
         this.metaName = metaName;

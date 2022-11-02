@@ -17,9 +17,15 @@ public  class BaseModelCIDNoModifyTime{
 
     private static final long serialVersionUID = 2863256929817929827L;
 
+    /**
+     * 唯一标识
+     */
     @TableId(type = IdType.AUTO)
     private Integer id;
 
+    /**
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 

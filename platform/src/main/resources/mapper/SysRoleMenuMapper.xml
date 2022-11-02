@@ -8,10 +8,7 @@
         FROM
             sys_role_menu
         WHERE
-            menuId in
-        <foreach collection="idList" item="id" separator="," open="(" close=")">
-            #{id}
-        </foreach>
+            menuId=#{menuId}
     </select>
 
     <select id="findAllMenuIdByRoleId" resultType="Integer">

@@ -18,14 +18,17 @@ public class SysChannel extends BaseModelCID {
 
     /**
      * 机构名称
+     * @required
      */
     private String channelName;
     /**
      * 机构编码
+     * @required
      */
     private String channelCode;
     /**
      * 排序下标
+     * @required
      */
     private Integer sortIndex;
     /**
