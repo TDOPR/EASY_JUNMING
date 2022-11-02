@@ -34,7 +34,8 @@ CREATE TABLE `wallets`  (
   `lastmodifiedTime` timestamp(0) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `wallets_userId`(`userId`) USING BTREE,
-  INDEX `idx_amount`(`principalAmount`) USING BTREE
+  INDEX `idx_amount`(`principalAmount`) USING BTREE,
+   CONSTRAINT `FK_wallet_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '钱包表' ROW_FORMAT = Dynamic;
 
 -- ------------------------------------------
@@ -51,7 +52,8 @@ CREATE TABLE `wallet_logs`  (
   `createTime` timestamp(0) NULL DEFAULT NULL,
    PRIMARY KEY (`id`) USING BTREE,
    INDEX `wallet_logs_userId_index`(`userId`) USING BTREE,
-   INDEX `type`(`type`) USING BTREE
+   INDEX `type`(`type`) USING BTREE,
+   CONSTRAINT `FK_wallet_logs_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '钱包日志表' ROW_FORMAT = Dynamic;
 
 DROP TABLE IF EXISTS `profit_logs`;
@@ -65,5 +67,6 @@ CREATE TABLE `profit_logs`  (
    `createTime` timestamp(0) NULL DEFAULT NULL,
    `lastmodifiedTime` timestamp(0) NULL DEFAULT NULL,
    PRIMARY KEY (`id`) USING BTREE,
-   INDEX `profit_logs_userId_index`(`userId`) USING BTREE
+   INDEX `profit_logs_userId_index`(`userId`) USING BTREE,
+   CONSTRAINT `FK_profit_logs_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '收益日结记录表' ROW_FORMAT = Dynamic;

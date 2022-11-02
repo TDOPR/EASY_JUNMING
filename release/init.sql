@@ -9,10 +9,10 @@ CREATE TABLE `sys_role`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
-  `roleCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL  COMMENT '角色编码',
-  `roleName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL  COMMENT '角色名称',
+  `roleCode` varchar(255)  NULL DEFAULT NULL  COMMENT '角色编码',
+  `roleName` varchar(255)  NULL DEFAULT NULL  COMMENT '角色名称',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
 
 /**
  * 机构表
@@ -22,12 +22,12 @@ CREATE TABLE `sys_channel`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
-  `channelCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL  COMMENT '机构编码',
-  `channelName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL  COMMENT '机构名称',
+  `channelCode` varchar(255)  NULL DEFAULT NULL  COMMENT '机构编码',
+  `channelName` varchar(255)  NULL DEFAULT NULL  COMMENT '机构名称',
   `sortIndex` int(0) NULL DEFAULT NULL  COMMENT '排序下标',
   `parentId` int(0) NULL DEFAULT NULL  COMMENT '父机构编号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '机构表' ROW_FORMAT = Dynamic;
 
 /**
  * 用户表
@@ -40,18 +40,18 @@ CREATE TABLE `sys_user`  (
   `channelId` int(0)  NULL DEFAULT NULL COMMENT '渠道Id',
   `deleted` int(0) NULL DEFAULT NULL COMMENT '逻辑删除 1=删除 0=未删除',
   `enabled` int(0) NULL DEFAULT NULL COMMENT '用户状态 1=可用 0=删除',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户昵称',
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '密码',
+  `name` varchar(255) NULL DEFAULT NULL COMMENT '用户昵称',
+  `password` varchar(255)  NULL DEFAULT NULL COMMENT '密码',
   `roleId` int(0) NULL DEFAULT NULL COMMENT '角色Id',
-  `salt` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '密码加密的盐',
-  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '登录名',
+  `salt` varchar(255)  NULL DEFAULT NULL COMMENT '密码加密的盐',
+  `username` varchar(255)  NULL DEFAULT NULL COMMENT '登录名',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `UK51bvuyvihefoh4kp5syh2jpi4`(`username`) USING BTREE,
   INDEX `FKtlnkwkosadnhdypumotecrebo`(`channelId`) USING BTREE,
   INDEX `FK9s2sqg6p1req126agyn1sfeiy`(`roleId`) USING BTREE,
   CONSTRAINT `FK9s2sqg6p1req126agyn1sfeiy` FOREIGN KEY (`roleId`) REFERENCES `sys_role` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FKtlnkwkosadnhdypumotecrebo` FOREIGN KEY (`channelId`) REFERENCES `sys_channel` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 124 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='用户表'  ROW_FORMAT = Dynamic;
 
 /**
  * 菜单表
@@ -61,14 +61,14 @@ CREATE TABLE `sys_menu`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
-  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '菜单图标样式',
-  `importStr` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '组件路径',
+  `icon` varchar(255)  NULL DEFAULT NULL COMMENT '菜单图标样式',
+  `importStr` varchar(255) NULL DEFAULT NULL COMMENT '组件路径',
   `parentId` int(0) NULL DEFAULT NULL COMMENT '父菜单编号',
-  `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '访问路径',
+  `path` varchar(255)  NULL DEFAULT NULL COMMENT '访问路径',
   `sortIndex` int(0) NULL DEFAULT NULL COMMENT '排序下标',
-  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '菜单名称',
+  `title` varchar(255)  NULL DEFAULT NULL COMMENT '菜单名称',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 50 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='菜单表' ROW_FORMAT = Dynamic;
 
 /**
  * 角色菜单表
@@ -80,19 +80,9 @@ CREATE TABLE `sys_role_menu`  (
   `createTime` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`menuId`, `roleId`) USING BTREE,
   FOREIGN KEY (`menuId`) REFERENCES `sys_menu` (`id`)
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='角色菜单表' ROW_FORMAT = Dynamic;
 
-/**
- * 鉴权token
- */
-DROP TABLE IF EXISTS `sys_token`;
-CREATE TABLE `sys_token`  (
-  `id` int(0) NOT NULL AUTO_INCREMENT,
-  `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `accessToken` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'token令牌',
-  `userId` int(0) NULL DEFAULT NULL COMMENT '用户Id',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
 
 /**
  * 操作日志表
@@ -101,13 +91,13 @@ DROP TABLE IF EXISTS `sys_operationlog`;
 CREATE TABLE `sys_operationlog`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `createTime` datetime(0) NULL DEFAULT NULL  COMMENT '创建时间',
-  `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '详细信息',
-  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '操作类型',
-  `ipAddr` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'ip地址',
-  `module` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '模块',
-  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '操作员',
+  `content` text  NULL COMMENT '详细信息',
+  `description` varchar(255) NULL DEFAULT NULL COMMENT '操作类型',
+  `ipAddr` varchar(255)  NULL DEFAULT NULL COMMENT 'ip地址',
+  `module` varchar(255)  NULL DEFAULT NULL COMMENT '模块',
+  `username` varchar(255)  NULL DEFAULT NULL COMMENT '操作员',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 50 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='操作日志表' ROW_FORMAT = Dynamic;
 
 /**
  * 登录日志表
@@ -116,10 +106,10 @@ DROP TABLE IF EXISTS `sys_loginlog`;
 CREATE TABLE `sys_loginlog`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `createTime` datetime(0) NULL DEFAULT NULL  COMMENT '创建时间',
-  `ipAddr` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '登录Ip地址',
-  `username` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户名',
+  `ipAddr` varchar(255)  NULL DEFAULT NULL COMMENT '登录Ip地址',
+  `username` varchar(255)  NULL DEFAULT NULL COMMENT '用户名',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='操作日志表' ROW_FORMAT = Dynamic;
 
 /**
  * 错误日志表
@@ -128,12 +118,12 @@ DROP TABLE IF EXISTS `sys_errorlog`;
 CREATE TABLE `sys_errorlog`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
-  `errorMsg` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '错误信息',
-  `errorType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '错误类型',
-  `ipAddr` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '机器ip地址',
-  `position` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT'异常发生的位置',
+  `errorMsg` varchar(255)  NULL DEFAULT NULL COMMENT '错误信息',
+  `errorType` varchar(255)  NULL DEFAULT NULL COMMENT '错误类型',
+  `ipAddr` varchar(255)  NULL DEFAULT NULL COMMENT '机器ip地址',
+  `position` text  NULL COMMENT'异常发生的位置',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 140 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='错误日志表' ROW_FORMAT = Dynamic;
 
 /**
  * 字典表
@@ -143,11 +133,11 @@ CREATE TABLE `sys_dictionary`  (
   `id` bigint(0) NOT NULL,
   `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
-  `dicKey` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '字典的key',
-  `dicName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '字典类型名称',
-  `dicValue` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '字典的value',
+  `dicKey` varchar(255)  NULL DEFAULT NULL COMMENT '字典的key',
+  `dicName` varchar(255)  NULL DEFAULT NULL COMMENT '字典类型名称',
+  `dicValue` varchar(255)  NULL DEFAULT NULL COMMENT '字典的value',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='字典表' ROW_FORMAT = Dynamic;
 
 /**
  * 元数据表信息
@@ -159,11 +149,11 @@ CREATE TABLE `meta_info`  (
   `lastmodifiedTime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   `increment` bit(1) NOT NULL COMMENT '表的主键是否为自增类型 true(1)=自增 flase(0)=手动设置',
   `menuId` int(0) NULL DEFAULT NULL COMMENT '关联的菜单Id' ,
-  `metaDescription` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '描述信息',
-  `metaName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '表名称',
-  `tableCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '数据库表名',
+  `metaDescription` varchar(255) NULL DEFAULT NULL COMMENT '描述信息',
+  `metaName` varchar(255)  NULL DEFAULT NULL COMMENT '表名称',
+  `tableCode` varchar(255)  NULL DEFAULT NULL COMMENT '数据库表名',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='元数据表' ROW_FORMAT = Dynamic;
 
 /**
  * 元数据表字段信息
@@ -173,17 +163,17 @@ CREATE TABLE `meta_column`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
   `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
-  `columnCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '数据库中字段名称',
-  `columnName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '字段名名称->映射到页面显示的table列名称',
-  `dataType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '数据类型',
+  `columnCode` varchar(255) NULL DEFAULT NULL COMMENT '数据库中字段名称',
+  `columnName` varchar(255)  NULL DEFAULT NULL COMMENT '字段名名称->映射到页面显示的table列名称',
+  `dataType` varchar(255) NULL DEFAULT NULL COMMENT '数据类型',
   `metaId` bigint(0) NULL DEFAULT NULL COMMENT '所属meta_info的主键Id',
   `search` bit(1) NOT NULL COMMENT '是否作为查询条件',
   `sortIndex` int(0) NULL DEFAULT NULL COMMENT '页面上字段显示的顺序',
   `viewShow` bit(1) NOT NULL COMMENT '页面上是否展示当前列',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FKnd8poxd4jfxgpchufdgxlvwyb`(`metaId`) USING BTREE,
-  CONSTRAINT `FKnd8poxd4jfxgpchufdgxlvwyb` FOREIGN KEY (`metaId`) REFERENCES `meta_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 47 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  CONSTRAINT `FKnd8poxd4jfxgpchufdgxlvwyb` FOREIGN KEY (`metaId`) REFERENCES `meta_info` (`id`)
+) ENGINE = InnoDB CHARACTER SET = utf8mb4  COLLATE = utf8mb4_unicode_ci COMMENT ='元数据表字段' ROW_FORMAT = Dynamic;
 
 
 INSERT INTO sys_dictionary (id, createTime, lastmodifiedTime, dicKey, dicName, dicValue) VALUES (1, '2020-11-03 10:46:11', '2020-11-03 10:46:11', 'loginLogSaveDay', '基础字典', '-1');
@@ -253,10 +243,10 @@ INSERT INTO meta_column (id, columnCode, columnName, dataType, metaId, sortIndex
 DROP TABLE IF EXISTS `books`;
 CREATE TABLE `books`  (
   `id` int(0) NOT NULL AUTO_INCREMENT,
-  `bookName` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
-  `author` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `bookName` varchar(255)  NULL DEFAULT NULL,
+  `author` varchar(255)  NULL DEFAULT NULL,
   `publishTime` datetime(0) NULL DEFAULT NULL,
-  `bookType` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `bookType` varchar(255) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
