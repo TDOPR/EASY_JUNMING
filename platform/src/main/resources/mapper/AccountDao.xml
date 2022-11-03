@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.MetaInfoMapper">
+
+    <resultMap type="com.haoliang.model.MetaInfo" id="menuTree">
+        <id column="id" property="id"/>
+        <result column="createTime" property="createTime"/>
+        <result column="lastmodifiedTime" property="lastmodifiedTime"/>
+        <result column="metaName" property="metaName"/>
+        <result column="metaDescription" property="metaDescription"/>
+        <result column="increment" property="increment"/>
+        <result column="menuId" property="menuId"/>
+        <collection property="metaColumnList" ofType="com.haoliang.model.MetaColumn" column="id" select="getMetaInfoList"/>
+    </resultMap>
+
+    <select id="selectbyPage" resultMap="menuTree">
+        SELECT
+            *
+        FROM
+        meta_info
+        WHERE
+            1=1
+        <if test="metaName!=null and metaName!=''">
+            AND metaName  LIKE CONCAT('%',#{metaName},'%')
+        </if>
+
+        <if test="beginDate!=null">
+            AND createTime <![CDATA[ >= ]]> #{beginDate}
+        </if>
+
+        <if test="endDate!=null">
+            AND createTime <![CDATA[ <= ]]> #{endDate}
+        </if>
+    </select>
+
+    <select id="getMetaInfoList" resultType="com.haoliang.model.MetaColumn">
+        SELECT * FROM meta_column where metaId=#{metaId}
+    </select>
+</mapper>
