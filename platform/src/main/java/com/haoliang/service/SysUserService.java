@@ -4,10 +4,10 @@ package com.haoliang.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
+import com.haoliang.model.SysUser;
 import com.haoliang.model.bo.LoginBO;
 import com.haoliang.model.bo.UpdatePasswordBO;
 import com.haoliang.model.bo.UpdateUserStatus;
-import com.haoliang.model.SysUser;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -46,4 +46,5 @@ public interface SysUserService extends IService<SysUser> {
 
 
     JsonResult queryByCondition(PageParam<SysUser> pageParam);
+
 }

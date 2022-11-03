@@ -1,5 +1,5 @@
 {
-  "outPath": "src\\main\\resources\\static\\apidoc",
+  "outPath": "E:\\nginx-1.22.1\\apidoc",
   "requestHeaders": [{
     "name": "token",
     "type": "string",

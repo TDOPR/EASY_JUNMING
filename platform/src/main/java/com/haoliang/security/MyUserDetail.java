@@ -1,10 +1,13 @@
 package com.haoliang.security;
 
+import com.alibaba.fastjson.JSONObject;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Dominick Li
@@ -14,13 +17,16 @@ public class MyUserDetail implements org.springframework.security.core.userdetai
 
 
     private String username;
-    private java.util.Collection<SimpleGrantedAuthority> authorities;
+    private Collection<SimpleGrantedAuthority> authorities;
 
     public MyUserDetail(Claims claims) {
         this.username = claims.getSubject();
-        SimpleGrantedAuthority simpleGrantedAuthority=new SimpleGrantedAuthority("ROLE_"+claims.get("role", String.class));
-        authorities=new ArrayList<>();
-        authorities.add(simpleGrantedAuthority);
+        authorities = new ArrayList<>();
+        String authoritiesStr = claims.get("authorities").toString();
+        List<String> authoritieList = JSONObject.parseArray(authoritiesStr, String.class);
+        for (String str : authoritieList) {
+            authorities.add(new SimpleGrantedAuthority(str));
+        }
     }
 
 
@@ -29,7 +35,7 @@ public class MyUserDetail implements org.springframework.security.core.userdetai
      */
 
     @Override
-    public java.util.Collection<? extends GrantedAuthority> getAuthorities() {
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
@@ -45,6 +51,7 @@ public class MyUserDetail implements org.springframework.security.core.userdetai
 
     /**
      * 帐号是否未过期
+     *
      * @return
      */
     @Override
@@ -54,6 +61,7 @@ public class MyUserDetail implements org.springframework.security.core.userdetai
 
     /**
      * 帐号是否未锁定
+     *
      * @return
      */
     @Override

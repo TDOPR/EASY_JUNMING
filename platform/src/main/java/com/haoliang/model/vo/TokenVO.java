@@ -1,9 +1,6 @@
 package com.haoliang.model.vo;
 
-import com.haoliang.model.SysMenu;
 import lombok.Data;
-
-import java.util.List;
 
 
 @Data
@@ -19,15 +16,15 @@ public class TokenVO {
      */
     private String roleCode;
     /**
-     * 用户拥有的菜单
+     * 用户拥有的菜单权限
      */
-    private List<SysMenu> menus;
+    private RouterVO routerAuthority;
 
 
-    public TokenVO(String token, String roleCode, List<SysMenu> menus) {
+    public TokenVO(String token, String roleCode, RouterVO routerAuthority) {
         this.token = token;
         this.roleCode = roleCode;
-        this.menus = menus;
+        this.routerAuthority = routerAuthority;
     }
 
 

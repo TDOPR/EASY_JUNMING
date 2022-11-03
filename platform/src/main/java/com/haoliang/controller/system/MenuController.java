@@ -7,6 +7,7 @@ import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.SysMenu;
 import com.haoliang.service.SysMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class MenuController {
      * 查询所有菜单
      */
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('sys:menu:list')")
     public JsonResult findAll() {
         return sysMenuService.findAll();
     }
@@ -36,6 +38,7 @@ public class MenuController {
      */
     @OperationLog(module = "菜单管理", description = "添加或修改")
     @PostMapping("/")
+    @PreAuthorize("hasAnyAuthority('sys:menu:add','sys:menu:edit')")
     public JsonResult saveMenu(@RequestBody SysMenu sysMenu) {
         return JsonResult.build(sysMenuService.saveOrUpdate(sysMenu));
     }
@@ -55,6 +58,7 @@ public class MenuController {
      */
     @OperationLog(module = "菜单管理", description = "批量删除")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('sys:menu:remove')")
     public JsonResult deleteById(@PathVariable Integer id) {
         return sysMenuService.deleteById(id);
     }

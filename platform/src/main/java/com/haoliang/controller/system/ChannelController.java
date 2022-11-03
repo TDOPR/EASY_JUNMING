@@ -6,6 +6,7 @@ import com.haoliang.common.model.JsonResult;
 import com.haoliang.model.SysChannel;
 import com.haoliang.service.SysChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class ChannelController {
      * 查询所有
      */
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('sys:channel:list')")
     public JsonResult<List<SysChannel>> queryByCondition() {
         return channelService.findAll();
     }
@@ -36,6 +38,7 @@ public class ChannelController {
      */
     @OperationLog(module = "渠道管理",description = "删除")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('sys:channel:remove')")
     public JsonResult deleteById(@PathVariable Integer id) {
         return channelService.deleteChannelById(id);
     }
@@ -45,9 +48,11 @@ public class ChannelController {
      */
     @OperationLog(module = "渠道管理",description = "添加或修改")
     @PostMapping("/")
-    public JsonResult save(@RequestBody SysChannel sysChannel) {
+    @PreAuthorize("hasAnyAuthority('sys:channel:add','sys:channel:edit')")
+    public JsonResult add(@RequestBody SysChannel sysChannel) {
         return channelService.saveChannel(sysChannel);
     }
+
 
     /**
      * 刷新渠道层级和顺序

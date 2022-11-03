@@ -29,7 +29,7 @@ spring:
         max-active: 8
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    url: jdbc:mysql://localhost:3306/easytrade1?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
     username: root
     password: 123456
     type: com.zaxxer.hikari.HikariDataSource
@@ -99,7 +99,7 @@ login:
   maxErrorNumber: 3
   captcha:
     #是否启动验证码
-    enable: true
+    enable: false
     # 验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母
     type: RANDOM
     #图像干扰策略  line=线段干扰 circle=圆圈干扰 shear=扭曲干扰  random=随机策略

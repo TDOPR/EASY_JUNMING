@@ -3,6 +3,7 @@ package com.haoliang.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.model.SysMenu;
+import com.haoliang.model.vo.RouterVO;
 
 import java.util.List;
 
@@ -15,7 +16,9 @@ public interface SysMenuService extends IService<SysMenu> {
 
     JsonResult findAll();
 
-    JsonResult findAllByRoleId(Integer roleId);
+    JsonResult<RouterVO> findAllByRoleId(Integer roleId);
+
+    JsonResult<RouterVO> findAllByToken(String  token);
 
     JsonResult reloadMenu(List<SysMenu> sysMenus, String token);
 

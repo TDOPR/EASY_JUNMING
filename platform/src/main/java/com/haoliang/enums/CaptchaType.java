@@ -8,8 +8,6 @@ import lombok.Getter;
 
 /**
  * 验证码类型
- *
- * @author Lion Li
  */
 @Getter
 @AllArgsConstructor

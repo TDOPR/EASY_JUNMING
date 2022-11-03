@@ -58,7 +58,7 @@ public class GetWorkspaceHarDiskInfoUtil {
      */
     public static WorkspaceHarDiskInfo getWorkspaceHarDiskInfo(String savePath) {
         if (!new File(savePath).exists()) {
-            System.err.println(String.format("%s not exists"));
+            System.err.println(String.format("%s not exists",savePath));
             return null;
         }
         if (OsUtil.isLinuxOs()) {

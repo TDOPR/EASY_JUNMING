@@ -24,7 +24,7 @@ public class JwtTokenUtils {
     /**
      * 根据身份ID标识，生成Token
      */
-    public static String getToken(Integer identityId, String roleName,String username) {
+    public static String getToken(Integer identityId, String authorities,String username) {
         Date nowDate = new Date();
         //过期时间
         Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
@@ -36,7 +36,7 @@ public class JwtTokenUtils {
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, GlobalConfig.getTokenSecret())
                 //自定义属性 放入用户拥有请求权限
-                .claim("role", roleName)
+                .claim("authorities", authorities)
                 .claim("userName", username)
                 .compact();
     }

@@ -7,14 +7,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.vo.PageVO;
-import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.common.utils.StringUtil;
 import com.haoliang.enums.RoleTypeEnum;
 import com.haoliang.mapper.SysMenuMapper;
 import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysRoleMenuMapper;
 import com.haoliang.mapper.SysUserMapper;
-import com.haoliang.model.SysMenu;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.SysRoleMenu;
 import com.haoliang.model.bo.SysRoleBO;
@@ -102,12 +100,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
 
     @Override
-    public List<SysMenu> getMenuListByRole(Integer roleId) {
-        List<SysMenu> sysMenuList = sysMenuMapper.findAllByParentIdAndRoleIdOrderBySortIndexAsc(roleId);
-        return sysMenuList;
-    }
-
-    @Override
     public JsonResult<List<SelectVO>> findSelectList() {
         List<SysRole> sysRoleList = this.list();
         List<SelectVO> selectVOList = new ArrayList<>();
@@ -117,10 +109,4 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         return JsonResult.successResult(selectVOList);
     }
 
-    @Override
-    public JsonResult getMenuListByToken(String token) {
-        String roleCode = JwtTokenUtils.getRoleCodeFromToken(token);
-        SysRole sysRole = this.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, roleCode));
-        return JsonResult.successResult(getMenuListByRole(sysRole.getId()));
-    }
 }

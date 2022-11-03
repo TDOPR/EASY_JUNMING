@@ -50,7 +50,7 @@ public class LogController {
      * 分页查询登录日志
      */
     @PostMapping("/loginlog/queryByCondition")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:loginlog:list')")
     public JsonResult<PageVO<SysLoginLog>> loginlogList(@RequestBody PageParam<SysLoginLog> pageParam) {
         IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         return JsonResult.successResult(new PageVO<>(iPage));
@@ -62,7 +62,7 @@ public class LogController {
      */
     @OperationLog(module = "登录日志", description = "批量删除")
     @PostMapping("/loginlog/deleteByIds")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:loginlog:remove')")
     public JsonResult deleteLoginLogsByIds(@RequestBody String idList) {
         return JsonResult.build(sysLoginLogService.removeByIds(JSONArray.parseArray(idList, Integer.class)));
     }
@@ -72,7 +72,7 @@ public class LogController {
      * @return 文件二进制流
      */
     @PostMapping("/loginlog/export")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:loginlog:export')")
     public void exportLoginLog(@RequestBody PageParam<SysLoginLog> pageParam, HttpServletResponse response) {
         IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         List<SysLoginLog> sysLoginLogList = iPage.getRecords();
@@ -87,7 +87,7 @@ public class LogController {
      * 分页查询操作日志
      */
     @PostMapping("/operationlog/queryByCondition")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:operationlog:list')")
     public JsonResult<PageVO<SysOperationLog>> operationlogList(@RequestBody PageParam<SysOperationLog> pageParam) {
         IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         return JsonResult.successResult(new PageVO<>(iPage));
@@ -98,7 +98,7 @@ public class LogController {
      * @return 文件二进制流
      */
     @PostMapping("/operationlog/export")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:operationlog:export')")
     public void exportOperationlog(@RequestBody PageParam<SysOperationLog> pageParam, HttpServletResponse response) {
         IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         List<SysOperationLog> sysOperationLogList = iPage.getRecords();
@@ -113,7 +113,7 @@ public class LogController {
      * 分页查询错误日志
      */
     @PostMapping("/errorlog/queryByCondition")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:errorlog:list')")
     public JsonResult<PageVO<SysErrorLog>> errorlogList(@RequestBody PageParam<SysErrorLog> pageParam) {
         IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         return JsonResult.successResult(new PageVO<>(iPage));
@@ -125,7 +125,7 @@ public class LogController {
      */
     @OperationLog(module = "错误日志", description = "批量删除")
     @PostMapping("/errorlog/deleteByIds")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:errorlog:remove')")
     public JsonResult deleteErrorLogsByIds(@RequestBody String idList) {
         return JsonResult.build(sysErrorLogService.removeByIds(JSONObject.parseArray(idList, Integer.class)));
     }
@@ -135,7 +135,7 @@ public class LogController {
      * @return 文件二进制流
      */
     @PostMapping("/errorlog/export")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:errorlog:export')")
     public void exportErrorlog(@RequestBody PageParam<SysErrorLog> pageParam, HttpServletResponse response) {
         IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
         List<SysErrorLog> sysErrorLogList = iPage.getRecords();
@@ -145,6 +145,5 @@ public class LogController {
         }
         ExcelUtil.exportData(ExportErrorLogVO.class, "错误日志", errorLogVOList, response);
     }
-
 
 }

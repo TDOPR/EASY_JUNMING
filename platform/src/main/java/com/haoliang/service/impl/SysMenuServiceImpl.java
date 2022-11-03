@@ -8,6 +8,8 @@ import com.haoliang.mapper.SysMenuMapper;
 import com.haoliang.mapper.SysRoleMenuMapper;
 import com.haoliang.model.SysMenu;
 import com.haoliang.model.SysRole;
+import com.haoliang.model.vo.MenuVO;
+import com.haoliang.model.vo.RouterVO;
 import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +41,17 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     }
 
     @Override
-    public JsonResult findAllByRoleId(Integer roleId) {
-        List<SysMenu> sysMenus = sysMenuMapper.findAllByParentIdAndRoleIdOrderBySortIndexAsc(roleId);
-        return JsonResult.successResult(sysMenus);
+    public JsonResult<RouterVO> findAllByRoleId(Integer roleId) {
+        RouterVO routerVO = new RouterVO();
+        List<MenuVO> sysMenus = sysMenuMapper.findAllByParentIdAndRoleIdOrderBySortIndexAsc(roleId);
+        List<String> authorityList=sysMenuMapper.findAllAuthorityByRoleId(roleId);
+        routerVO.setMenuList(sysMenus);
+        routerVO.setAuthorityList(authorityList);
+        return JsonResult.successResult(routerVO);
     }
+
+
+
 
     @Override
     public JsonResult reloadMenu(List<SysMenu> sysMenuList, String token) {
@@ -62,20 +71,26 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         }
         this.saveOrUpdateBatch(saveSysMenuList);
         String roleCode = JwtTokenUtils.getRoleCodeFromToken(token);
-        return JsonResult.successResult(sysRoleService.getMenuListByRole(sysRoleService.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode,roleCode)).getId()));
+        return JsonResult.successResult(this.findAllByRoleId(sysRoleService.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, roleCode)).getId()));
     }
 
 
     @Override
     public JsonResult deleteById(Integer id) {
         Integer existsId = sysRoleMenuMapper.findAllByMenuId(id);
-        if (existsId!=null) {
-            String menuName=sysMenuMapper.findMenuNameById(existsId);
-            return JsonResult.failureResult("["+menuName+"]已被角色使用,不能删除!");
-        }else{
+        if (existsId != null) {
+            String menuName = sysMenuMapper.findMenuNameById(existsId);
+            return JsonResult.failureResult("[" + menuName + "]已被角色使用,不能删除!");
+        } else {
             this.removeById(id);
             return JsonResult.successResult();
         }
 
+    }
+
+    @Override
+    public JsonResult<RouterVO> findAllByToken(String token) {
+        SysRole sysRole = sysRoleService.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, JwtTokenUtils.getRoleCodeFromToken(token)));
+        return this.findAllByRoleId(sysRole.getId());
     }
 }

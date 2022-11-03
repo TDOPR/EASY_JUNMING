@@ -1,5 +1,6 @@
 package com.haoliang.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,23 +13,24 @@ import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.utils.AESUtil;
 import com.haoliang.common.utils.DateUtil;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.common.utils.RedisUtils;
 import com.haoliang.common.utils.excel.ExcelUtil;
-import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.config.LoginConfig;
-import com.haoliang.enums.RoleTypeEnum;
+import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysUserMapper;
 import com.haoliang.model.SysLoginLog;
-import com.haoliang.model.SysMenu;
+import com.haoliang.model.SysRole;
 import com.haoliang.model.SysUser;
 import com.haoliang.model.bo.LoginBO;
 import com.haoliang.model.bo.UpdatePasswordBO;
 import com.haoliang.model.bo.UpdateUserStatus;
 import com.haoliang.model.vo.ExportUserVO;
+import com.haoliang.model.vo.RouterVO;
 import com.haoliang.model.vo.TokenVO;
 import com.haoliang.model.vo.UserVO;
 import com.haoliang.service.SysLoginLogService;
-import com.haoliang.service.SysRoleService;
+import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +62,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private SysUserMapper sysUserMapper;
 
     @Autowired
-    private SysRoleService sysRoleService;
+    private LoginConfig loginConfig;
+
+    @Resource
+    private SysRoleMapper sysRoleMapper;
 
     @Autowired
-    private LoginConfig loginConfig;
+    private SysMenuService sysMenuService;
 
     @Override
     public JsonResult login(LoginBO loginBO, String clientIp) {
@@ -88,13 +93,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             return jsonResult;
         }
 
-        String roleCode = RoleTypeEnum.valueOf(sysUser.getRoleId()).getName();
-        String token = JwtTokenUtils.getToken(sysUser.getId(), roleCode.toUpperCase(), sysUser.getUsername());
+        SysRole sysRole=sysRoleMapper.selectById(sysUser.getRoleId());
+        JsonResult<RouterVO> result = sysMenuService.findAllByRoleId(sysUser.getRoleId());
+        String token = JwtTokenUtils.getToken(sysUser.getId(), JSONObject.toJSONString(result.getData().getAuthorityList()), sysUser.getUsername());
         RedisUtils.setCacheObject(CacheKeyPrefixConstants.TOKEN + sysUser.getId(), token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp));
-
-        List<SysMenu> sysMenuList = sysRoleService.getMenuListByRole(sysUser.getRoleId());
-        return JsonResult.successResult(new TokenVO(token, roleCode, sysMenuList));
+        return JsonResult.successResult(new TokenVO(token, sysRole.getRoleCode(), result.getData()));
     }
 
     @Override
@@ -222,4 +226,5 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         ExcelUtil.exportData(ExportUserVO.class, "用户信息", exportUserVOList, response);
     }
+
 }

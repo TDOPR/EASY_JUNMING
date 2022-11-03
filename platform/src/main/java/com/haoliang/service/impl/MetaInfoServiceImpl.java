@@ -89,9 +89,7 @@ public class MetaInfoServiceImpl extends ServiceImpl<MetaInfoMapper, MetaInfo> i
                 metaColumn.setMetaId(metaInfo.getId());
                 sortIndex++;
             }
-
         } else {
-
             //如果模型名称变更需同步修改菜单名称
             if (!exists.getMetaName().equals(metaInfo.getMetaName())) {
                 SysMenu sysMenu = sysMenuMapper.selectById(metaInfo.getMenuId());

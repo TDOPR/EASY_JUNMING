@@ -46,7 +46,7 @@ public class SysMenu extends BaseModelCID {
     private Integer parentId;
 
     /**
-     * 排序下标
+     * 显示顺序
      * @required
      */
     @NotEmpty(message = "不能为空")
@@ -58,6 +58,28 @@ public class SysMenu extends BaseModelCID {
      */
     @NotEmpty(message = "不能为空")
     private String importStr;
+
+    /**
+     * 菜单类型  1=目录,2=菜单,3=权限
+     * @required
+     */
+    @NotEmpty(message = "不能为空")
+    private Integer type;
+
+    /**
+     * 是否外链 1=外链,0=内部菜单
+     */
+    private Integer outlink;
+
+    /**
+     * 显示状态 1=可见,0=隐藏
+     */
+    private Integer display;
+
+    /**
+     * 权限字符
+     */
+    private String authorityStr;
 
     /**
      * 子菜单列表

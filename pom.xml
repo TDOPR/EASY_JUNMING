@@ -151,13 +151,13 @@
             <dependency>
                 <groupId>com.haoliang.easytrade</groupId>
                 <artifactId>common</artifactId>
-                <version>1.0.0</version>
+                <version>${version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.haoliang.easytrade</groupId>
                 <artifactId>business</artifactId>
-                <version>1.0.0</version>
+                <version>${version}</version>
             </dependency>
 
         </dependencies>

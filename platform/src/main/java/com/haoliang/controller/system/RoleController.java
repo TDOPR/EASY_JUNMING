@@ -1,13 +1,15 @@
 package com.haoliang.controller.system;
 
 import com.alibaba.fastjson.JSONObject;
-import com.haoliang.model.bo.SysRoleBO;
-import com.haoliang.model.SysRole;
-import com.haoliang.service.SysRoleService;
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
+import com.haoliang.model.SysRole;
+import com.haoliang.model.bo.SysRoleBO;
+import com.haoliang.service.SysMenuService;
+import com.haoliang.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -21,10 +23,14 @@ public class RoleController {
     @Autowired
     private SysRoleService roleService;
 
+    @Autowired
+    private SysMenuService sysMenuService;
+
     /**
      * 分页查询
      */
     @PostMapping("/pagelist")
+    @PreAuthorize("hasAuthority('sys:role:list')")
     public JsonResult queryByCondition(@RequestBody PageParam<SysRole> pageParam) {
         return roleService.queryByCondition(pageParam);
     }
@@ -35,6 +41,7 @@ public class RoleController {
      */
     @OperationLog(module = "角色管理", description = "批量删除")
     @PostMapping("/delete")
+    @PreAuthorize("hasAuthority('sys:role:remove')")
     public JsonResult deleteByIds(@RequestBody String idList) {
         return JsonResult.build(roleService.removeByIds(JSONObject.parseArray(idList, Integer.class)));
     }
@@ -44,6 +51,7 @@ public class RoleController {
      */
     @OperationLog(module = "角色管理", description = "新增或修改")
     @PostMapping("/")
+    @PreAuthorize("hasAnyAuthority('sys:role:add','sys:role:edit')")
     public JsonResult save(@RequestBody SysRoleBO sysRoleBO) {
         return roleService.saveRole(sysRoleBO);
     }
@@ -61,7 +69,7 @@ public class RoleController {
      */
     @GetMapping("/getMenuList")
     public JsonResult getMenuList(@RequestHeader String token) {
-        return roleService.getMenuListByToken(token);
+        return sysMenuService.findAllByToken(token);
     }
 
 }
