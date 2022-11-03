@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.haoliang.mapper.TreePathMapper">
+
+    <select id="getNumByLevel" resultType="java.util.Map">
+        SELECT
+            b.LEVEL,
+            count( 1 ) AS NUM
+        FROM
+            tree_paths a
+                LEFT JOIN user_info b ON a.descendant = b.id
+        WHERE
+            a.ancestor = #{uid}
+        GROUP BY
+            b.LEVEL;
+    </select>
+
+    <select id="getLevelById" resultType="java.util.Map">
+        SELECT
+            b.ID,
+            b.LEVEL
+        FROM
+            tree_paths a
+                LEFT JOIN user_info b ON a.ancestor = b.id
+        WHERE
+            a.ancestor = #{uid}
+        GROUP BY
+            b.ID;
+    </select>
+
+</mapper>

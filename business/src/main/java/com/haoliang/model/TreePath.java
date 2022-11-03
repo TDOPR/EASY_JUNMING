@@ -9,6 +9,9 @@ import lombok.Data;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+ * @author Administrator
+ */
 @Data
 @TableName("tree_paths")
 public class TreePath implements Serializable  {
