@@ -1,13 +1,15 @@
--- ---------------------------------------
+-- --------------------------------
 -- Table structure for users 用户表
--- ---------------------------------------
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users`  (
+-- -------------------------------
+DROP TABLE IF EXISTS `app_users`;
+CREATE TABLE `app_users`  (
   `id` int(0) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `code` varchar(20) NOT NULL DEFAULT '' COMMENT '邀请码',
-  `deleted` tinyint UNSIGNED NOT NULL COMMENT '删除状态：0-未删除 1-已删除',
-  `level` tinyint UNSIGNED NULL DEFAULT 0 COMMENT '代理商等级',
-  `parentId` int(0) UNSIGNED NULL DEFAULT 0 COMMENT '邀请人Id',
+  `inviteCode` varchar(20) NOT NULL DEFAULT '' COMMENT '邀请码',
+  `deleted` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '删除状态：0-未删除 1-已删除',
+  `level` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '代理商等级',
+  `parentId` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '邀请人Id',
+  `loginCount` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '登录次数',
+  `nickName` varchar(255) UNSIGNED NOT NULL DEFAULT '' COMMENT '用户昵称',
   `createTime` timestamp(0) NULL DEFAULT NULL,
   `lastmodifiedTime` timestamp(0) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
@@ -15,9 +17,9 @@ CREATE TABLE `users`  (
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'eht 用户表' ROW_FORMAT = Dynamic;
 
 
--- ------------------------------------------
--- Table structure for wallets 用户钱包表
--- ------------------------------------------
+-- ---------------------------
+-- Table structure for wallets
+-- ---------------------------
 DROP TABLE IF EXISTS `wallets`;
 CREATE TABLE `wallets`  (
   `id` bigint UNSIGNED NOT NULL,
@@ -35,12 +37,12 @@ CREATE TABLE `wallets`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `wallets_userId`(`userId`) USING BTREE,
   INDEX `idx_amount`(`principalAmount`) USING BTREE,
-   CONSTRAINT `FK_wallet_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
-) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '钱包表' ROW_FORMAT = Dynamic;
+  CONSTRAINT `FK_wallet_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
+) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户钱包表' ROW_FORMAT = Dynamic;
 
--- ------------------------------------------
--- Table structure for wallet_logs 钱包流水表
--- ------------------------------------------
+-- -------------------------------
+-- Table structure for wallet_logs
+-- -------------------------------
 DROP TABLE IF EXISTS `wallet_logs`;
 CREATE TABLE `wallet_logs`  (
   `id` bigint UNSIGNED NOT NULL,
@@ -56,6 +58,9 @@ CREATE TABLE `wallet_logs`  (
    CONSTRAINT `FK_wallet_logs_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '钱包日志表' ROW_FORMAT = Dynamic;
 
+-- -------------------------------
+-- Table structure for profit_logs
+-- -------------------------------
 DROP TABLE IF EXISTS `profit_logs`;
 CREATE TABLE `profit_logs`  (
   `id` bigint UNSIGNED NOT NULL,
@@ -64,8 +69,8 @@ CREATE TABLE `profit_logs`  (
   `profitRate` decimal(4, 3) NOT NULL DEFAULT 0.00 COMMENT '收益率 0.01=1%',
   `generatedAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '托管本金',
   `grantToUser` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '结算类型 1=已结算 0=未结算',
-   `createTime` timestamp(0) NULL DEFAULT NULL,
-   `lastmodifiedTime` timestamp(0) NULL DEFAULT NULL,
+  `createTime` timestamp(0) NULL DEFAULT NULL,
+  `lastmodifiedTime` timestamp(0) NULL DEFAULT NULL,
    PRIMARY KEY (`id`) USING BTREE,
    INDEX `profit_logs_userId_index`(`userId`) USING BTREE,
    CONSTRAINT `FK_profit_logs_userId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`)

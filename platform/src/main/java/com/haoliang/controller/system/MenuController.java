@@ -27,7 +27,7 @@ public class MenuController {
     /**
      * 查询所有菜单
      */
-    @GetMapping("/")
+    @GetMapping
     @PreAuthorize("hasAuthority('sys:menu:list')")
     public JsonResult findAll() {
         return sysMenuService.findAll();
@@ -37,7 +37,7 @@ public class MenuController {
      * 添加或修改
      */
     @OperationLog(module = "菜单管理", description = "添加或修改")
-    @PostMapping("/")
+    @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:menu:add','sys:menu:edit')")
     public JsonResult saveMenu(@RequestBody SysMenu sysMenu) {
         return JsonResult.build(sysMenuService.saveOrUpdate(sysMenu));

@@ -10,5 +10,5 @@
   }],
   "serverUrl": "http://127.0.0.1:9090",
   "projectName": "后台管理系统",
-  "packageFilters": "com.haoliang.controller.system"
+  "packageFilters": "com.haoliang.controller"
 }

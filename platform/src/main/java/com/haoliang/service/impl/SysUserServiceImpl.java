@@ -10,7 +10,9 @@ import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
+import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.vo.PageVO;
+import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.utils.AESUtil;
 import com.haoliang.common.utils.DateUtil;
 import com.haoliang.common.utils.JwtTokenUtils;
@@ -19,17 +21,16 @@ import com.haoliang.common.utils.excel.ExcelUtil;
 import com.haoliang.config.LoginConfig;
 import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysUserMapper;
-import com.haoliang.model.SysLoginLog;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.SysUser;
 import com.haoliang.model.bo.LoginBO;
 import com.haoliang.model.bo.UpdatePasswordBO;
 import com.haoliang.model.bo.UpdateUserStatus;
+import com.haoliang.model.condition.SysUserCondition;
 import com.haoliang.model.vo.ExportUserVO;
 import com.haoliang.model.vo.RouterVO;
 import com.haoliang.model.vo.TokenVO;
 import com.haoliang.model.vo.UserVO;
-import com.haoliang.service.SysLoginLogService;
 import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -97,7 +98,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         JsonResult<RouterVO> result = sysMenuService.findAllByRoleId(sysUser.getRoleId());
         String token = JwtTokenUtils.getToken(sysUser.getId(), JSONObject.toJSONString(result.getData().getAuthorityList()), sysUser.getUsername());
         RedisUtils.setCacheObject(CacheKeyPrefixConstants.TOKEN + sysUser.getId(), token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
-        sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp));
+        sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp,1));
         return JsonResult.successResult(new TokenVO(token, sysRole.getRoleCode(), result.getData()));
     }
 
@@ -126,12 +127,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public JsonResult<PageVO<UserVO>> queryByCondition(PageParam<SysUser> pageParam) {
-        Date endDate = pageParam.getEndDate();
+    public JsonResult<PageVO<UserVO>> queryByCondition(PageParam<SysUser, SysUserCondition> pageParam) {
+        Date endDate = pageParam.getSearchParam().getEndDate();
         if (endDate != null) {
             endDate = DateUtil.getDateStrIncrement(endDate, 1, TimeUnit.DAYS);
+            pageParam.getSearchParam().setEndDate(endDate);
         }
-        IPage<UserVO> page = sysUserMapper.selectPageVo(pageParam.getPage(), pageParam.getLike().get("username"), pageParam.getBeginDate(), endDate);
+        IPage<UserVO> page = sysUserMapper.selectPageVo(pageParam.getPage(),pageParam.getSearchParam());
         return JsonResult.successResult(new PageVO(page));
     }
 
@@ -217,7 +219,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public void exportUsers(PageParam<SysUser> pageParam, HttpServletResponse response) {
+    public void exportUsers(PageParam<SysUser,SysUserCondition> pageParam, HttpServletResponse response) {
         JsonResult<PageVO<UserVO>> jsonResult = this.queryByCondition(pageParam);
         PageVO<UserVO> data = jsonResult.getData();
         List<ExportUserVO> exportUserVOList = new ArrayList<>(data.getContent().size());

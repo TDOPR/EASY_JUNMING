@@ -30,7 +30,6 @@ public class SettingController {
      * 服务器资源使用率信息
      */
     @GetMapping("/getMonitorInfo")
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public JsonResult getMonitorInfo(){
         return systemService.getMonitorInfo();
     }
@@ -39,7 +38,7 @@ public class SettingController {
      * 获取字典信息
      */
     @GetMapping("/setting")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:system:list')")
     public JsonResult getSetting(){
         return systemService.getSetting();
     }
@@ -49,7 +48,7 @@ public class SettingController {
      */
     @OperationLog(module = "系统设置",description = "修改基础字典")
     @PostMapping("/setting")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAuthority('sys:system:list')")
     public JsonResult saveSetting(@RequestBody Map<String, String> map){
         return sysDictionaryService.modifyBaseDictionary(map);
     }

@@ -5,7 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- 内存不足邮件提示 -->
-    <bean id="monitorDisk" class="com.haoliang.model.bo.EmailTemplateBO">
+    <bean id="monitorDisk" class="com.haoliang.model.dto.EmailTemplateDTO">
         <property name="title" value="服务器硬盘内存不足警告" />
         <property name="content">
             <value>
@@ -14,6 +14,21 @@
                 ]]>
             </value>
         </property>
+        <property name="to" value="826853123@qq.com" />
     </bean>
+
+
+    <!-- 注册或登录邮箱验证 -->
+    <bean id="registerLogin" class="com.haoliang.model.dto.EmailTemplateDTO">
+        <property name="title" value="[easyTrade] Please verify your device" />
+        <property name="content">
+            <value>
+                <![CDATA[
+                <p><span style="font-size: 14px;">Hey !</span></p><p><span style="font-size: 14px;">Verification code: {{code}}</span></p><p><span style="font-size: 14px;">Expires in {{time}} minutes</span></p><p><span style="font-size: 14px;">Please use it as soon as possible!</span></p>
+                ]]>
+            </value>
+        </property>
+    </bean>
+
 
 </beans>

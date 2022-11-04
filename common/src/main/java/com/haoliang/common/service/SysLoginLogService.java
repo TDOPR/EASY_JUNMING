@@ -1,7 +1,7 @@
-package com.haoliang.service;
+package com.haoliang.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.haoliang.model.SysLoginLog;
+import com.haoliang.common.model.SysLoginLog;
 
 public interface SysLoginLogService extends IService<SysLoginLog> {
 

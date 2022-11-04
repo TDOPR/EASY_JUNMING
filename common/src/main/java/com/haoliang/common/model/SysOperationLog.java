@@ -1,4 +1,4 @@
-package com.haoliang.model;
+package com.haoliang.common.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.haoliang.common.base.BaseModelCIDNoModifyTime;

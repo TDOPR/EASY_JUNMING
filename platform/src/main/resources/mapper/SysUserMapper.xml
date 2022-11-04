@@ -11,7 +11,7 @@
             roleId=#{roleId}
     </select>
 
-    <select id="selectPageVo" resultType="com.haoliang.model.vo.UserVO">
+    <select id="selectPageVo" parameterType="com.haoliang.model.condition.SysUserCondition" resultType="com.haoliang.model.vo.UserVO">
          SELECT
             s.id,s.username,s.name,s.createTime,s.name,s.enabled,s.deleted,s.roleId,s.channelId,sr.roleName,sc.channelName
         FROM
@@ -19,15 +19,21 @@
         LEFT JOIN sys_role sr ON sr.id=s.roleId
         LEFT JOIN sys_channel sc ON sc.id=s.channelId
         WHERE
-           sr.roleCode!='admin' and deleted=0
-        <if test="username!=null and username!=''">
-            AND s.username  LIKE CONCAT('%',#{username},'%')
+           sr.roleCode!='admin'
+        <if test="user.deleted!=null and user.deleted!=''">
+            AND s.deleted=#{user.deleted}
         </if>
-        <if test="beginDate!=null">
-            AND s.createTime <![CDATA[ >= ]]> #{beginDate}
+        <if test="user.enabled!=null and user.enabled!=''">
+            AND s.enabled=#{user.enabled}
         </if>
-        <if test="endDate!=null">
-            AND s.createTime <![CDATA[ <= ]]> #{endDate}
+        <if test="user.username!=null and user.username!=''">
+            AND s.username  LIKE CONCAT('%',#{user.username},'%')
+        </if>
+        <if test="user.beginDate!=null">
+            AND s.createTime <![CDATA[ >= ]]> #{user.beginDate}
+        </if>
+        <if test="user.endDate!=null">
+            AND s.createTime <![CDATA[ <= ]]> #{user.endDate}
         </if>
     </select>
 

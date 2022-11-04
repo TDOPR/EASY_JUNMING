@@ -1,4 +1,4 @@
-package com.haoliang.controller;
+package com.haoliang.server;
 
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.ErrorLogUtil;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
  **/
 @ControllerAdvice
 @Slf4j
-public class ControllerException {
+public class GlobalExceptionAdvice {
 
     private static final String ERROR_MESSAGE = "系统内部错误,请联系管理员！";
 

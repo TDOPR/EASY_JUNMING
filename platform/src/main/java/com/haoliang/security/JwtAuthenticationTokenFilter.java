@@ -7,6 +7,8 @@ import com.haoliang.config.DictionaryParam;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -34,18 +36,23 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         if (!StringUtils.isEmpty(token)) {
             Claims claims = JwtTokenUtils.getTokenClaim(token);
             if (claims != null) {
-                if (!JwtTokenUtils.isTokenExpired(token) && org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() == null) {
-                    boolean flag=true;
-                    if(DictionaryParam.isEnableSso()){
-                        flag=token.equals(RedisUtils.getCacheObject(CacheKeyPrefixConstants.TOKEN+claims.getSubject()));
+                if (!JwtTokenUtils.isTokenExpired(token) && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    boolean flag = true;
+                    if (DictionaryParam.isEnableSso()) {
+                        //如果有权限则是系统用户
+                        if (claims.containsKey("authorities")) {
+                            flag = token.equals(RedisUtils.getCacheObject(CacheKeyPrefixConstants.TOKEN + claims.getSubject()));
+                        } else {
+                            flag = token.equals(RedisUtils.getCacheObject(CacheKeyPrefixConstants.APP_USER_TOKEN + claims.getSubject()));
+                        }
                     }
                     //如果是单点登录需要判断当前token和redis里的token是否一致
                     if (flag || !DictionaryParam.isEnableSso()) {
-                        org.springframework.security.core.userdetails.UserDetails userDetails = new MyUserDetail(claims);
+                        UserDetails userDetails = new MyUserDetail(claims);
                         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         logger.debug("authorication user: " + claims.getSubject() + ", setting security context");
-                        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(authentication);
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
                     } else {
                         //用户在别的地方已登录 已失效
                         logger.info("token in expire");

@@ -16,6 +16,7 @@ import com.haoliang.model.MetaColumn;
 import com.haoliang.model.MetaInfo;
 import com.haoliang.model.SysMenu;
 import com.haoliang.model.SysRoleMenu;
+import com.haoliang.model.condition.MetaInfoCondition;
 import com.haoliang.model.vo.SelectVO;
 import com.haoliang.server.NativeQueryServer;
 import com.haoliang.service.MetaColumnService;
@@ -160,19 +161,20 @@ public class MetaInfoServiceImpl extends ServiceImpl<MetaInfoMapper, MetaInfo> i
     }
 
     @Override
-    public JsonResult findAll(PageParam<MetaInfo> pageParam) {
-        Date endDate = pageParam.getEndDate();
+    public JsonResult findAll(PageParam<MetaInfo, MetaInfoCondition> pageParam) {
+        Date endDate = pageParam.getSearchParam().getEndDate();
         if (endDate != null) {
             endDate = DateUtil.getDateStrIncrement(endDate, 1, TimeUnit.DAYS);
+            pageParam.getSearchParam().setEndDate(endDate);
         }
-        IPage<MetaInfo> page=metaInfoMapper.selectbyPage(pageParam.getPage(), pageParam.getLike().get("metaName"),pageParam.getBeginDate(),endDate);
+        IPage<MetaInfo> page = metaInfoMapper.selectbyPage(pageParam.getPage(),pageParam.getSearchParam());
         return JsonResult.successResult(new PageVO(page));
     }
 
     @Override
     public MetaInfo getMetaInfo(Long id) {
-        MetaInfo metaInfo=this.getById(id);
-        List<MetaColumn> metaColumnList=metaColumnService.list(new LambdaQueryWrapper<MetaColumn>().eq(MetaColumn::getMetaId,id));
+        MetaInfo metaInfo = this.getById(id);
+        List<MetaColumn> metaColumnList = metaColumnService.list(new LambdaQueryWrapper<MetaColumn>().eq(MetaColumn::getMetaId, id));
         metaInfo.setMetaColumnList(metaColumnList);
         return metaInfo;
     }

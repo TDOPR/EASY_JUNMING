@@ -16,6 +16,7 @@ import com.haoliang.mapper.SysUserMapper;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.SysRoleMenu;
 import com.haoliang.model.bo.SysRoleBO;
+import com.haoliang.model.condition.SysRoleCondition;
 import com.haoliang.model.vo.RoleVO;
 import com.haoliang.model.vo.SelectVO;
 import com.haoliang.service.SysRoleService;
@@ -44,8 +45,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     private SysMenuMapper sysMenuMapper;
 
     @Override
-    public JsonResult queryByCondition(PageParam<SysRole> pageParam) {
-        IPage<SysRole> iPage = this.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public JsonResult queryByCondition(PageParam<SysRole, SysRoleCondition> pageParam) {
+        IPage<SysRole> iPage = this.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysRole> sysRoles = iPage.getRecords();
         List<RoleVO> roleVOList = new ArrayList<>();
         RoleVO roleVO;

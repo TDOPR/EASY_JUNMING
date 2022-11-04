@@ -6,6 +6,7 @@ import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.bo.SysRoleBO;
+import com.haoliang.model.condition.SysRoleCondition;
 import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class RoleController {
      */
     @PostMapping("/pagelist")
     @PreAuthorize("hasAuthority('sys:role:list')")
-    public JsonResult queryByCondition(@RequestBody PageParam<SysRole> pageParam) {
+    public JsonResult queryByCondition(@RequestBody PageParam<SysRole, SysRoleCondition> pageParam) {
         return roleService.queryByCondition(pageParam);
     }
 

@@ -1,7 +1,7 @@
-package com.haoliang.mapper;
+package com.haoliang.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.haoliang.model.SysLoginLog;
+import com.haoliang.common.model.SysLoginLog;
 
 public interface SysLoginLogMapper extends BaseMapper<SysLoginLog> {
 }

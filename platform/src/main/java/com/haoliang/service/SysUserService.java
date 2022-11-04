@@ -8,6 +8,7 @@ import com.haoliang.model.SysUser;
 import com.haoliang.model.bo.LoginBO;
 import com.haoliang.model.bo.UpdatePasswordBO;
 import com.haoliang.model.bo.UpdateUserStatus;
+import com.haoliang.model.condition.SysUserCondition;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -38,13 +39,13 @@ public interface SysUserService extends IService<SysUser> {
     /**
      * 按条件导出用户数据
      */
-    void exportUsers(PageParam<SysUser> pageParam, HttpServletResponse response);
+    void exportUsers(PageParam<SysUser, SysUserCondition> pageParam, HttpServletResponse response);
 
     JsonResult saveUser(SysUser sysUser);
 
     JsonResult deleteByIdList(List<Integer> idList);
 
 
-    JsonResult queryByCondition(PageParam<SysUser> pageParam);
+    JsonResult queryByCondition(PageParam<SysUser,SysUserCondition> pageParam);
 
 }

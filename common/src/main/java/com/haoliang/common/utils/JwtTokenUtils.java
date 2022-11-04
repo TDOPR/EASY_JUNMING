@@ -42,6 +42,23 @@ public class JwtTokenUtils {
     }
 
     /**
+     * 根据身份ID标识，生成Token
+     */
+    public static String getToken(Integer identityId) {
+        Date nowDate = new Date();
+        //过期时间
+        Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
+        return Jwts.builder()
+                .setHeaderParam("type", "JWT")
+                //放入唯一标识,可以是用户名或者Id
+                .setSubject(identityId.toString())
+                .setIssuedAt(nowDate)
+                .setExpiration(expireDate)
+                .signWith(SignatureAlgorithm.HS512, GlobalConfig.getTokenSecret())
+                .compact();
+    }
+
+    /**
      * 根据token获取身份信息
      */
     public static Claims getTokenClaim(String token) {

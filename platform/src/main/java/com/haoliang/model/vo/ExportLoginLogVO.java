@@ -1,7 +1,7 @@
 package com.haoliang.model.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.haoliang.model.SysLoginLog;
+import com.haoliang.common.model.SysLoginLog;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 

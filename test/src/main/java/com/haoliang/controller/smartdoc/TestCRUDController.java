@@ -3,6 +3,7 @@ package com.haoliang.controller.smartdoc;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.haoliang.common.base.BaseCondition;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.bo.IntIdListBO;
@@ -48,8 +49,8 @@ public class TestCRUDController {
      * 分页查询
      */
     @GetMapping("/")
-    public JsonResult findAll(PageParam<Test> pageParam) {
-        IPage<Test> iPage = testService.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public JsonResult findAll(PageParam<Test, BaseCondition> pageParam) {
+        IPage<Test> iPage = testService.page(pageParam.getPage(), pageParam.getSearchParam().getQueryWrapper());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 

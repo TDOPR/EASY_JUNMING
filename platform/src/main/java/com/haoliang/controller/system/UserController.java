@@ -13,6 +13,7 @@ import com.haoliang.model.SysUser;
 import com.haoliang.model.bo.LoginBO;
 import com.haoliang.model.bo.UpdatePasswordBO;
 import com.haoliang.model.bo.UpdateUserStatus;
+import com.haoliang.model.condition.SysUserCondition;
 import com.haoliang.model.vo.RouterVO;
 import com.haoliang.model.vo.TokenVO;
 import com.haoliang.service.SysMenuService;
@@ -44,7 +45,7 @@ public class UserController {
      */
     @PostMapping("/pagelist")
     @PreAuthorize("hasAuthority('sys:user:list')")
-    public JsonResult<PageVO<SysUser>> queryByCondition(@RequestBody PageParam<SysUser> pageParam) {
+    public JsonResult<PageVO<SysUser>> queryByCondition(@RequestBody PageParam<SysUser, SysUserCondition> pageParam) {
         return sysUserService.queryByCondition(pageParam);
     }
 
@@ -54,7 +55,7 @@ public class UserController {
      */
     @PostMapping("/export")
     @PreAuthorize("hasAuthority('sys:user:export')")
-    public void exportUsers(@RequestBody  PageParam<SysUser> pageParam, HttpServletResponse response) {
+    public void exportUsers(@RequestBody  PageParam<SysUser,SysUserCondition> pageParam, HttpServletResponse response) {
         sysUserService.exportUsers(pageParam,response);
     }
 

@@ -10,10 +10,10 @@ spring:
         # 启动注册到监控中心(设置true则需要启动monitor项目)
         enabled: false
         #监控中心地址,多个以逗号隔开,并把localhost换成ip
-        url: http://localhost:9091
+        url: http://localhost:9092
         instance:
           prefer-ip: true
-        register-once: false
+        register-once: true
         username: admin
         password: 123456
   redis:
@@ -29,9 +29,12 @@ spring:
         max-active: 8
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/easytrade1?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+#    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+#    username: root
+#    password: 123456
+    url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
     username: root
-    password: 123456
+    password: LXYx29K1rJhiOWtc
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
       # 连接池名称
@@ -100,7 +103,7 @@ login:
   captcha:
     #是否启动验证码
     enable: false
-    # 验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母
+    # 验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母 ,移动端只发送字符验证
     type: RANDOM
     #图像干扰策略  line=线段干扰 circle=圆圈干扰 shear=扭曲干扰  random=随机策略
     category: RANDOM
@@ -109,17 +112,16 @@ login:
     # 字符验证码长度
     charLength: 4
     #失效时间(单位:分钟)
-    expirationTime: 1
+    expirationTime: 2
 
 #########################  邮件配置 ##################################
 mail:
   enable: true
   host: smtp.qq.com
   port: 25
-  username: xxx@qq.com
-  password: xxxx
+  username: 826853123@qq.com
+  password: eddwoukjplfbbdba
   formName: 皓亮君
-  to: xxxx1@qq.com,xxxx2@qq.com
 #########################  应用其它配置   ############################
 app:
   #文件存储根路径
@@ -143,3 +145,4 @@ app:
     - /actuator/**
     - /captchaImage
     - /wallet/**
+    - /sendCaptchaToEmail/*

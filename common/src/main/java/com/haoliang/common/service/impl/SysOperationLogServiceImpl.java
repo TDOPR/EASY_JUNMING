@@ -1,13 +1,13 @@
-package com.haoliang.service.impl;
+package com.haoliang.common.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.mapper.SysOperationLogMapper;
+import com.haoliang.common.model.SysOperationLog;
+import com.haoliang.common.service.SysOperationLogService;
 import com.haoliang.common.utils.IpAddrUtil;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.common.utils.PointUtils;
-import com.haoliang.mapper.SysOperationLogMapper;
-import com.haoliang.model.SysOperationLog;
-import com.haoliang.service.SysOperationLogService;
 import org.aspectj.lang.JoinPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;

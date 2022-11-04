@@ -11,13 +11,16 @@ import com.haoliang.common.model.SysErrorLog;
 import com.haoliang.common.model.vo.ExportErrorLogVO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.utils.excel.ExcelUtil;
-import com.haoliang.model.SysLoginLog;
-import com.haoliang.model.SysOperationLog;
+import com.haoliang.common.model.SysLoginLog;
+import com.haoliang.common.model.SysOperationLog;
+import com.haoliang.model.condition.SysErrorLogCondition;
+import com.haoliang.model.condition.SysLoginLogCondition;
+import com.haoliang.model.condition.SysOperationLogCondition;
 import com.haoliang.model.vo.ExportLoginLogVO;
 import com.haoliang.model.vo.ExportOperationLogVO;
 import com.haoliang.common.service.SysErrorLogService;
-import com.haoliang.service.SysLoginLogService;
-import com.haoliang.service.SysOperationLogService;
+import com.haoliang.common.service.SysLoginLogService;
+import com.haoliang.common.service.SysOperationLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +34,7 @@ import java.util.List;
 
 /**
  * 日志管理
+ *
  * @author Dominick Li
  **/
 @RestController
@@ -51,8 +55,8 @@ public class LogController {
      */
     @PostMapping("/loginlog/queryByCondition")
     @PreAuthorize("hasAuthority('sys:loginlog:list')")
-    public JsonResult<PageVO<SysLoginLog>> loginlogList(@RequestBody PageParam<SysLoginLog> pageParam) {
-        IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public JsonResult<PageVO<SysLoginLog>> loginlogList(@RequestBody PageParam<SysLoginLog, SysLoginLogCondition> pageParam) {
+        IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 
@@ -69,12 +73,13 @@ public class LogController {
 
     /**
      * 导出登录日志
+     *
      * @return 文件二进制流
      */
     @PostMapping("/loginlog/export")
     @PreAuthorize("hasAuthority('sys:loginlog:export')")
-    public void exportLoginLog(@RequestBody PageParam<SysLoginLog> pageParam, HttpServletResponse response) {
-        IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public void exportLoginLog(@RequestBody PageParam<SysLoginLog, SysLoginLogCondition> pageParam, HttpServletResponse response) {
+        IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysLoginLog> sysLoginLogList = iPage.getRecords();
         List<ExportLoginLogVO> exportLoginLogVOList = new ArrayList<>(sysLoginLogList.size());
         for (SysLoginLog sysLoginLog : sysLoginLogList) {
@@ -88,8 +93,8 @@ public class LogController {
      */
     @PostMapping("/operationlog/queryByCondition")
     @PreAuthorize("hasAuthority('sys:operationlog:list')")
-    public JsonResult<PageVO<SysOperationLog>> operationlogList(@RequestBody PageParam<SysOperationLog> pageParam) {
-        IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public JsonResult<PageVO<SysOperationLog>> operationlogList(@RequestBody PageParam<SysOperationLog, SysOperationLogCondition> pageParam) {
+        IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 
@@ -99,8 +104,8 @@ public class LogController {
      */
     @PostMapping("/operationlog/export")
     @PreAuthorize("hasAuthority('sys:operationlog:export')")
-    public void exportOperationlog(@RequestBody PageParam<SysOperationLog> pageParam, HttpServletResponse response) {
-        IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public void exportOperationlog(@RequestBody PageParam<SysOperationLog, SysOperationLogCondition> pageParam, HttpServletResponse response) {
+        IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysOperationLog> sysOperationLogList = iPage.getRecords();
         List<ExportOperationLogVO> exportOperationLogVOList = new ArrayList<>(sysOperationLogList.size());
         for (SysOperationLog sysOperationLog : sysOperationLogList) {
@@ -114,8 +119,8 @@ public class LogController {
      */
     @PostMapping("/errorlog/queryByCondition")
     @PreAuthorize("hasAuthority('sys:errorlog:list')")
-    public JsonResult<PageVO<SysErrorLog>> errorlogList(@RequestBody PageParam<SysErrorLog> pageParam) {
-        IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public JsonResult<PageVO<SysErrorLog>> errorlogList(@RequestBody PageParam<SysErrorLog, SysErrorLogCondition> pageParam) {
+        IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 
@@ -136,8 +141,8 @@ public class LogController {
      */
     @PostMapping("/errorlog/export")
     @PreAuthorize("hasAuthority('sys:errorlog:export')")
-    public void exportErrorlog(@RequestBody PageParam<SysErrorLog> pageParam, HttpServletResponse response) {
-        IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getQueryWrapper());
+    public void exportErrorlog(@RequestBody PageParam<SysErrorLog, SysErrorLogCondition> pageParam, HttpServletResponse response) {
+        IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysErrorLog> sysErrorLogList = iPage.getRecords();
         List<ExportErrorLogVO> errorLogVOList = new ArrayList<>(sysErrorLogList.size());
         for (SysErrorLog sysErrorLog : sysErrorLogList) {

@@ -34,9 +34,9 @@ public class JsonResult<T>  implements Serializable {
 
     private static final long serialVersionUID = -7268040542410707954L;
 
-    protected static String successMessage = "操作成功";
+    protected static String successMessage = "ok";
 
-    protected static String errorMessage = "操作失败";
+    protected static String errorMessage = "error";
 
     public JsonResult() {
     }

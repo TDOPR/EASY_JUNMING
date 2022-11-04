@@ -5,13 +5,17 @@ import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.model.MetaInfo;
+import com.haoliang.model.condition.MetaInfoCondition;
 import com.haoliang.service.MetaInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
+ * 元数据管理
  * @author Dominick Li
- * @description 元数据管理
  **/
 @RestController
 @RequestMapping("/meta")
@@ -24,13 +28,15 @@ public class MetaController {
      * 分页查询的元数据列表
      */
     @PostMapping("/pagelist")
-    public JsonResult findAll(@RequestBody PageParam<MetaInfo> pageParam) {
+    @PreAuthorize("hasAuthority('sys:meta:list')")
+    public JsonResult findAll(@RequestBody PageParam<MetaInfo, MetaInfoCondition> pageParam) {
         return metaInfoService.findAll(pageParam);
     }
 
     @OperationLog(module = "元数据管理",description = "添加或修改")
     @PostMapping("/")
-    public JsonResult save(@RequestBody @javax.validation.Valid MetaInfo metaInfo) {
+    @PreAuthorize("hasAuthority('sys:meta:list')")
+    public JsonResult save(@RequestBody @Valid MetaInfo metaInfo) {
         return metaInfoService.saveMetaInfo(metaInfo);
     }
 

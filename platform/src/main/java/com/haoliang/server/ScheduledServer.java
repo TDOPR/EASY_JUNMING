@@ -9,11 +9,11 @@ import com.haoliang.common.utils.DateUtil;
 import com.haoliang.common.utils.GetWorkspaceHarDiskInfoUtil;
 import com.haoliang.config.AppParam;
 import com.haoliang.config.DictionaryParam;
-import com.haoliang.model.bo.EmailTemplateBO;
-import com.haoliang.model.SysLoginLog;
-import com.haoliang.model.SysOperationLog;
-import com.haoliang.service.SysLoginLogService;
-import com.haoliang.service.SysOperationLogService;
+import com.haoliang.model.dto.EmailTemplateDTO;
+import com.haoliang.common.model.SysLoginLog;
+import com.haoliang.common.model.SysOperationLog;
+import com.haoliang.common.service.SysLoginLogService;
+import com.haoliang.common.service.SysOperationLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledServer {
 
     @Resource(name = "monitorDisk")
-    private EmailTemplateBO monitorInfoTemplate;
+    private EmailTemplateDTO monitorInfoTemplate;
 
     @Autowired
     private AppParam appParam;

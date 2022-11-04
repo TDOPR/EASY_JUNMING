@@ -7,18 +7,23 @@ import cn.hutool.core.util.IdUtil;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.vo.CaptchaVO;
+import com.haoliang.common.utils.IdUtils;
 import com.haoliang.common.utils.RedisUtils;
 import com.haoliang.common.utils.ReflectUtils;
 import com.haoliang.common.utils.SpringUtil;
 import com.haoliang.config.LoginConfig;
 import com.haoliang.enums.CaptchaCategory;
 import com.haoliang.enums.CaptchaType;
+import com.haoliang.model.dto.EmailTemplateDTO;
+import com.haoliang.server.EmailServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.time.Duration;
 
 /**
@@ -31,8 +36,30 @@ public class CaptchaController {
     @Autowired
     private LoginConfig loginConfig;
 
+    @Resource(name = "registerLogin")
+    private EmailTemplateDTO emailTemplate;
+
     /**
-     * 生成验证码
+     * 发送邮件验证码
+     * @return 验证码id
+     */
+    @GetMapping("/sendCaptchaToEmail/{email}")
+    public JsonResult<String> sendCaptchaToEmail(@PathVariable String email) {
+        CodeGenerator codeGenerator = ReflectUtils.newInstance(CaptchaType.CHAR.getClazz(), loginConfig.getCaptcha().getCharLength());
+        String code = codeGenerator.generate();
+        boolean flag = EmailServer.send(emailTemplate.getTitle(), emailTemplate.getContent().replace("{{code}}", code).replace("{{time}}", loginConfig.getCaptcha().getExpirationTime().toString()), email);
+        if (flag) {
+            String uuid = IdUtils.simpleUUID();
+            String verifyKey = CacheKeyPrefixConstants.CAPTCHA_CODE + uuid;
+            RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(loginConfig.getCaptcha().getExpirationTime()));
+            return JsonResult.successResult("ok",uuid);
+        }
+        return JsonResult.failureResult();
+    }
+
+
+    /**
+     * 获取后台登录的验证码
      */
     @GetMapping("/captchaImage")
     public JsonResult<CaptchaVO> getCode() {

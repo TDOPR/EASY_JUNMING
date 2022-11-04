@@ -1,7 +1,7 @@
 package com.haoliang.aspect;
 
 import com.haoliang.annotation.OperationLog;
-import com.haoliang.service.SysOperationLogService;
+import com.haoliang.common.service.SysOperationLogService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;

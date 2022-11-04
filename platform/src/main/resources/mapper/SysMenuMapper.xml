@@ -12,6 +12,10 @@
         <result column="parentId" property="parentId"/>
         <result column="sortIndex" property="sortIndex"/>
         <result column="importStr" property="importStr"/>
+        <result column="outlink" property="outlink"/>
+        <result column="type" property="type"/>
+        <result column="display" property="display"/>
+        <result column="authorityStr" property="authorityStr"/>
         <collection property="children" ofType="com.haoliang.model.SysMenu" column="id" select="getMenuChildren"/>
     </resultMap>
 
@@ -37,11 +41,11 @@
 
     <select id="getMenuChildren"  resultMap="menuTree">
         SELECT
-            id,createTime,lastmodifiedTime,path,title,icon,parentId,sortIndex,importStr
+            *
         FROM
             sys_menu
         WHERE
-            parentId =#{parentId} AND sm.display=1
+            parentId =#{parentId}
         ORDER BY
             sortIndex
     </select>

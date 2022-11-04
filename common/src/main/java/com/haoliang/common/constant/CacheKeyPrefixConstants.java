@@ -34,4 +34,9 @@ public interface CacheKeyPrefixConstants {
      * 用户Token
      */
     String TOKEN = "token:";
+
+    /**
+     * 用户Token
+     */
+    String APP_USER_TOKEN = "app_user_token:";
 }

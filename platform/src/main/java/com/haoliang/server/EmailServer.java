@@ -3,7 +3,7 @@ package com.haoliang.server;
 
 import com.haoliang.common.utils.SpringUtil;
 import com.haoliang.config.EmailConfig;
-import com.haoliang.model.bo.EmailTemplateBO;
+import com.haoliang.model.dto.EmailTemplateDTO;
 import com.sun.mail.util.MailSSLSocketFactory;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class EmailServer {
      * @param content
      * @return
      */
-    public static boolean sendEmailByParam(List<File> fileList, String subject, String content) {
+    public static boolean sendEmail(List<File> fileList, String subject, String content, String[] to) {
         try {
             List<FileInfo> fileInfoList = new ArrayList<>();
             if (fileList != null) {
@@ -69,15 +69,14 @@ public class EmailServer {
                     fileInfoList.add(new FileInfo(file.getName(), new FileInputStream(file)));
                 }
             }
-            send(subject, content, fileInfoList);
-            return true;
+            return send(subject, content, to, fileInfoList);
         } catch (Exception e) {
             log.error("邮件发送失败: errorMsg={}", e.getMessage());
             return false;
         }
     }
 
-    public static boolean sendEmailByParam(MultipartFile[] fileList, String subject, String content) {
+    public static boolean sendEmail(MultipartFile[] fileList, String subject, String content, String[] to) {
         try {
             List<FileInfo> fileInfoList = new ArrayList<>();
             if (fileList != null) {
@@ -85,8 +84,7 @@ public class EmailServer {
                     fileInfoList.add(new FileInfo(file.getName(), file.getInputStream()));
                 }
             }
-            send(subject, content, fileInfoList);
-            return true;
+            return send(subject, content, to, fileInfoList);
         } catch (Exception e) {
             log.error("邮件发送失败: errorMsg={}", e.getMessage());
             return false;
@@ -94,14 +92,25 @@ public class EmailServer {
     }
 
 
-    public static void send(EmailTemplateBO emailTemplateBO) {
-        send(emailTemplateBO.getTitle(), emailTemplateBO.getContent(), null);
+    public static boolean send(EmailTemplateDTO emailTemplateDTO) {
+        return send(emailTemplateDTO.getTitle(), emailTemplateDTO.getContent(), new String[]{emailTemplateDTO.getTo()}, null);
+    }
+
+    /**
+     * 发送邮件
+     * @param subject  标题
+     * @param text 内容
+     * @param to 发送给谁
+     * @return 发送是否成功
+     */
+    public static boolean send(String subject, String text, String to) {
+        return send(subject, text, new String[]{to}, null);
     }
 
     /**
      * 发送邮件的主要代码
      */
-    public static void send(String subject, String text, List<FileInfo> fileList) {
+    public static boolean send(String subject, String text, String[] to, List<FileInfo> fileList) {
         try {
             JavaMailSenderImpl jms = new JavaMailSenderImpl();
             MimeMessage mimeMessage = jms.createMimeMessage();
@@ -126,7 +135,7 @@ public class EmailServer {
             //设置发送人
             helper.setFrom(CONFIG.getUsername(), CONFIG.getFormName());
             //设置收集人的账号信息       也可以把集合转换成字符串数组   String to[] = new String[List.size]; List.toArray(to);
-            helper.setTo(CONFIG.getTo());
+            helper.setTo(to);
             //设置邮件主题
             helper.setSubject(subject);
             //设置邮件内容为网页格式
@@ -142,8 +151,10 @@ public class EmailServer {
             }
             jms.send(mimeMessage);
             log.info("发送成功!");
+            return true;
         } catch (Exception e) {
             log.error("send email error:{}", e);
+            return false;
         }
     }
 

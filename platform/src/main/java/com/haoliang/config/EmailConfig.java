@@ -1,7 +1,6 @@
 package com.haoliang.config;
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -48,10 +47,5 @@ public class EmailConfig {
      */
     private String  formName;
 
-    /**
-     * 收件人的邮箱账号
-     */
-    @Value("#{'${mail.to}'.split(',')}")
-    private String[] to;
 }
 

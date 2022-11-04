@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.model.MetaInfo;
+import com.haoliang.model.condition.MetaInfoCondition;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface MetaInfoService extends IService<MetaInfo> {
 
     JsonResult deleteByIdList(List<Long> parseArray);
 
-    JsonResult findAll(PageParam<MetaInfo> pageParam);
+    JsonResult findAll(PageParam<MetaInfo, MetaInfoCondition> pageParam);
 
     MetaInfo getMetaInfo(Long id);
 }

@@ -1,4 +1,4 @@
-package com.haoliang.model.bo;
+package com.haoliang.model.dto;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import lombok.Data;
  * @description 重xml中获取发送邮件的模版
  **/
 @Data
-public class EmailTemplateBO {
+public class EmailTemplateDTO {
 
     /**
      * 邮件标题
@@ -19,4 +19,8 @@ public class EmailTemplateBO {
      */
     private String content;
 
+    /**
+     * 发送给谁
+     */
+    private String to;
 }

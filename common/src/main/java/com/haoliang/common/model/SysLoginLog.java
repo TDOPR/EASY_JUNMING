@@ -1,6 +1,7 @@
-package com.haoliang.model;
+package com.haoliang.common.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.haoliang.common.base.BaseModelCIDNoModifyTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,8 +26,15 @@ public class SysLoginLog extends BaseModelCIDNoModifyTime {
      */
     private String ipAddr;
 
-    public SysLoginLog(String username, String ipAddr){
+    /**
+     * 用户类型 1=系统用户 2=app用户
+     */
+    @JsonIgnore
+    private Integer userType;
+
+    public SysLoginLog(String username, String ipAddr,Integer userType){
         this.ipAddr=ipAddr;
         this.username=username;
+        this.userType=userType;
     }
 }

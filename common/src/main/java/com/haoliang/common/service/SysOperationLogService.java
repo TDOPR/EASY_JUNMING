@@ -1,7 +1,7 @@
-package com.haoliang.service;
+package com.haoliang.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.haoliang.model.SysOperationLog;
+import com.haoliang.common.model.SysOperationLog;
 import org.aspectj.lang.JoinPoint;
 
 public interface SysOperationLogService extends IService<SysOperationLog> {

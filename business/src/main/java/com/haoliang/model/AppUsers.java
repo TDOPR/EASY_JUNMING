@@ -1,7 +1,7 @@
 package com.haoliang.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.haoliang.common.base.BaseModel;
+import com.haoliang.common.base.BaseModelCID;
 import lombok.Data;
 
 /**
@@ -10,8 +10,8 @@ import lombok.Data;
  * @CreateTime 2022/11/1 10:30
  **/
 @Data
-@TableName("users")
-public class Users extends BaseModel {
+@TableName("app_users")
+public class AppUsers extends BaseModelCID {
 
     /**
      * 邀请码
@@ -24,9 +24,19 @@ public class Users extends BaseModel {
     private String eamil;
 
     /**
+     * 用户昵称
+     */
+    private String nickName;
+
+    /**
      * 用户状态 1=已删除,0=未删除
      */
     private Integer deleted;
+
+    /**
+     * 登录次数
+     */
+    private Integer loginCount;
 
     /**
      * 代理商等级
