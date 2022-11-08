@@ -23,7 +23,7 @@
               </el-col>
               <el-col :span="6">
                 <el-form-item label="模型名称" class="names">
-                  <el-input v-model="condition.like.metaName"></el-input>
+                  <el-input v-model="condition.searchParam.metaName"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="11" :offset="1">
@@ -144,10 +144,13 @@ export default {
   data() {
     return {
       meta: {},
-      createDate: "",
+      createDate: '',
       condition: {
-        like: {
+        searchParam: {
           metaName: "",
+          tableCode: "",
+          beginDate: "",
+          endDate: "",
         },
         currentPage: 1,
         pageSize: 10,
@@ -176,6 +179,15 @@ export default {
           condition: val,
         });
       },
+      createDate(val) {
+       if (this.createDate != null) {
+        this.condition.searchParam.beginDate = this.createDate[0];
+        this.condition.searchParam.endDate = this.createDate[1];
+      } else {
+        this.condition.searchParam.beginDate = "";
+        this.condition.searchParam.endDate = "";
+      }
+    },
       deep: true,
     },
   },
@@ -185,6 +197,11 @@ export default {
       this.condition = thisCondition;
       this.pageNum = this.condition.currentPage;
       this.pageSize = this.condition.pageSize;
+      if (this.condition.searchParam.beginDate && this.condition.searchParam.endDate) {
+        this.createDate = [this.condition.searchParam.beginDate, this.condition.searchParam.endDate];
+      } else {
+        this.createDate = ["", ""];
+      }
       this.refreshView = false;
       this.$nextTick(() => {
         this.refreshView = true;
@@ -307,12 +324,12 @@ export default {
       if (this.loading) {
         return;
       }
-      if (this.createDate != null) {
-        this.condition.beginDate = this.createDate[0];
-        this.condition.endDate = this.createDate[1];
+       if (this.createDate != null) {
+        this.condition.searchParam.beginDate = this.createDate[0];
+        this.condition.searchParam.endDate = this.createDate[1];
       } else {
-        this.condition.beginDate = "";
-        this.condition.endDate = "";
+        this.condition.searchParam.beginDate = "";
+        this.condition.searchParam.endDate = "";
       }
       this.loading = true;
       this.$ajax

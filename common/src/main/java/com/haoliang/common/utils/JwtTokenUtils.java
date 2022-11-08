@@ -1,6 +1,7 @@
 package com.haoliang.common.utils;
 
 import com.haoliang.common.config.GlobalConfig;
+import com.haoliang.common.utils.redis.RedisUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Clock;
 import io.jsonwebtoken.Jwts;
@@ -63,6 +64,7 @@ public class JwtTokenUtils {
      */
     public static Claims getTokenClaim(String token) {
         try {
+            token= RedisUtils.getCacheObject(token);
             return Jwts.parser().setSigningKey(GlobalConfig.getTokenSecret()).parseClaimsJws(token).getBody();
         } catch (Exception e) {
             log.error("getTokenClaim error:{}", e.getMessage());
@@ -70,17 +72,17 @@ public class JwtTokenUtils {
         }
     }
 
-    /**
-     * 判断token是否失效
-     */
-    public static boolean isTokenExpired(String token) {
-        try {
-            final Date expiration = getExpirationDateFromToken(token);
-            return expiration.before(clock.now());
-        } catch (Exception e) {
-            return true;
-        }
-    }
+//    /**
+//     * 判断token是否失效
+//     */
+//    public static boolean isTokenExpired(String token) {
+//        try {
+//            final Date expiration = getExpirationDateFromToken(token);
+//            return expiration.before(clock.now());
+//        } catch (Exception e) {
+//            return true;
+//        }
+//    }
 
     /**
      * 根据token获取username

@@ -33,7 +33,4 @@ public class AppUserController {
         return appUserService.login(appUserLogin, IpAddrUtil.getLocalIp(request));
     }
 
-
-
-
 }

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 钱包接口
  * @author Dominick Li
- * @Description 钱包接口
  * @CreateTime 2022/11/1 12:16
  **/
 @RestController

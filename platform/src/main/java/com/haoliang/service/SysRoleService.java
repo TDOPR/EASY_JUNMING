@@ -18,4 +18,6 @@ public interface SysRoleService extends IService<SysRole> {
     JsonResult queryByCondition(PageParam<SysRole, SysRoleCondition> pageParam);
 
     JsonResult saveRole(SysRoleBO sysRoleBO);
+
+    JsonResult deleteByIdList(List<Integer> idList);
 }

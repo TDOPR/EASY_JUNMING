@@ -1,7 +1,6 @@
 package com.haoliang.common.utils;
 
 import cn.hutool.core.io.FileUtil;
-import com.haoliang.common.enums.ContentTypeEnum;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
@@ -9,9 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DecimalFormat;
 
 /**
@@ -132,73 +130,7 @@ public class FileUtils extends FileUtil {
     }
 
 
-    /**
-     * 根据图片的绝对路径构建图片输出流
-     * 单台机器部署可以使用,分布式的情况不能这样
-     */
-    public static void downloadFileByLocal(HttpServletResponse response, File file, ContentTypeEnum type) throws Exception {
-        downloadFileByInputStream(response, new FileInputStream(file), type);
-    }
 
-    /**
-     * 根据输入流返回
-     * zip
-     */
-    public static void downloadFileByInputStream(HttpServletResponse response, InputStream fileinput, ContentTypeEnum type) {
-        BufferedInputStream bis = null;
-        OutputStream out = null;
-        try {
-            bis = new BufferedInputStream(fileinput);
-            if (type != ContentTypeEnum.OCTET_STREAM) {
-                response.reset();
-                response.setContentType(type.getValue() + ";charset=UTF-8");
-            }
-            response.addHeader("Content-Transfer-Encoding", "base64");
-            out = response.getOutputStream();
-            byte[] buffer = new byte[4096];
-            int size = 0;
-            while ((size = bis.read(buffer, 0, buffer.length)) != -1) {
-                out.write(buffer, 0, size);
-            }
-        } catch (FileNotFoundException e) {
-            logger.error("下载文件出错：未找到文件。请检查parameter.properties文件中的存储路径地址配置，或查看服务器中文件是否存在。");
-        } catch (IOException e) {
-            logger.error("下载文件出错：读写出错");
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-            }
-
-            try {
-                if (bis != null) {
-                    bis.close();
-                }
-            } catch (IOException e) {
-            }
-
-            try {
-                if (fileinput != null) {
-                    fileinput.close();
-                }
-            } catch (IOException e) {
-            }
-        }
-    }
-
-
-    /*
-     *根据图片的url资源返回图片的输出流
-     */
-    public static void showPicByUrl(HttpServletResponse response, String url) {
-        try (InputStream is = new URL(url).openStream()) {
-            downloadFileByInputStream(response, is, ContentTypeEnum.JPG);
-        } catch (Exception e) {
-            logger.error("图片链接资源不存在: ,url:{},error:{}", url, e);
-        }
-    }
 
     /**
      * 根据base数据保存图片

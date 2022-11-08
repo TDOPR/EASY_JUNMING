@@ -3,6 +3,7 @@ package com.haoliang.controller.system;
 
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.bo.IntIdListBO;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.SysMenu;
 import com.haoliang.service.SysMenuService;
@@ -40,7 +41,7 @@ public class MenuController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:menu:add','sys:menu:edit')")
     public JsonResult saveMenu(@RequestBody SysMenu sysMenu) {
-        return JsonResult.build(sysMenuService.saveOrUpdate(sysMenu));
+        return sysMenuService.saveMenu(sysMenu);
     }
 
     /**
@@ -57,10 +58,10 @@ public class MenuController {
      * @param id 菜单Id
      */
     @OperationLog(module = "菜单管理", description = "批量删除")
-    @DeleteMapping("/{id}")
+    @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:menu:remove')")
-    public JsonResult deleteById(@PathVariable Integer id) {
-        return sysMenuService.deleteById(id);
+    public JsonResult deleteById(@RequestBody IntIdListBO intIdListBO) {
+        return sysMenuService.deleteByIdList(intIdListBO.getIdList());
     }
 
 

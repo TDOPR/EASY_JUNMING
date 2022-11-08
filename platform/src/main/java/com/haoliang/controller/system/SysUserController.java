@@ -1,11 +1,11 @@
 package com.haoliang.controller.system;
 
 
-import com.alibaba.fastjson.JSONObject;
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.annotation.PrintLog;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
+import com.haoliang.common.model.bo.IntIdListBO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.utils.IpAddrUtil;
 import com.haoliang.common.utils.JwtTokenUtils;
@@ -32,7 +32,7 @@ import javax.validation.Valid;
  **/
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class SysUserController {
 
     @Autowired
     private SysUserService sysUserService;
@@ -46,6 +46,9 @@ public class UserController {
     @PostMapping("/pagelist")
     @PreAuthorize("hasAuthority('sys:user:list')")
     public JsonResult<PageVO<SysUser>> queryByCondition(@RequestBody PageParam<SysUser, SysUserCondition> pageParam) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new SysUserCondition());
+        }
         return sysUserService.queryByCondition(pageParam);
     }
 
@@ -64,26 +67,27 @@ public class UserController {
      */
     @OperationLog(module = "用户管理", description = "禁用或者启用")
     @PostMapping("/userEnabled")
+    @PreAuthorize("hasAuthority('sys:user:enabled')")
     public JsonResult userEnabled(@RequestBody UpdateUserStatus updateUserStatus) {
         return sysUserService.userEnabled(updateUserStatus);
     }
 
     /**
      * 批量删除用户
-     * @param idList 用户id数组
+     * @param idList id数组
      */
     @OperationLog(module = "用户管理", description = "删除")
-    @PostMapping("/deleteByIds")
+    @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:user:remove')")
-    public JsonResult deleteUsersByIds(@RequestBody String idList) {
-        return sysUserService.deleteByIdList(JSONObject.parseArray(idList, Integer.class));
+    public JsonResult deleteUsersByIds(@RequestBody IntIdListBO intIdListBO) {
+        return sysUserService.deleteByIdList(intIdListBO.getIdList());
     }
 
     /**
      * 添加或修改用户
      */
     @OperationLog(module = "用户管理", description = "添加或修改")
-    @PostMapping("/save")
+    @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:user:add','sys:user:edit')")
     public JsonResult save(@RequestBody SysUser sysUser) {
         return sysUserService.saveUser(sysUser);
@@ -122,7 +126,7 @@ public class UserController {
      */
     @GetMapping("/getRouters")
     public JsonResult<RouterVO> getRouters(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
-        return sysMenuService.findAllByToken(token);
+        return sysMenuService.findAllByRoleCode(JwtTokenUtils.getRoleCodeFromToken(token));
     }
 
 }

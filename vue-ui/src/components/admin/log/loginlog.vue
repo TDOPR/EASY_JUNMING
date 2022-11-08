@@ -19,7 +19,7 @@
               </el-col>
               <el-col :span="6">
                 <el-form-item label="用户名" class="names">
-                  <el-input v-model="condition.like.username"></el-input>
+                  <el-input v-model="condition.searchParam.username"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="9" :offset="1">
@@ -105,11 +105,11 @@ export default {
     return {
       createDate: ["", ""],
       condition: {
-        like: {
+        searchParam: {
           username: "",
+          beginDate: "",
+          endDate: "",
         },
-        beginDate: "",
-        endDate: "",
         currentPage: 1,
         pageSize: 10,
       },
@@ -169,12 +169,12 @@ export default {
       deep: true,
     },
     createDate(val) {
-      if (this.createDate != null) {
-        this.condition.beginDate = this.createDate[0];
-        this.condition.endDate = this.createDate[1];
+       if (this.createDate != null) {
+        this.condition.searchParam.beginDate = this.createDate[0];
+        this.condition.searchParam.endDate = this.createDate[1];
       } else {
-        this.condition.beginDate = "";
-        this.condition.endDate = "";
+        this.condition.searchParam.beginDate = "";
+        this.condition.searchParam.endDate = "";
       }
     },
   },
@@ -182,8 +182,8 @@ export default {
     var thisCondition = this.$store.state.eachCondition[this.$route.name];
     if (thisCondition) {
       this.condition = thisCondition;
-      if (this.condition.beginDate && this.condition.endDate) {
-        this.createDate = [this.condition.beginDate, this.condition.endDate];
+      if (this.condition.searchParam.beginDate && this.condition.searchParam.endDate) {
+        this.createDate = [this.condition.searchParam.beginDate, this.condition.searchParam.endDate];
       } else {
         this.createDate = ["", ""];
       }
@@ -250,15 +250,15 @@ export default {
     },
     getOCRFileList() {
       this.loading = true;
-      if (this.createDate != null) {
-        this.condition.beginDate = this.createDate[0];
-        this.condition.endDate = this.createDate[1];
+       if (this.createDate != null) {
+        this.condition.searchParam.beginDate = this.createDate[0];
+        this.condition.searchParam.endDate = this.createDate[1];
       } else {
-        this.condition.beginDate = "";
-        this.condition.endDate = "";
+        this.condition.searchParam.beginDate = "";
+        this.condition.searchParam.endDate = "";
       }
       this.$ajax
-        .post("/api/admin/loginlog/queryByCondition", this.condition)
+        .post("/api/admin/loginlog/pagelist", this.condition)
         .then((res) => {
           if (res.code == 200) {
             this.tabelData = res.data.content;

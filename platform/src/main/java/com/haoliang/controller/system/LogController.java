@@ -1,26 +1,21 @@
 package com.haoliang.controller.system;
 
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haoliang.annotation.OperationLog;
-import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.model.PageParam;
-import com.haoliang.common.model.SysErrorLog;
+import com.haoliang.common.model.*;
+import com.haoliang.common.model.bo.IntIdListBO;
 import com.haoliang.common.model.vo.ExportErrorLogVO;
 import com.haoliang.common.model.vo.PageVO;
+import com.haoliang.common.service.SysErrorLogService;
+import com.haoliang.common.service.SysLoginLogService;
+import com.haoliang.common.service.SysOperationLogService;
 import com.haoliang.common.utils.excel.ExcelUtil;
-import com.haoliang.common.model.SysLoginLog;
-import com.haoliang.common.model.SysOperationLog;
 import com.haoliang.model.condition.SysErrorLogCondition;
 import com.haoliang.model.condition.SysLoginLogCondition;
 import com.haoliang.model.condition.SysOperationLogCondition;
 import com.haoliang.model.vo.ExportLoginLogVO;
 import com.haoliang.model.vo.ExportOperationLogVO;
-import com.haoliang.common.service.SysErrorLogService;
-import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.service.SysOperationLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,9 +48,12 @@ public class LogController {
     /**
      * 分页查询登录日志
      */
-    @PostMapping("/loginlog/queryByCondition")
+    @PostMapping("/loginlog/pagelist")
     @PreAuthorize("hasAuthority('sys:loginlog:list')")
     public JsonResult<PageVO<SysLoginLog>> loginlogList(@RequestBody PageParam<SysLoginLog, SysLoginLogCondition> pageParam) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new SysLoginLogCondition());
+        }
         IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
@@ -65,10 +63,10 @@ public class LogController {
      * @param idList id数组  格式[1,2,3]
      */
     @OperationLog(module = "登录日志", description = "批量删除")
-    @PostMapping("/loginlog/deleteByIds")
+    @PostMapping("/loginlog/delete")
     @PreAuthorize("hasAuthority('sys:loginlog:remove')")
-    public JsonResult deleteLoginLogsByIds(@RequestBody String idList) {
-        return JsonResult.build(sysLoginLogService.removeByIds(JSONArray.parseArray(idList, Integer.class)));
+    public JsonResult deleteLoginLogsByIds(@RequestBody IntIdListBO intIdListBO) {
+        return JsonResult.build(sysLoginLogService.removeByIds(intIdListBO.getIdList()));
     }
 
     /**
@@ -79,6 +77,9 @@ public class LogController {
     @PostMapping("/loginlog/export")
     @PreAuthorize("hasAuthority('sys:loginlog:export')")
     public void exportLoginLog(@RequestBody PageParam<SysLoginLog, SysLoginLogCondition> pageParam, HttpServletResponse response) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new SysLoginLogCondition());
+        }
         IPage<SysLoginLog> iPage = sysLoginLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysLoginLog> sysLoginLogList = iPage.getRecords();
         List<ExportLoginLogVO> exportLoginLogVOList = new ArrayList<>(sysLoginLogList.size());
@@ -91,9 +92,12 @@ public class LogController {
     /**
      * 分页查询操作日志
      */
-    @PostMapping("/operationlog/queryByCondition")
+    @PostMapping("/operationlog/pagelist")
     @PreAuthorize("hasAuthority('sys:operationlog:list')")
     public JsonResult<PageVO<SysOperationLog>> operationlogList(@RequestBody PageParam<SysOperationLog, SysOperationLogCondition> pageParam) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new SysOperationLogCondition());
+        }
         IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
@@ -105,6 +109,9 @@ public class LogController {
     @PostMapping("/operationlog/export")
     @PreAuthorize("hasAuthority('sys:operationlog:export')")
     public void exportOperationlog(@RequestBody PageParam<SysOperationLog, SysOperationLogCondition> pageParam, HttpServletResponse response) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new SysOperationLogCondition());
+        }
         IPage<SysOperationLog> iPage = sysOperationLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysOperationLog> sysOperationLogList = iPage.getRecords();
         List<ExportOperationLogVO> exportOperationLogVOList = new ArrayList<>(sysOperationLogList.size());
@@ -117,9 +124,12 @@ public class LogController {
     /**
      * 分页查询错误日志
      */
-    @PostMapping("/errorlog/queryByCondition")
+    @PostMapping("/errorlog/pagelist")
     @PreAuthorize("hasAuthority('sys:errorlog:list')")
     public JsonResult<PageVO<SysErrorLog>> errorlogList(@RequestBody PageParam<SysErrorLog, SysErrorLogCondition> pageParam) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new SysErrorLogCondition());
+        }
         IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         return JsonResult.successResult(new PageVO<>(iPage));
     }
@@ -129,10 +139,10 @@ public class LogController {
      * @param idList id数组
      */
     @OperationLog(module = "错误日志", description = "批量删除")
-    @PostMapping("/errorlog/deleteByIds")
+    @PostMapping("/errorlog/delete")
     @PreAuthorize("hasAuthority('sys:errorlog:remove')")
-    public JsonResult deleteErrorLogsByIds(@RequestBody String idList) {
-        return JsonResult.build(sysErrorLogService.removeByIds(JSONObject.parseArray(idList, Integer.class)));
+    public JsonResult deleteErrorLogsByIds(@RequestBody IntIdListBO intIdListBO) {
+        return JsonResult.build(sysErrorLogService.removeByIds(intIdListBO.getIdList()));
     }
 
     /**
@@ -142,6 +152,9 @@ public class LogController {
     @PostMapping("/errorlog/export")
     @PreAuthorize("hasAuthority('sys:errorlog:export')")
     public void exportErrorlog(@RequestBody PageParam<SysErrorLog, SysErrorLogCondition> pageParam, HttpServletResponse response) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new SysErrorLogCondition());
+        }
         IPage<SysErrorLog> iPage = sysErrorLogService.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysErrorLog> sysErrorLogList = iPage.getRecords();
         List<ExportErrorLogVO> errorLogVOList = new ArrayList<>(sysErrorLogList.size());

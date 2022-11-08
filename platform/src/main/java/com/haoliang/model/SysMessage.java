@@ -1,0 +1,40 @@
+package com.haoliang.model;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.haoliang.common.base.BaseModelCID;
+import lombok.Data;
+
+import javax.validation.constraints.NotEmpty;
+
+/**
+ * @Description 国际化信息
+ * @author Dominick Li
+ * @CreateTime 2022/11/4 15:37
+ **/
+@Data
+@TableName("sys_message")
+public class SysMessage extends BaseModelCID {
+
+    /**
+     * key名称
+     * @required
+     */
+    @NotEmpty
+    private String keyName;
+
+    /**
+     * 中文
+     */
+    private String zhCn;
+
+    /**
+     * 繁体中文
+     */
+    private String zhTw;
+
+    /**
+     * 英文
+     */
+    private String enUs;
+
+}

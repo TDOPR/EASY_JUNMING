@@ -8,7 +8,7 @@ import com.haoliang.common.service.SysErrorLogService;
 import com.haoliang.common.utils.DateUtil;
 import com.haoliang.common.utils.GetWorkspaceHarDiskInfoUtil;
 import com.haoliang.config.AppParam;
-import com.haoliang.config.DictionaryParam;
+import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.model.dto.EmailTemplateDTO;
 import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.SysOperationLog;
@@ -62,14 +62,14 @@ public class ScheduledServer {
         log.info("-------------执行清理过期文件任务--------------");
         //清理登录日志,操作日志,错误日志
         Date nowDate = new Date();
-        if (DictionaryParam.getErrorLogSaveDay() >= 0) {
-            sysErrorLogService.remove(new LambdaQueryWrapper<SysErrorLog>().le(SysErrorLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -DictionaryParam.getErrorLogSaveDay(), TimeUnit.DAYS)));
+        if (SysSettingParam.getErrorLogSaveDay() >= 0) {
+            sysErrorLogService.remove(new LambdaQueryWrapper<SysErrorLog>().le(SysErrorLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -SysSettingParam.getErrorLogSaveDay(), TimeUnit.DAYS)));
         }
-        if (DictionaryParam.getLoginLogSaveDay() >= 0) {
-            sysLoginLogService.remove(new LambdaQueryWrapper<SysLoginLog>().le(SysLoginLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -DictionaryParam.getLoginLogSaveDay(), TimeUnit.DAYS)));
+        if (SysSettingParam.getLoginLogSaveDay() >= 0) {
+            sysLoginLogService.remove(new LambdaQueryWrapper<SysLoginLog>().le(SysLoginLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -SysSettingParam.getLoginLogSaveDay(), TimeUnit.DAYS)));
         }
-        if (DictionaryParam.getOperationLogSaveDay() >= 0) {
-            sysOperationLogService.remove(new LambdaQueryWrapper<SysOperationLog>().le(SysOperationLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -DictionaryParam.getOperationLogSaveDay(), TimeUnit.DAYS)));
+        if (SysSettingParam.getOperationLogSaveDay() >= 0) {
+            sysOperationLogService.remove(new LambdaQueryWrapper<SysOperationLog>().le(SysOperationLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -SysSettingParam.getOperationLogSaveDay(), TimeUnit.DAYS)));
         }
     }
 
@@ -90,16 +90,16 @@ public class ScheduledServer {
             return;
         }
         log.info(String.format("目录所属文件系统: %s  ,硬盘使用详情: %s/%s ,使用率达到：%s", workspaceHarDiskInfo.getFilesystem(), workspaceHarDiskInfo.getUsed(), workspaceHarDiskInfo.getSize(), workspaceHarDiskInfo.getUse()));
-        if (Integer.parseInt(workspaceHarDiskInfo.getUse().substring(0, workspaceHarDiskInfo.getUse().length() - 1)) > DictionaryParam.getThresholdSize()) {
-            log.error("已超过阔值" + DictionaryParam.getThresholdSize() + "%,请及时处理，避免服务因存储不足导致异常的情况");
+        if (Integer.parseInt(workspaceHarDiskInfo.getUse().substring(0, workspaceHarDiskInfo.getUse().length() - 1)) > SysSettingParam.getThresholdSize()) {
+            log.error("已超过阔值" + SysSettingParam.getThresholdSize() + "%,请及时处理，避免服务因存储不足导致异常的情况");
             String content = monitorInfoTemplate.getContent();
             content = content.replace("{{serverName}}", appParam.getServerName());
             content = content.replace("{{info}}", String.format("所属文件系统: %s  ,硬盘使用: %s/%s ,使用率达到：%s", workspaceHarDiskInfo.getFilesystem(), workspaceHarDiskInfo.getUsed(), workspaceHarDiskInfo.getSize(), workspaceHarDiskInfo.getUse()));
-            content = content.replace("{{rate}}", DictionaryParam.getThresholdSize() + "%");
+            content = content.replace("{{rate}}", SysSettingParam.getThresholdSize() + "%");
             monitorInfoTemplate.setContent(content);
             EmailServer.send(monitorInfoTemplate);
         } else {
-            log.info("硬盘已使用:{},未达到阔值:{}", workspaceHarDiskInfo.getUse(), DictionaryParam.getThresholdSize());
+            log.info("硬盘已使用:{},未达到阔值:{}", workspaceHarDiskInfo.getUse(), SysSettingParam.getThresholdSize());
         }
     }
 

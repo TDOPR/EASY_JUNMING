@@ -1,7 +1,7 @@
 package com.haoliang.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.haoliang.common.base.BaseModel;
+import com.haoliang.common.base.BaseModelCID;
 import lombok.Data;
 
 /**
@@ -10,7 +10,7 @@ import lombok.Data;
  **/
 @Data
 @TableName("sys_dictionary")
-public class SysDictionary extends BaseModel {
+public class SysDictionary extends BaseModelCID {
 
     /**
      * 字典的key
@@ -21,8 +21,8 @@ public class SysDictionary extends BaseModel {
      */
     private String dicValue;
     /**
-     * 字典类型名称,区分一组类型
+     * 父级id
      */
-    private String dicName;
+    private Integer parentId;
 
 }

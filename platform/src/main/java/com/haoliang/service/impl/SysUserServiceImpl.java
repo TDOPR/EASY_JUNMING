@@ -13,11 +13,10 @@ import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.utils.AESUtil;
-import com.haoliang.common.utils.DateUtil;
-import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.common.utils.RedisUtils;
+import com.haoliang.common.utils.*;
 import com.haoliang.common.utils.excel.ExcelUtil;
+import com.haoliang.common.config.SysSettingParam;
+import com.haoliang.common.utils.redis.RedisUtils;
 import com.haoliang.config.LoginConfig;
 import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysUserMapper;
@@ -93,13 +92,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (!loginFlag) {
             return jsonResult;
         }
-
+        String tokenKey= CacheKeyPrefixConstants.TOKEN + sysUser.getId()+":"+IdUtils.simpleUUID();
         SysRole sysRole=sysRoleMapper.selectById(sysUser.getRoleId());
         JsonResult<RouterVO> result = sysMenuService.findAllByRoleId(sysUser.getRoleId());
         String token = JwtTokenUtils.getToken(sysUser.getId(), JSONObject.toJSONString(result.getData().getAuthorityList()), sysUser.getUsername());
-        RedisUtils.setCacheObject(CacheKeyPrefixConstants.TOKEN + sysUser.getId(), token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
+
+        //单点登录需要删除用户在其它地方登录的Token
+        if(SysSettingParam.isEnableSso()){
+            RedisUtils.deleteObjects(CacheKeyPrefixConstants.TOKEN + sysUser.getId()+":*");
+        }
+        RedisUtils.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp,1));
-        return JsonResult.successResult(new TokenVO(token, sysRole.getRoleCode(), result.getData()));
+        return JsonResult.successResult(new TokenVO(tokenKey, sysRole.getRoleCode(), result.getData()));
     }
 
     @Override
@@ -119,6 +123,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             }
             exists.setRoleId(sysUser.getRoleId());
             exists.setName(sysUser.getName());
+            exists.setMobile(sysUser.getMobile());
+            exists.setEmail(sysUser.getEmail());
             exists.setUsername(sysUser.getUsername());
             exists.setChannelId(sysUser.getChannelId());
             this.saveOrUpdate(sysUser);
@@ -220,6 +226,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public void exportUsers(PageParam<SysUser,SysUserCondition> pageParam, HttpServletResponse response) {
+        //导出数据则不需要分页限制
+        pageParam.setPageSize(100000);
         JsonResult<PageVO<UserVO>> jsonResult = this.queryByCondition(pageParam);
         PageVO<UserVO> data = jsonResult.getData();
         List<ExportUserVO> exportUserVOList = new ArrayList<>(data.getContent().size());

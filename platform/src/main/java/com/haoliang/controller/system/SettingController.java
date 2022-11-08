@@ -25,15 +25,6 @@ public class SettingController {
     @Autowired
     private SysDictionaryService sysDictionaryService;
 
-
-    /**
-     * 服务器资源使用率信息
-     */
-    @GetMapping("/getMonitorInfo")
-    public JsonResult getMonitorInfo(){
-        return systemService.getMonitorInfo();
-    }
-
     /**
      * 获取字典信息
      */

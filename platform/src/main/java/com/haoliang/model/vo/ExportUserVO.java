@@ -26,13 +26,19 @@ public class ExportUserVO {
     @ExcelProperty("用户姓名")
     private String name;
 
+    @ExcelProperty("邮箱号")
+    private String email;
+
+    @ExcelProperty("手机号")
+    private String mobile;
+
     @ExcelProperty("用户使用状态")
     private String enabled;
 
     @ExcelProperty("角色名称")
     private String roleName;
 
-    @ExcelProperty("渠道名称")
-    private String channelName;
+//    @ExcelProperty("渠道名称")
+//    private String channelName;
 
 }

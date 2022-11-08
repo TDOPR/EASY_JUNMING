@@ -26,7 +26,7 @@
               </el-col>
               <el-col :span="4">
                 <el-form-item label="帐号" class="names">
-                  <el-input v-model="condition.like.username"></el-input>
+                  <el-input v-model="condition.searchParam.username"></el-input>
                 </el-form-item>
               </el-col>
                     <el-col :span="9" :offset="1">
@@ -140,12 +140,10 @@ export default {
       user: {},
       createDate: ["", ""],
       condition: {
-        like: {
+        searchParam: {
           username: "",
-          company: "",
-        },
-        eq: {
-          channelId: "",
+          beginDate: "",
+          endDate: "",
         },
         currentPage: 1,
         pageSize: 10,
@@ -208,11 +206,11 @@ export default {
       }, 
       createDate(val) {
       if (this.createDate != null) {
-        this.condition.beginDate = this.createDate[0];
-        this.condition.endDate = this.createDate[1];
+        this.condition.searchParam.beginDate = this.createDate[0];
+        this.condition.searchParam.endDate = this.createDate[1];
       } else {
-        this.condition.beginDate = "";
-        this.condition.endDate = "";
+        this.condition.searchParam.beginDate = "";
+        this.condition.searchParam.endDate = "";
       }
     },
       deep: true,
@@ -222,6 +220,11 @@ export default {
     var thisCondition = this.$store.state.eachCondition[this.$route.name];
     if (thisCondition) {
       this.condition = thisCondition;
+      if (this.condition.searchParam.beginDate && this.condition.searchParam.endDate) {
+        this.createDate = [this.condition.searchParam.beginDate, this.condition.searchParam.endDate];
+      } else {
+        this.createDate = ["", ""];
+      }
       this.pageNum = this.condition.currentPage;
       this.pageSize = this.condition.pageSize;
       this.refreshView = false;
@@ -320,7 +323,7 @@ export default {
     deleteSelected() {
       this.loading = true;
       var ids = this.selectedIds.map((item) => item.id);
-      this.$ajax.post("/api/user/deleteByIds", ids).then((res) => {
+      this.$ajax.post("/api/user/delete", ids).then((res) => {
         if (res.code == 200) {
           this.$notify({
             title: "提示",
@@ -364,12 +367,12 @@ export default {
       });
     },
     getUserList() {
-       if (this.createDate != null) {
-        this.condition.beginDate = this.createDate[0];
-        this.condition.endDate = this.createDate[1];
+      if (this.createDate != null) {
+        this.condition.searchParam.beginDate = this.createDate[0];
+        this.condition.searchParam.endDate = this.createDate[1];
       } else {
-        this.condition.beginDate = "";
-        this.condition.endDate = "";
+        this.condition.searchParam.beginDate = "";
+        this.condition.searchParam.endDate = "";
       }
       this.loading = true;
       this.$ajax

@@ -19,6 +19,7 @@ public class SysRole extends BaseModelCID {
         this.roleName = roleName;
         this.roleCode = roleCode;
     }
+
     /**
      * 角色名称
      * @required
@@ -29,5 +30,10 @@ public class SysRole extends BaseModelCID {
      * @required
      */
     private String roleCode;
+
+    /**
+     * 启用状态 1=启用 0=禁用
+     */
+    private Integer enabled=1;
 
 }

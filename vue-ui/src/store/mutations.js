@@ -53,7 +53,12 @@ export default {
         state.eachCondition={}
         state.addRoutes=[]    // 动态路由添加
     },
-
+    setPermissionList(state,list){
+        state.permissionList=list
+    },
+    setRoleCode(state,roleCode){
+        state.roleCode=roleCode
+    },
     setAddRoutes(state,list){
         state.addRoutes=list
     }

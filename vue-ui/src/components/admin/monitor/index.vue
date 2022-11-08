@@ -91,7 +91,7 @@ export default {
         return
       }
       this.ajaxLoading=true;
-      this.$ajax.get("/api/admin/getMonitorInfo").then((res) => {
+      this.$ajax.get("/api/monitor/getMonitorInfo").then((res) => {
         if (res.code == 200) {
           this.firstLoading=false
           that.cpu=res.data.cpu;

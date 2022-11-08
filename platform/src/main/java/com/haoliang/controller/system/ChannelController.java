@@ -26,7 +26,7 @@ public class ChannelController {
     /**
      * 查询所有
      */
-    @GetMapping("/")
+    @GetMapping
     @PreAuthorize("hasAuthority('sys:channel:list')")
     public JsonResult<List<SysChannel>> queryByCondition() {
         return channelService.findAll();
@@ -47,12 +47,11 @@ public class ChannelController {
      * 添加或修改
      */
     @OperationLog(module = "渠道管理",description = "添加或修改")
-    @PostMapping("/")
+    @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:channel:add','sys:channel:edit')")
     public JsonResult add(@RequestBody SysChannel sysChannel) {
         return channelService.saveChannel(sysChannel);
     }
-
 
     /**
      * 刷新渠道层级和顺序

@@ -27,8 +27,6 @@ npm run dev
 账号: admin 
 密码: 123456
 
-
-
 # 4.生成本地接口文档到resource/static目录下
 在父工程命令行执行下面命令
 mvn smart-doc:markdown -Dfile.encoding=UTF-8  -pl :platform -am

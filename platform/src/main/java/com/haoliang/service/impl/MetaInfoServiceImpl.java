@@ -167,7 +167,7 @@ public class MetaInfoServiceImpl extends ServiceImpl<MetaInfoMapper, MetaInfo> i
             endDate = DateUtil.getDateStrIncrement(endDate, 1, TimeUnit.DAYS);
             pageParam.getSearchParam().setEndDate(endDate);
         }
-        IPage<MetaInfo> page = metaInfoMapper.selectbyPage(pageParam.getPage(),pageParam.getSearchParam());
+        IPage<MetaInfo> page = metaInfoMapper.selectbyPage(pageParam.getPage(),pageParam.getSearchParam().getMetaName(),pageParam.getSearchParam().getBeginDate(),pageParam.getSearchParam().getEndDate());
         return JsonResult.successResult(new PageVO(page));
     }
 

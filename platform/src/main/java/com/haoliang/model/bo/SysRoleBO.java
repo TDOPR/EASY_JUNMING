@@ -13,6 +13,9 @@ import java.util.List;
 @Data
 public class SysRoleBO  extends SysRole {
 
+    /**
+     * 角色关联的菜单Id数组
+     */
     private List<Integer> menuIds;
 
 }

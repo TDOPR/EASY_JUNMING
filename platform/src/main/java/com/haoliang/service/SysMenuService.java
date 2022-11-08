@@ -18,10 +18,11 @@ public interface SysMenuService extends IService<SysMenu> {
 
     JsonResult<RouterVO> findAllByRoleId(Integer roleId);
 
-    JsonResult<RouterVO> findAllByToken(String  token);
+    JsonResult<RouterVO> findAllByRoleCode(String  token);
 
     JsonResult reloadMenu(List<SysMenu> sysMenus, String token);
 
-    JsonResult deleteById(Integer id);
+    JsonResult deleteByIdList(List<Integer> id);
 
+    JsonResult saveMenu(SysMenu sysMenu);
 }

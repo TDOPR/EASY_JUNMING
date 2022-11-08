@@ -226,7 +226,7 @@ export default {
       let message = this.role.id ? "修改成功" : "添加成功";
       console.log(this.role);
       this.$ajax
-        .post("/api/menu/saveMenu", this.role)
+        .post("/api/menu", this.role)
         .then((res) => {
           if (res.code == 200) {
             this.$notify({
@@ -367,7 +367,7 @@ export default {
       });
     },
     deleteSelected(row) {
-      this.$ajax.delete("/api/menu/"+row.id).then((res) => {
+      this.$ajax.post("/api/menu/delete",{idList:[row.id]}).then((res) => {
         if (res.code == 200) {
           this.$notify({
             title: "提示",

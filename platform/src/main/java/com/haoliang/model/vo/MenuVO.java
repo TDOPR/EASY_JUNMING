@@ -13,6 +13,11 @@ import java.util.List;
 public class MenuVO  {
 
     /**
+     * 菜单Id
+     */
+    private Integer id;
+
+    /**
      * 访问路径
      */
     private String path;

@@ -21,6 +21,21 @@
                   >批量删除
                 </el-button>
               </el-col>
+              <el-col :span="4">
+                <el-form-item label="角色名称" class="names">
+                  <el-input v-model="condition.searchParam.roleName"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="4">
+                <el-form-item label="角色编码" class="names">
+                  <el-input v-model="condition.searchParam.roleCode"></el-input>
+                </el-form-item>
+              </el-col>
+              <el-col :span="4" style="padding-left: 20px">
+                <el-button type="primary" size="small" @click="getDataList"
+                  >查询</el-button
+                >
+              </el-col>
             </el-row>
           </el-form>
         </div>
@@ -29,7 +44,7 @@
             <el-table
               class="tableLimit"
               :data="tabelData"
-              style="width: 100%;height :100%"
+              style="width: 100%; height: 100%"
               @selection-change="selectAll"
               :row-class-name="tableRowClassName"
             >
@@ -57,7 +72,8 @@
                   <el-button @click="create(scope.row)" type="text" size="small"
                     >修改
                   </el-button>
-                  <el-button :disabled="scope.row.builtIn==1"
+                  <el-button
+                    :disabled="scope.row.builtIn == 1"
                     @click="deleteSelected(scope.row)"
                     type="text"
                     size="small"
@@ -68,19 +84,19 @@
             </el-table>
           </div>
         </div>
-         <div class="table-pagination">
-            <el-pagination
-              background
-              @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
-              :current-page="pageNum"
-              :page-sizes="[10, 15, 20, 30, 50, 100]"
-              :page-size="pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="total"
-            >
-            </el-pagination>
-          </div>
+        <div class="table-pagination">
+          <el-pagination
+            background
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageNum"
+            :page-sizes="[10, 15, 20, 30, 50, 100]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+          >
+          </el-pagination>
+        </div>
       </el-main>
     </el-container>
     <el-dialog
@@ -105,9 +121,12 @@ export default {
     return {
       role: {},
       condition: {
-        like: {},
         currentPage: 1,
         pageSize: 10,
+        searchParam: {
+          roleName: "",
+          roleCode: "",
+        },
       },
       saveTitle: "新增角色",
       isAllChecked: false,
@@ -118,33 +137,33 @@ export default {
       selectedIds: [],
       dialogTableVisible: false,
       loading: false,
-      refreshView:true,
+      refreshView: true,
     };
   },
   components: {
     save,
   },
-  watch:{
-    condition:{
-      handler(val){
-        this.$store.commit("setEachCondition",{
-          name:this.$route.name,
-          condition:val
-        })
+  watch: {
+    condition: {
+      handler(val) {
+        this.$store.commit("setEachCondition", {
+          name: this.$route.name,
+          condition: val,
+        });
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
-  created(){
-    var thisCondition=this.$store.state.eachCondition[this.$route.name]
-    if(thisCondition){
-      this.condition=thisCondition
-      this.pageNum= this.condition.currentPage
-      this.pageSize= this.condition.pageSize
-      this.refreshView=false
-      this.$nextTick(()=>{
-        this.refreshView=true
-      })
+  created() {
+    var thisCondition = this.$store.state.eachCondition[this.$route.name];
+    if (thisCondition) {
+      this.condition = thisCondition;
+      this.pageNum = this.condition.currentPage;
+      this.pageSize = this.condition.pageSize;
+      this.refreshView = false;
+      this.$nextTick(() => {
+        this.refreshView = true;
+      });
     }
   },
   mounted() {
@@ -161,8 +180,8 @@ export default {
     });
   },
   beforeDestroy() {
-    this.$bus.off("closeRoleSaveDialog")
-    this.$bus.off("refreshRoleList")
+    this.$bus.off("closeRoleSaveDialog");
+    this.$bus.off("refreshRoleList");
   },
   methods: {
     selectAll(sels) {
@@ -172,17 +191,16 @@ export default {
       let ids;
       if (row.id) {
         ids = [row.id];
-        this.$confirm(
-            '提示', {
-              message: '确认要执行删除操作?',
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then((res) => {
-            this.sureDeleteSelect(ids)
-          }).catch((err) => {
-
+        this.$confirm("提示", {
+          message: "确认要执行删除操作?",
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning",
+        })
+          .then((res) => {
+            this.sureDeleteSelect(ids);
           })
+          .catch((err) => {});
       } else {
         if (this.selectedIds.length == 0) {
           this.$notify({
@@ -194,11 +212,11 @@ export default {
           return;
         }
         ids = this.selectedIds.map((item) => item.id);
-        this.sureDeleteSelect(ids)
+        this.sureDeleteSelect(ids);
       }
     },
-    sureDeleteSelect(ids){
-      this.$ajax.post("/api/role/delete",ids).then((res) => {
+    sureDeleteSelect(ids) {
+      this.$ajax.post("/api/role/delete", {idList:ids}).then((res) => {
         if (res.code == 200) {
           this.$notify({
             title: "提示",
@@ -314,13 +332,13 @@ export default {
 }
 .table-pagination {
   text-align: right;
-    /* position: absolute;
+  /* position: absolute;
     left: 50%;
     transform: translateX(-45%);
     bottom: 0px; */
 }
-.table-list >>>.el-table__body-wrapper{
-  height: calc( 100% - 55px);
+.table-list >>> .el-table__body-wrapper {
+  height: calc(100% - 55px);
   overflow: auto;
 }
 </style>

@@ -13,17 +13,14 @@
 
     <select id="selectPageVo" parameterType="com.haoliang.model.condition.SysUserCondition" resultType="com.haoliang.model.vo.UserVO">
          SELECT
-            s.id,s.username,s.name,s.createTime,s.name,s.enabled,s.deleted,s.roleId,s.channelId,sr.roleName,sc.channelName
+            s.id,s.username,s.name,s.createTime,s.name,s.enabled,s.deleted,s.roleId,s.channelId,s.email,s.mobile,sr.roleName,sc.channelName
         FROM
             sys_user s
         LEFT JOIN sys_role sr ON sr.id=s.roleId
         LEFT JOIN sys_channel sc ON sc.id=s.channelId
         WHERE
-           sr.roleCode!='admin'
-        <if test="user.deleted!=null and user.deleted!=''">
-            AND s.deleted=#{user.deleted}
-        </if>
-        <if test="user.enabled!=null and user.enabled!=''">
+           sr.roleCode!='admin' AND s.deleted=0
+        <if test="user.enabled!=null">
             AND s.enabled=#{user.enabled}
         </if>
         <if test="user.username!=null and user.username!=''">
@@ -35,6 +32,18 @@
         <if test="user.endDate!=null">
             AND s.createTime <![CDATA[ <= ]]> #{user.endDate}
         </if>
+    </select>
+
+    <select id="findExistsByRoleId" resultType="java.lang.Integer">
+        SELECT
+            DISTINCT roleId
+        FROM
+            sys_user
+        WHERE
+            roleId IN
+        <foreach collection="idList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </select>
 
 </mapper>

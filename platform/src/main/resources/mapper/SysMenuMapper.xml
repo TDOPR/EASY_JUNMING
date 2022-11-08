@@ -21,11 +21,26 @@
 
 
     <resultMap type="com.haoliang.model.vo.MenuVO" id="menuTreeByRoleId">
+        <result column="id" property="id"/>
         <result column="path" property="path"/>
         <result column="title" property="title"/>
         <result column="icon" property="icon"/>
         <result column="importStr" property="importStr"/>
-        <collection property="children" ofType="com.haoliang.model.SysMenu" column="{id= id,roleId= roleId}" select="getMenuChildrenByRoleId"/>
+        <collection property="children" ofType="com.haoliang.model.vo.MenuVO" column="{id= id,roleId= roleId}" select="getMenuChildrenByRoleId"/>
+    </resultMap>
+
+    <resultMap type="com.haoliang.model.vo.MenuVO" id="menuTreeByAdminRole">
+        <result column="id" property="id"/>
+        <result column="path" property="path"/>
+        <result column="title" property="title"/>
+        <result column="icon" property="icon"/>
+        <result column="importStr" property="importStr"/>
+        <collection property="children" ofType="com.haoliang.model.vo.MenuVO" column="id" select="getMenuChildrenByParentId"/>
+    </resultMap>
+
+    <resultMap type="com.haoliang.model.dto.MenuIdDTO" id="menuIdTree">
+        <result column="id" property="id"/>
+        <collection property="children" ofType="com.haoliang.model.dto.MenuIdDTO" column="id" select="findIdByParentId"/>
     </resultMap>
 
     <select id="findAllByParentIdOrderBySortIndexAsc" resultMap="menuTree">
@@ -50,42 +65,13 @@
             sortIndex
     </select>
 
-    <select id="findAllByParentIdAndRoleIdOrderBySortIndexAsc" resultMap="menuTreeByRoleId">
-        SELECT
-            sm.id,sm.path,sm.outlink,sm.type,sm.title,sm.icon,sm.importStr,srm.roleId
-        FROM
-            sys_menu sm
-        LEFT JOIN
-            sys_role_menu srm
-            ON sm.id=srm.menuId
-        WHERE
-            parentId=0 AND sm.display=1 AND srm.roleId=#{roleId}
-        ORDER BY
-            sortIndex
-    </select>
-
-    <select id="getMenuChildrenByRoleId"  resultMap="menuTreeByRoleId">
-     SELECT
-            sm.id,sm.path,sm.outlink,sm.type,sm.title,sm.icon,sm.sortIndex,sm.importStr,srm.roleId
-        FROM
-            sys_menu sm
-        LEFT JOIN
-            sys_role_menu srm
-            ON sm.id=srm.menuId
-        WHERE
-            parentId=#{id} AND sm.display=1 AND type!=3 AND srm.roleId=#{roleId}
-        ORDER BY
-            sortIndex
-    </select>
-
 
     <select id="findMenuNameById" resultType="java.lang.String">
         SELECT
-            menuName
+            title
         FROM
             sys_menu
-        WHERE
-            id =#{menuId}
+        WHERE  id=#{id}
     </select>
 
     <select id="findMaxSortIndex" resultType="java.lang.Integer">
@@ -104,5 +90,69 @@
             srm.roleId=#{roleId} and sm.type>1 and sm.authorityStr != ''
     </select>
 
+    <select id="findAllAuthority" resultType="java.lang.String">
+        SELECT
+            authorityStr
+        FROM
+            sys_menu
+        WHERE
+            type>1 and authorityStr != ''
+    </select>
+
+
+    <!-- 根据角色Id查询菜单  -->
+    <select id="findAllByParentIdAndRoleIdOrderBySortIndexAsc" resultMap="menuTreeByRoleId">
+        SELECT
+            sm.id,sm.path,sm.outlink,sm.type,sm.title,sm.icon,sm.importStr,srm.roleId
+        FROM
+            sys_menu sm
+        LEFT JOIN
+            sys_role_menu srm
+            ON sm.id=srm.menuId
+        WHERE
+            parentId=0 AND sm.display=1 AND srm.roleId=#{roleId}
+        ORDER BY
+            sortIndex
+    </select>
+    <select id="getMenuChildrenByRoleId"  resultMap="menuTreeByRoleId">
+     SELECT
+            sm.id,sm.path,sm.outlink,sm.type,sm.title,sm.icon,sm.sortIndex,sm.importStr,srm.roleId
+        FROM
+            sys_menu sm
+        LEFT JOIN
+            sys_role_menu srm
+            ON sm.id=srm.menuId
+        WHERE
+            parentId=#{id} AND sm.display=1 AND type!=3 AND srm.roleId=#{roleId}
+        ORDER BY
+            sortIndex
+    </select>
+
+
+    <!-- 管理员角色 查询所有的菜单  -->
+    <select id="findAllByParentIOrderBySortIndexAsc" resultMap="menuTreeByAdminRole">
+          SELECT
+            sm.id,sm.path,sm.outlink,sm.type,sm.title,sm.icon,sm.importStr
+        FROM
+            sys_menu sm
+        WHERE
+            parentId=0 AND sm.display=1
+        ORDER BY
+            sortIndex
+    </select>
+    <select id="getMenuChildrenByParentId"  resultMap="menuTreeByAdminRole">
+     SELECT
+            sm.id,sm.path,sm.outlink,sm.type,sm.title,sm.icon,sm.sortIndex,sm.importStr
+        FROM
+            sys_menu sm
+        WHERE
+            parentId=#{id} AND sm.display=1 AND type!=3
+        ORDER BY
+            sortIndex
+    </select>
+
+    <select id="findIdByParentId" resultMap="menuIdTree">
+        select id from sys_menu WHERE parentId=#{parentId}
+    </select>
 
 </mapper>

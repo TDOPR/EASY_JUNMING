@@ -16,7 +16,7 @@ public class AppUsers extends BaseModelCID {
     /**
      * 邀请码
      */
-    private String code;
+    private String inviteCode;
 
     /**
      * 邮箱号

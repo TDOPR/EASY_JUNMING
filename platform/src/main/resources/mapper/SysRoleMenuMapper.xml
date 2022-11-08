@@ -2,16 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haoliang.mapper.SysRoleMenuMapper">
 
-    <select id="findAllByMenuId" resultType="Integer">
+    <select id="findAllByMenuIdIn" resultType="Integer">
          SELECT
-            menuId
+            DISTINCT menuId
         FROM
             sys_role_menu
         WHERE
             menuId=#{menuId}
+
     </select>
 
     <select id="findAllMenuIdByRoleId" resultType="Integer">
         SELECT menuId FROM sys_role_menu WHERE roleId=#{roleId}
+    </select>
+    <select id="findRoleNameByIdIn" resultType="java.lang.String">
+        select roleName from sys_role where id in
+        <foreach collection="idList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </select>
 </mapper>

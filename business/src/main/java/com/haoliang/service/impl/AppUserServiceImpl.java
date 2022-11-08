@@ -2,6 +2,7 @@ package com.haoliang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.model.JsonResult;
@@ -9,13 +10,15 @@ import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.utils.IdUtils;
 import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.common.utils.RedisUtils;
+import com.haoliang.common.utils.StringUtil;
+import com.haoliang.common.utils.redis.RedisUtils;
 import com.haoliang.mapper.AppUserMapper;
 import com.haoliang.model.AppUsers;
 import com.haoliang.model.dto.AppUserLoginDTO;
 import com.haoliang.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 
@@ -31,6 +34,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     private SysLoginLogService sysLoginLogService;
 
     @Override
+    @Transactional
     public JsonResult login(AppUserLoginDTO appUserLogin, String localIp) {
         String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + appUserLogin.getUuid();
         String code = RedisUtils.getCacheObject(cacheKey);
@@ -41,25 +45,35 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
             return JsonResult.failureResult("验证码错误!");
         }
         AppUsers appUsers;
-        if (appUserLogin.getType() == 1) {
-            appUsers = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getEamil, appUserLogin.getUsername()));
-            if (appUsers == null) {
-                //自动注册
-                appUsers = new AppUsers();
-                appUsers.setEamil(appUserLogin.getUsername());
-                appUsers.setCode(getInviteCode());
-                appUsers.setCode(code);
-            } else {
-                appUsers.setLoginCount(appUsers.getLoginCount() + 1);
+        appUsers = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getEamil, appUserLogin.getEmail()));
+        if (appUsers == null) {
+            Integer inviteUserId = null;
+            if (StringUtil.isNotEmpty(appUserLogin.getInviteCode())) {
+                //根据邀请码找到对应的用户
+                AppUsers inviteUser = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getInviteCode, appUserLogin.getInviteCode()));
+                if (inviteUser == null) {
+                    return JsonResult.failureResult("邀请码错误！");
+                }
+                inviteUserId = inviteUser.getId();
             }
-
+            //自动注册
+            appUsers = new AppUsers();
+            appUsers.setEamil(appUserLogin.getEmail());
+            //生成邀请码
+            appUsers.setInviteCode(getInviteCode());
+            //设置用户的邀请人ID
+            appUsers.setParentId(inviteUserId);
         } else {
-            // TODO 手机号待确定供应商API
-            appUsers=new AppUsers();
+            appUsers.setLoginCount(appUsers.getLoginCount() + 1);
         }
+
         String token = JwtTokenUtils.getToken(appUsers.getId());
-        RedisUtils.setCacheObject(CacheKeyPrefixConstants.APP_USER_TOKEN + appUsers.getId(), token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
-        sysLoginLogService.save(new SysLoginLog(appUsers.getEamil(), localIp,2));
+        //单点登录需要删除用户在其它地方登录的Token
+        if (SysSettingParam.isEnableSso()) {
+            RedisUtils.deleteObjects(CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":*");
+        }
+        RedisUtils.setCacheObject(CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId(), token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
+        sysLoginLogService.save(new SysLoginLog(appUsers.getEamil(), localIp, 2));
         return JsonResult.successResult();
     }
 
@@ -70,7 +84,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         String inviteCode = IdUtils.generateShortUUID(8);
         AppUsers exists;
         while (true) {
-            exists = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getCode, inviteCode));
+            exists = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getInviteCode, inviteCode));
             if (exists != null) {
                 inviteCode = IdUtils.generateShortUUID(8);
             } else {

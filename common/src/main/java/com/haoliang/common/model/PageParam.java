@@ -21,12 +21,12 @@ public class PageParam<T,C extends BaseCondition> {
     private Page<T> page;
 
     /**
-     * 当前页
+     * 当前页 默认值为1
      */
     private Integer currentPage;
 
     /**
-     * 每页显示的数量
+     * 每页显示的数量 默认值为10
      */
     private Integer pageSize = 10;
 

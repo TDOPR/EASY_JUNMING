@@ -50,6 +50,8 @@
         <easyexcel.version>3.1.1</easyexcel.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <aspectjweaver.version>1.9.4</aspectjweaver.version>
+        <p6spy.version>1.0</p6spy.version>
+        <druid-boot.version>1.2.14</druid-boot.version>
     </properties>
 
     <dependencyManagement>
@@ -146,6 +148,12 @@
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
                 <version>${aspectjweaver.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid-boot.version}</version>
             </dependency>
 
             <dependency>

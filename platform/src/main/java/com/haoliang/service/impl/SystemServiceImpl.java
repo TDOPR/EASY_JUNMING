@@ -2,7 +2,7 @@ package com.haoliang.service.impl;
 
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.MonitorInfoUtils;
-import com.haoliang.config.DictionaryParam;
+import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.model.vo.DataVO;
 import com.haoliang.service.SystemService;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public JsonResult getSetting() {
         HashMap result = new HashMap();
-        result.put("dictionary", DictionaryParam.getDictionaryParam());
+        result.put("dictionary", SysSettingParam.getDictionaryParam());
         return JsonResult.successResult(result);
     }
 

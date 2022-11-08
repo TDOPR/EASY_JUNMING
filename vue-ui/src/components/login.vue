@@ -44,7 +44,7 @@ import Vue from "vue";
 export default {
   data() {
     return {
-      captchaEnabled: true,
+      captchaEnabled: false,
       capsTooltip: false,
       username: "",
       password: "",
@@ -97,14 +97,17 @@ export default {
           username: this.username,
           password: this.password,
           uuid: this.uuid,
-          code: this.code
+          code: this.code,
         })
         .then((res) => {
           if (res.code == 200) {
             this.$utils.setSessionStorage("token", res.data.token);
             this.$utils.setSessionStorage("username", this.username);
-            this.$utils.setSessionStorage("roleMenus", res.data.menus);
+            this.$utils.setSessionStorage("roleMenus", res.data.routerAuthority.menuList);   
             this.$utils.setSessionStorage("roleCode", res.data.roleCode);
+            
+            this.$store.commit("setPermissionList",res.data.routerAuthority.authorityList)
+            this.$store.commit("setRoleCode",res.data.roleCode)
             let msg = "登录成功";
             this.$notify({
               title: "提示",

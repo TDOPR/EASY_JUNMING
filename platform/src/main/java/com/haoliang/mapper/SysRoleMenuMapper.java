@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 
-    Integer findAllByMenuId(@Param("menuId")Integer menuId);
+    Integer findAllByMenuIdIn(@Param("menuId")Integer menuId);
 
     List<Integer> findAllMenuIdByRoleId(@Param("roleId")Integer id);
+
+    List<String> findRoleNameByIdIn(@Param("idList") List<Integer> existsId);
 }

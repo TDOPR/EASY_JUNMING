@@ -2,13 +2,13 @@ package com.haoliang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.haoliang.model.MetaInfo;
-import com.haoliang.model.condition.MetaInfoCondition;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 
 public interface MetaInfoMapper extends BaseMapper<MetaInfo> {
 
-    IPage<MetaInfo> selectbyPage(Page<MetaInfo> page,@Param("meta") MetaInfoCondition metaInfoCondition);
+    IPage<MetaInfo> selectbyPage(IPage<MetaInfo> page, @Param("metaName") String  metaName, @Param("beginDate") Date beginDate, @Param("endDate") Date  endDate);
 
 }

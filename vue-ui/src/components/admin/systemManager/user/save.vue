@@ -149,7 +149,7 @@ export default {
           this.loading = true;
           let message = this.user.id == null ? "添加成功" : "修改成功";
           console.log("success submit!");
-          this.$ajax.post("/api/user/save", this.user).then((res) => {
+          this.$ajax.post("/api/user", this.user).then((res) => {
             if (res.code == 200) {
               this.$notify({
                 title: "提示",

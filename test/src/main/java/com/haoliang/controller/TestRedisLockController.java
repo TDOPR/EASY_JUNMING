@@ -1,7 +1,7 @@
 package com.haoliang.controller;
 
 import com.haoliang.common.annotation.RedisLock;
-import com.haoliang.common.utils.RedisUtils;
+import com.haoliang.common.utils.redis.RedisUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

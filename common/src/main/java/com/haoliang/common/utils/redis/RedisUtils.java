@@ -1,5 +1,6 @@
-package com.haoliang.common.utils;
+package com.haoliang.common.utils.redis;
 
+import com.haoliang.common.utils.SpringUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.redisson.api.*;
@@ -116,6 +117,22 @@ public class RedisUtils {
     public static boolean deleteObject(final String key) {
         return getClient().getBucket(key).delete();
     }
+
+
+    /**
+     * 删除单个对象
+     * @param pattern 字符串前缀
+     */
+    public static void deleteObjects(final String pattern) {
+        Collection<String> keys=keys(pattern);
+        for(String key: keys){
+            deleteObject(key);
+        }
+    }
+
+    /**
+     * 删除多个对象
+     */
 
     /**
      * 获得缓存的Map

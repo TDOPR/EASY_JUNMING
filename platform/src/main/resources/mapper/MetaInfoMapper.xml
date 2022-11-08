@@ -20,20 +20,21 @@
         meta_info
         WHERE
             1=1
-        <if test="meta.metaName!=null and meta.metaName!=''">
-            AND metaName  LIKE CONCAT('%',#{meta.metaName},'%')
+        <if test="metaName!=null and metaName!=''">
+            AND metaName  LIKE CONCAT('%',#{metaName},'%')
         </if>
 
         <if test="meta.beginDate!=null">
-            AND createTime <![CDATA[ >= ]]> #{meta.beginDate}
+            AND createTime <![CDATA[ >= ]]> #{beginDate}
         </if>
 
         <if test="meta.endDate!=null">
-            AND createTime <![CDATA[ <= ]]> #{meta.endDate}
+            AND createTime <![CDATA[ <= ]]> #{endDate}
         </if>
     </select>
 
     <select id="getMetaColumnList" >
         SELECT * FROM meta_column where metaId=#{metaId}
     </select>
+
 </mapper>

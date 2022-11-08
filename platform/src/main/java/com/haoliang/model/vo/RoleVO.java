@@ -9,10 +9,14 @@ import java.util.List;
 @Data
 public class RoleVO  extends SysRole {
 
+    /**
+     * 关联的用户名
+     */
     private String userStr;
 
-    private String builtIn;
-
+    /**
+     * 角色拥有的菜单Id 用于修改角色时候自动勾选菜单
+     */
     private List<Integer> menuIds;
 
     /**

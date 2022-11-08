@@ -15,4 +15,5 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
     IPage<UserVO> selectPageVo(IPage<SysUser> page,@Param("user") SysUserCondition sysUserCondition);
 
+    List<Integer> findExistsByRoleId(@Param("idList") List<Integer> idList);
 }

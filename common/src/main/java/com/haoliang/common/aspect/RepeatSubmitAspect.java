@@ -5,7 +5,7 @@ import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.common.utils.MD5Util;
-import com.haoliang.common.utils.RedisUtils;
+import com.haoliang.common.utils.redis.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;

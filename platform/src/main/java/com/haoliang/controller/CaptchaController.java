@@ -1,4 +1,4 @@
-package com.haoliang.controller.system;
+package com.haoliang.controller;
 
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
@@ -8,7 +8,7 @@ import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.vo.CaptchaVO;
 import com.haoliang.common.utils.IdUtils;
-import com.haoliang.common.utils.RedisUtils;
+import com.haoliang.common.utils.redis.RedisUtils;
 import com.haoliang.common.utils.ReflectUtils;
 import com.haoliang.common.utils.SpringUtil;
 import com.haoliang.config.LoginConfig;

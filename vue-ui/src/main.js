@@ -19,6 +19,8 @@ import '../statics/css/icon/iconfont.css'
 import store from './store/index'
 // 引入echarts图表工具
 import echarts from 'echarts'
+import directive from './directive'
+
 
 Vue.prototype.$echarts = echarts
 
@@ -50,6 +52,7 @@ Vue.prototype.isNeedLogo = false
 Vue.use(ElementUI)
 Vue.use(bus)
 Vue.use(VueCropper)
+Vue.use(directive);
 // eslint-disable-next-line no-new
 new Vue({
   el: '#app',

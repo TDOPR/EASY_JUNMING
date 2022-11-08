@@ -1,10 +1,11 @@
-package com.haoliang.config;
+package com.haoliang.common.config;
 
-import com.haoliang.enums.DictionaryKeyEnum;
+
+import com.haoliang.common.enums.SysSettingKeyEnum;
 
 import java.util.HashMap;
 
-public class DictionaryParam {
+public class SysSettingParam {
 
     private static boolean loading = false;
 
@@ -23,29 +24,29 @@ public class DictionaryParam {
     }
 
     public static void setLoading(boolean loading) {
-        DictionaryParam.loading = loading;
+        SysSettingParam.loading = loading;
     }
 
     public static Integer getLoginLogSaveDay() {
-        return Integer.parseInt(DICTIONARY_PARAM.get(DictionaryKeyEnum.LOGIN_LOG_SAVE_DAY.getKey()));
+        return Integer.parseInt(DICTIONARY_PARAM.get(SysSettingKeyEnum.LOGIN_LOG_SAVE_DAY.getKey()));
     }
 
     public static Integer getOperationLogSaveDay() {
-        return Integer.parseInt(DICTIONARY_PARAM.get(DictionaryKeyEnum.OPERATION_LOG_SAVE_DAY.getKey()));
+        return Integer.parseInt(DICTIONARY_PARAM.get(SysSettingKeyEnum.OPERATION_LOG_SAVE_DAY.getKey()));
     }
 
     public static Integer getErrorLogSaveDay() {
-        return Integer.parseInt(DICTIONARY_PARAM.get(DictionaryKeyEnum.ERROR_LOG_SAVE_DAY.getKey()));
+        return Integer.parseInt(DICTIONARY_PARAM.get(SysSettingKeyEnum.ERROR_LOG_SAVE_DAY.getKey()));
     }
 
 
     public static boolean isEnableSso() {
-        return Boolean.parseBoolean(DICTIONARY_PARAM.get(DictionaryKeyEnum.ENABLE_SSO.getKey()));
+        return Boolean.parseBoolean(DICTIONARY_PARAM.get(SysSettingKeyEnum.ENABLE_SSO.getKey()));
     }
 
 
     public static Integer getThresholdSize() {
-        return Integer.parseInt(DICTIONARY_PARAM.get(DictionaryKeyEnum.THRESHOLD_SIZE.getKey()));
+        return Integer.parseInt(DICTIONARY_PARAM.get(SysSettingKeyEnum.THRESHOLD_SIZE.getKey()));
     }
 
 }

@@ -38,6 +38,16 @@ public class SysUser extends BaseModelCID {
     private String name;
 
     /**
+     * 邮箱号
+     */
+    private String email;
+
+    /**
+     * 手机号
+     */
+    private String mobile;
+
+    /**
      * 用户状态 1=正常 0=禁用
      * @required
      */
@@ -51,7 +61,7 @@ public class SysUser extends BaseModelCID {
 
     /**
      * 机构编号
-     * @required
+     * @ignore
      */
     private Integer channelId;
 

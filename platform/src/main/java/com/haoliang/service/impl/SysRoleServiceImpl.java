@@ -9,7 +9,6 @@ import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.utils.StringUtil;
 import com.haoliang.enums.RoleTypeEnum;
-import com.haoliang.mapper.SysMenuMapper;
 import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysRoleMenuMapper;
 import com.haoliang.mapper.SysUserMapper;
@@ -22,6 +21,7 @@ import com.haoliang.model.vo.SelectVO;
 import com.haoliang.service.SysRoleService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -41,11 +41,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Resource
     private SysRoleMenuMapper sysRoleMenuMapper;
 
-    @Resource
-    private SysMenuMapper sysMenuMapper;
-
     @Override
     public JsonResult queryByCondition(PageParam<SysRole, SysRoleCondition> pageParam) {
+        if (pageParam.getSearchParam() == null) {
+            pageParam.setSearchParam(new SysRoleCondition());
+        }
         IPage<SysRole> iPage = this.page(pageParam.getPage(), pageParam.getSearchParam().buildQueryParam());
         List<SysRole> sysRoles = iPage.getRecords();
         List<RoleVO> roleVOList = new ArrayList<>();
@@ -54,11 +54,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             roleVO = new RoleVO();
             roleVO.setUserStr(StringUtil.List2Str(sysUserMapper.findAllByUsernameByRoleId(sysRole.getId()), ","));
             BeanUtils.copyProperties(sysRole, roleVO);
-            if (RoleTypeEnum.nameOf(sysRole.getRoleCode()) != null) {
-                roleVO.setBuiltIn("1");
-            } else {
-                roleVO.setBuiltIn("0");
-            }
             roleVO.setMenuIds(sysRoleMenuMapper.findAllMenuIdByRoleId(sysRole.getId()));
             roleVOList.add(roleVO);
         }
@@ -105,9 +100,40 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         List<SysRole> sysRoleList = this.list();
         List<SelectVO> selectVOList = new ArrayList<>();
         sysRoleList.forEach(sysRole -> {
-            selectVOList.add(new SelectVO(sysRole.getId(), sysRole.getRoleName()));
+            if (!sysRole.getId().equals(RoleTypeEnum.ADMIN.getCode())) {
+                selectVOList.add(new SelectVO(sysRole.getId(), sysRole.getRoleName()));
+            }
         });
         return JsonResult.successResult(selectVOList);
     }
 
+    @Override
+    @Transactional
+    public JsonResult deleteByIdList(List<Integer> idList) {
+        //查询角色是否被用户引用
+        List<Integer> existsId = sysUserMapper.findExistsByRoleId(idList);
+        StringBuilder sb = new StringBuilder();
+        if (existsId.size() > 0) {
+            List<String> roleName = sysRoleMenuMapper.findRoleNameByIdIn(existsId);
+            for (Object str : roleName) {
+                sb.append(str).append(",");
+            }
+            if (sb.length() > 0) {
+                sb.deleteCharAt(sb.length() - 1);
+            }
+            idList.removeAll(existsId);
+        }
+
+        if (idList.size() > 0) {
+            //删除角色并且删除相关的角色菜单表
+            sysRoleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, idList));
+        }
+
+        this.removeByIds(idList);
+        if (sb.length() > 0) {
+            return JsonResult.failureResult("[" + sb.toString() + "]角色已被用户使用,不能删除!");
+        } else {
+            return JsonResult.successResult();
+        }
+    }
 }

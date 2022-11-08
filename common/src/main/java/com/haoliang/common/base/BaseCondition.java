@@ -18,13 +18,13 @@ import java.util.concurrent.TimeUnit;
 public abstract class BaseCondition<T> {
 
     /**
-     * 开始时间
+     * 范围 开始时间 格式: yyyy-MM-dd
      */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date beginDate;
 
     /**
-     * 结束时间
+     * 范围 结束时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
     private Date endDate;
@@ -36,11 +36,11 @@ public abstract class BaseCondition<T> {
     private QueryWrapper<T> queryWrapper;
 
     /**
-     * 构建查询条件
+     * 构建通用查询条件
      */
-    protected   void buildBaseQueryWrapper(){
-        if (this.queryWrapper== null) {
-            this.queryWrapper=new QueryWrapper<>();
+    protected void buildBaseQueryWrapper() {
+        if (this.queryWrapper == null) {
+            this.queryWrapper = new QueryWrapper<>();
             //排序条件
             this.queryWrapper.orderByDesc("createTime");
             if (!StringUtils.isEmpty(this.getBeginDate())) {
@@ -59,7 +59,6 @@ public abstract class BaseCondition<T> {
      * 构建查询条件
      */
     public abstract QueryWrapper buildQueryParam();
-
 
 
 }
