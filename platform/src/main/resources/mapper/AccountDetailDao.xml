@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.AccountDetailDao">
+
+    <select id="selectReleaseInfoCount" parameterType="java.util.Map" resultType="java.lang.Integer" >
+        SELECT
+        count(1)
+        FROM
+        account_detail a
+        INNER JOIN account b
+        ON a.user_id = b.uid
+        AND a.`coin_id` = b.`coin_id`
+        WHERE a.business_type = 'ppt_rebate_revenue'
+        <if test="uid != null and uid != ''">
+            AND a.`user_id` = #{uid}
+        </if>
+        ORDER BY a.`created` DESC
+    </select>
+
+
+    <select id="selectTransferDetailCount" parameterType="java.util.Map" resultType="java.lang.Integer" >
+        SELECT
+        count(1)
+        FROM
+        account_detail a
+        LEFT JOIN star_user b
+        ON a.`user_id` = b.`id`
+        WHERE a.`business_type` = 'star_transfer'
+        AND direction = 2
+        <if test="uid != null and uid != ''">
+            AND a.`user_id` = #{uid}
+        </if>
+        ORDER BY a.`created` DESC
+    </select>
+</mapper>

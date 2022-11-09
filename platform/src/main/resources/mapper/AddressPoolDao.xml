@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.AddressPoolDao">
+
+    <resultMap type="com.haoliang.model.EvmEventEntity" id="addressPoolMap">
+        <result property="id" column="id"/>
+        <result property="blockNum" column="block_num"/>
+    </resultMap>
+
+    <!--    <select id="getCountByTxHash" resultType="java.lang.Integer">-->
+    <!--        SELECT-->
+    <!--            count( 1 )-->
+    <!--        FROM-->
+    <!--            evm_event a-->
+    <!--        WHERE-->
+    <!--            a.tx_hash = #{txHash};-->
+    <!--    </select>-->
+
+    <select id="getAddress" resultType="java.lang.String">
+        SELECT address
+        FROM address_pool
+        ORDER BY RAND()
+        LIMIT 1
+    </select>
+
+    <delete id="deleteByAddress">
+        delete from address_pool where address = #{address}
+    </delete>
+
+</mapper>
