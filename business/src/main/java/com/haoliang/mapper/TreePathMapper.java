@@ -19,4 +19,10 @@ public interface TreePathMapper extends BaseMapper<TreePath> {
 
     @MapKey("uid")
     Map getLevelById(@Param("uid") int uid);
+
+    @MapKey("ancestor")
+    List<Map> getPathById(int uid);
+
+    @MapKey("id")
+    Map getUserLevelById(int uid);
 }

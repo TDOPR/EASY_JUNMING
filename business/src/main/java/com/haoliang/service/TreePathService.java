@@ -13,4 +13,7 @@ public interface TreePathService extends IService<TreePath> {
     List<Map> getNumByLevel(int uid);
     Map getLevelById(int uid);
 
+    List<Map> getPathById(int uid);
+
+    Map getUserLevelById(int uid);
 }

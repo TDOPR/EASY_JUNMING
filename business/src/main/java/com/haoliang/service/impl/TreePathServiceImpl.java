@@ -37,4 +37,13 @@ public class TreePathServiceImpl extends ServiceImpl<TreePathMapper, TreePath> i
         return treePathMapper.getLevelById(uid);
     }
 
+    @Override
+    public List<Map> getPathById(int uid){
+        return treePathMapper.getPathById(uid);
+    }
+
+    @Override
+    public Map getUserLevelById(int uid){
+        return treePathMapper.getUserLevelById(uid);
+    }
 }
