@@ -46,6 +46,10 @@ public class TradeManager {
     private final static BigDecimal RECHARGE_VALUE = new BigDecimal("300");
     private final static BigDecimal SUPER_RATE = new BigDecimal("0.05");
 
+
+/*
+* 静态收益
+* */
     public void staticIncome() {
         //获取当日的收益比例
         Random r = new Random();
@@ -101,6 +105,9 @@ public class TradeManager {
         }
     }
 
+    /*
+    * 金额托管
+    * */
     public void tradeRecharge(String userAddress, BigDecimal amount) throws AccountException {
         if (!existUser(userAddress)) {
             return;
@@ -127,6 +134,10 @@ public class TradeManager {
         updatePerformance(userInfoEntity.getId(), amount, true);
     }
 
+
+    /*
+    * 取出托管
+    * */
     public void tradeWithdraw(String userAddress, BigDecimal amount, int type) throws AccountException {
         if (!existUser(userAddress)) {
             return;
@@ -178,6 +189,10 @@ public class TradeManager {
         userWithdrawService.save(userWithdrawEntity);
     }
 
+
+    /*
+    * 更新最大可托管额度
+    * */
     private boolean upgradeRechargeAmount(UserInfoEntity userInfoEntity, BigDecimal amount, int type) {
         BigDecimal rechargeMax = userInfoEntity.getRechargeMax();
         QueryWrapper<AccountEntity> accountEntityQueryWrapper = new QueryWrapper<>();
@@ -202,6 +217,10 @@ public class TradeManager {
         }
     }
 
+
+    /*
+    * 托管机器人
+    * */
     public void tradeRobot(String userAddress, BigDecimal amount) throws Exception {
         if (!existUser(userAddress)) {
             return;
@@ -279,6 +298,10 @@ public class TradeManager {
         robotReward(userInfoEntity.getDirectInviteid(), robotLevel, amount, userOrderEntity.getId());
     }
 
+
+    /*
+    * 用户是否存在
+    * */
     private boolean existUser(String userAddress) {
         //判断当前用户是否存在
         QueryWrapper<UserInfoEntity> userWrapper = new QueryWrapper<>();
@@ -287,6 +310,9 @@ public class TradeManager {
         return Help.isNotNull(createUserEntity);
     }
 
+    /*
+    * 从recharge表拉取  已托管未处理用户信息
+    * */
     public void reUsdt(String userAddress, BigDecimal amount) {
         if (!existUser(userAddress)) {
             return;
@@ -312,6 +338,7 @@ public class TradeManager {
             userInfoService.save(updateUserInfoEntity);
         }
     }
+
 
     public void rechargeEvent() {
 
@@ -342,11 +369,19 @@ public class TradeManager {
         }
     }
 
+
+    /*
+    * 创建用户
+    * */
     public void createUser(String userAddress, String inviteUserCode) throws Exception {
         //需要注册用户
         userInfoService.createUser(userAddress, inviteUserCode);
     }
 
+
+    /*
+    * 更新团队业绩
+    * */
     private void updatePerformance(int userId, BigDecimal amount, boolean type) {
         QueryWrapper<TreePath> treePathsEntityQueryWrapper = new QueryWrapper<>();
         treePathsEntityQueryWrapper.eq("descendant", userId);
@@ -367,6 +402,10 @@ public class TradeManager {
         }
     }
 
+
+    /*
+    * 更新级别
+    * */
     private void levelChange(int userId) {
         QueryWrapper<TreePath> treePathEntityQueryWrapper = new QueryWrapper<>();
         treePathEntityQueryWrapper.eq("ancestor", userId);
@@ -412,6 +451,10 @@ public class TradeManager {
         userInfoService.updateById(newUserInfoEntity);
     }
 
+
+    /*
+    * 社区团队奖
+    * */
     private void commuTeamReward(int userId, BigDecimal amount, long coinId, int orderId) throws Exception{
 
         QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
@@ -452,6 +495,10 @@ public class TradeManager {
         }
     }
 
+
+    /*
+    * 社区代数奖
+    * */
     private void commuAlgebraPrize(int inviteId,int coinId, int userId, BigDecimal reward, BusinessTypeEnum businessTypeEnum, int orderId) throws Exception{
 
         List<Map> treePathsEntityList = treePathsService.getPathById(userId);
@@ -479,6 +526,10 @@ public class TradeManager {
         }
     }
 
+
+    /*
+    * 购买机器人奖励
+    * */
     private void robotReward(int inviteId, int userRobotLevel, BigDecimal amount, int orderId) throws
             AccountException {
         //查询我的直推信息
