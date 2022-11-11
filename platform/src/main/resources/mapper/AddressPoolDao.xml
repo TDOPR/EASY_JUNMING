@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.haoliang.mapper.AddressPoolDao">
-
-    <resultMap type="com.haoliang.model.EvmEventEntity" id="addressPoolMap">
-        <result property="id" column="id"/>
-        <result property="blockNum" column="block_num"/>
-    </resultMap>
+<mapper namespace="com.haoliang.mapper.AddressPoolMapper">
 
     <!--    <select id="getCountByTxHash" resultType="java.lang.Integer">-->
     <!--        SELECT-->

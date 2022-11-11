@@ -2,6 +2,8 @@ package com.haoliang.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.haoliang.common.base.BaseModelNoModifyTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,24 +11,18 @@ import java.math.BigDecimal;
 
 /**
  * @author Dominick Li
- * @Description 用户钱包
+ * @Description 用户钱包流水表
  * @CreateTime 2022/11/1 10:57
  **/
 @Data
+@Builder
 @TableName("wallet_logs")
 @NoArgsConstructor
+@AllArgsConstructor
 public class WalletLogs extends BaseModelNoModifyTime {
 
-    public WalletLogs(Integer userId, Integer targetUserId, BigDecimal amount, Integer action, Integer type) {
-        this.userId = userId;
-        this.targetUserId = targetUserId;
-        this.amount = amount;
-        this.action = action;
-        this.type = type;
-    }
-
     /**
-     * 所属用户Id
+     * 用户Id
      */
     private Integer userId;
 
@@ -45,12 +41,10 @@ public class WalletLogs extends BaseModelNoModifyTime {
      */
     private Integer action;
 
-
     /**
-     * 流水类型  1-ai奖励(机器人)  2-社区推广奖励 3-社区团队奖励 4-特级分红奖励 5-提现违约金
+     * 流水类型 对应FlowingTypeEnum枚举
      */
     private Integer type;
-
 
 
 }

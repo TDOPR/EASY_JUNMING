@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 /**
  * @author Dominick Li
- * @Description 收益
+ * @Description 日收益
  * @CreateTime 2022/11/1 17:13
  **/
 @Component
@@ -52,12 +52,27 @@ public class ProfitTaskScheduledJob {
         //查询托管金额大于0的用户钱包信息
         List<Wallets> walletsList = walletService.list(new LambdaQueryWrapper<Wallets>().ge(Wallets::getPrincipalAmount, 0));
         List<ProfitLogs> profitLogsList = new ArrayList<>(walletsList.size());
+        ProfitLogs profitLogs;
         for (Wallets wallets : walletsList) {
-            profitLogsList.add(new ProfitLogs(wallets.getUserId(), wallets.getPrincipalAmount(), EasyTradeConfig.PROFIT_RATE, wallets.getPrincipalAmount().multiply(EasyTradeConfig.PROFIT_RATE)));
+            profitLogs = ProfitLogs.builder()
+                    .userId(wallets.getUserId())
+                    .principal(wallets.getPrincipalAmount())
+                    .profitRate(EasyTradeConfig.PROFIT_RATE)
+                    .generatedAmount(wallets.getPrincipalAmount().multiply(EasyTradeConfig.PROFIT_RATE))
+                    .build();
+            profitLogsList.add(profitLogs);
         }
         //批量插入日收益日志
         profitLogsService.saveBatch(profitLogsList);
         log.info("-------------计算日收益任务结束--------------");
+        //发放团队奖
+
+        //发放领导奖
+
+        //发放特别奖
+
+        //更新当天的的利率
+
     }
 
     /**
@@ -74,20 +89,24 @@ public class ProfitTaskScheduledJob {
         List<Long> allIdList = new ArrayList<>();
         BigDecimal total;
         List<WalletLogs> walletLogList = new ArrayList<>();
-
+        WalletLogs walletLogs;
         for (Wallets wallets : walletsList) {
             //获取用户未结算的收益信息
             profitLogsList = profitLogsService.list(new LambdaQueryWrapper<ProfitLogs>().eq(ProfitLogs::getGrantToUser, 0).eq(ProfitLogs::getUserId, wallets.getUserId()));
             allIdList.addAll(profitLogsList.stream().map(ProfitLogs::getId).collect(Collectors.toList()));
             //获取周收益金额
             total = new BigDecimal("0.0");
-            for(ProfitLogs profitLogs: profitLogsList){
-                total=total.add(profitLogs.getGeneratedAmount());
+            for (ProfitLogs profitLogs : profitLogsList) {
+                total = total.add(profitLogs.getGeneratedAmount());
             }
-            //修改静态收益总数
-            wallets.setStaticRewardAmount(wallets.getStaticRewardAmount().add(total));
+            walletLogs = WalletLogs.builder()
+                    .userId(wallets.getUserId())
+                    .amount(total)
+                    .action(FlowingActionEnum.INCOME.getValue())
+                    .type(FlowingTypeEnum.STATIC.getValue())
+                    .build();
             //添加钱包交易流水
-            walletLogList.add(new WalletLogs(wallets.getUserId(), null, total, FlowingActionEnum.INCOME.getValue(), FlowingTypeEnum.WEEK.getValue()));
+            walletLogList.add(walletLogs);
         }
         if (allIdList.size() > 0) {
             //修改未结算的流水记录为已结算
@@ -101,16 +120,15 @@ public class ProfitTaskScheduledJob {
     }
 
     public static void main(String[] args) {
-
-            //小数加减乘除用BigDecimal
-            BigDecimal b1 = new BigDecimal("1.8");
-            BigDecimal b2 = new BigDecimal("0.1");
-            BigDecimal b3 = b1.add(b2);//小数相加
-            BigDecimal b4 = b1.subtract(b2);//小数相减
-            BigDecimal b5 = b1.multiply(b2);//小数相乘
-            System.out.println("1.8 + 0.1 = " + b3);
-            System.out.println("1.8 - 0.1 = " + b4);
-            System.out.println("1.8 * 0.1 = " + b5);
+        //小数加减乘除用BigDecimal
+        BigDecimal b1 = new BigDecimal("1.8");
+        BigDecimal b2 = new BigDecimal("0.1");
+        BigDecimal b3 = b1.add(b2);//小数相加
+        BigDecimal b4 = b1.subtract(b2);//小数相减
+        BigDecimal b5 = b1.multiply(b2);//小数相乘
+        System.out.println("1.8 + 0.1 = " + b3);
+        System.out.println("1.8 - 0.1 = " + b4);
+        System.out.println("1.8 * 0.1 = " + b5);
     }
 
 }

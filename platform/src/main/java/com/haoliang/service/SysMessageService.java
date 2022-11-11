@@ -9,5 +9,5 @@ import javax.servlet.http.HttpServletResponse;
 public interface SysMessageService extends IService<SysMessage> {
     JsonResult saveMessage(SysMessage sysMessage);
 
-    void exportJson(HttpServletResponse httpServletResponse);
+    void exportJson(Integer type, HttpServletResponse httpServletResponse);
 }

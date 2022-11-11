@@ -4,6 +4,7 @@ package com.haoliang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.vo.PageVO;
@@ -66,11 +67,11 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             //角色名称和编码不能重复
             SysRole exists = this.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleName, sysRole.getRoleName()));
             if (exists != null) {
-                return JsonResult.failureResult("角色名称不能重复!");
+                return JsonResult.failureResult(ReturnMessageEnum.ROLE_NAME_EXISTS);
             }
             exists = this.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, sysRole.getRoleCode()));
             if (exists != null) {
-                return JsonResult.failureResult("角色编码不能重复!");
+                return JsonResult.failureResult(ReturnMessageEnum.ROLE_CODE_EXISTS);
             }
             SysRole newRole = new SysRole();
             BeanUtils.copyProperties(sysRole, newRole);
@@ -131,7 +132,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
         this.removeByIds(idList);
         if (sb.length() > 0) {
-            return JsonResult.failureResult("[" + sb.toString() + "]角色已被用户使用,不能删除!");
+            return JsonResult.failureResult("[" + sb.toString() + "] has been used by the user and cannot be deleted!");
         } else {
             return JsonResult.successResult();
         }

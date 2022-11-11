@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * 监控中心
  * @author Dominick Li
- * @Description
  * @CreateTime 2022/11/8 14:37
  **/
 @RestController
@@ -21,7 +21,7 @@ import java.util.List;
 public class MonitorInfoController {
 
     /**
-     * 服务器资源使用率信息
+     * 服务器硬件资源监控
      */
     @GetMapping("/getMonitorInfo")
     @PreAuthorize("hasAuthority('sys:monitor:list')")

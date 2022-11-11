@@ -3,6 +3,7 @@ package com.haoliang.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.haoliang.model.SysMenu;
 import com.haoliang.model.dto.MenuIdDTO;
+import com.haoliang.model.vo.MenuTreeVO;
 import com.haoliang.model.vo.MenuVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -26,4 +27,6 @@ public interface SysMenuMapper extends BaseMapper<SysMenu> {
     List<MenuVO> findAllByParentIOrderBySortIndexAsc();
 
     List<MenuIdDTO> findIdByParentId(@Param("parentId")Integer parentId);
+
+    List<MenuTreeVO> getTree();
 }

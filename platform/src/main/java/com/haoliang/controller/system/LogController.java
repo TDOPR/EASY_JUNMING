@@ -3,6 +3,8 @@ package com.haoliang.controller.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haoliang.annotation.OperationLog;
+import com.haoliang.common.constant.OperationAction;
+import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.*;
 import com.haoliang.common.model.bo.IntIdListBO;
 import com.haoliang.common.model.vo.ExportErrorLogVO;
@@ -62,7 +64,7 @@ public class LogController {
      * 批量删除登录日志
      * @param idList id数组  格式[1,2,3]
      */
-    @OperationLog(module = "登录日志", description = "批量删除")
+    @OperationLog(module = OperationModel.SYS_LOGIN_LOG, description = OperationAction.REMOVE)
     @PostMapping("/loginlog/delete")
     @PreAuthorize("hasAuthority('sys:loginlog:remove')")
     public JsonResult deleteLoginLogsByIds(@RequestBody IntIdListBO intIdListBO) {
@@ -138,7 +140,7 @@ public class LogController {
      * 批量删除错误日志
      * @param idList id数组
      */
-    @OperationLog(module = "错误日志", description = "批量删除")
+    @OperationLog(module =  OperationModel.SYS_ERROR_LOG, description = OperationAction.REMOVE)
     @PostMapping("/errorlog/delete")
     @PreAuthorize("hasAuthority('sys:errorlog:remove')")
     public JsonResult deleteErrorLogsByIds(@RequestBody IntIdListBO intIdListBO) {

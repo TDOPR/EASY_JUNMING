@@ -7,6 +7,7 @@ import com.haoliang.common.base.BaseModelCID;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 
@@ -22,21 +23,21 @@ public class SysMenu extends BaseModelCID {
      * 访问路径
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String path;
 
     /**
      * 菜单名称
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String title;
 
     /**
      * 菜单图标样式
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String icon;
 
     /**
@@ -49,21 +50,21 @@ public class SysMenu extends BaseModelCID {
      * 显示顺序
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotNull
     private Integer sortIndex = 1;
 
     /**
      * 组件路径
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String importStr;
 
     /**
      * 菜单类型  1=目录,2=菜单,3=权限
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotNull
     private Integer type;
 
     /**

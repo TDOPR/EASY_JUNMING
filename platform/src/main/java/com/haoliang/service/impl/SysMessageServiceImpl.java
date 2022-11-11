@@ -31,8 +31,14 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
     }
 
     @Override
-    public void exportJson(HttpServletResponse httpServletResponse) {
-        List<SysMessage> sysMessageList = this.list();
+    public void exportJson(Integer type, HttpServletResponse httpServletResponse) {
+
+        List<SysMessage> sysMessageList;
+        if (type == -1) {
+            sysMessageList = this.list();
+        } else {
+            sysMessageList = this.list(new LambdaQueryWrapper<SysMessage>().eq(SysMessage::getType, type));
+        }
         //对数据进行分组
         JSONObject data = new JSONObject();
         JSONObject zhCn = new JSONObject();

@@ -37,4 +37,9 @@ public class SysMessage extends BaseModelCID {
      */
     private String enUs;
 
+    /**
+     * 类型 0=后台 1=客户端
+     */
+    private Integer type;
+
 }

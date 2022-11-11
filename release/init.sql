@@ -44,7 +44,7 @@ CREATE TABLE `sys_user`  (
   `name` varchar(255) NOT NULL DEFAULT '' COMMENT '用户昵称',
   `password` varchar(255)  NOT NULL DEFAULT '' COMMENT '密码',
   `roleId` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '角色Id',
-  `salt` varchar(255) NOT NULL DEFAULT '' COMMENT '密码加密的盐',
+  `salt` varchar(32) NOT NULL DEFAULT '' COMMENT '密码加密的盐',
   `username` varchar(255)  NOT NULL DEFAULT '' COMMENT '用户名',
   `email` varchar(36)  NOT NULL DEFAULT '' COMMENT '邮箱号',
   `mobile` varchar(18)  NOT NULL DEFAULT '' COMMENT '手机号',

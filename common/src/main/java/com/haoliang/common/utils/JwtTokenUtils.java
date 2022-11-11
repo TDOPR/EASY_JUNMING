@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.DefaultClock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -18,14 +19,14 @@ import java.util.Date;
 @Slf4j
 public class JwtTokenUtils {
 
-    public static final String TOKEN_NAME="token";
+    public static final String TOKEN_NAME = "token";
 
     private static final Clock clock = DefaultClock.INSTANCE;
 
     /**
      * 根据身份ID标识，生成Token
      */
-    public static String getToken(Integer identityId, String authorities,String username) {
+    public static String getToken(Integer identityId, String authorities, String username,String roleCode) {
         Date nowDate = new Date();
         //过期时间
         Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
@@ -39,6 +40,7 @@ public class JwtTokenUtils {
                 //自定义属性 放入用户拥有请求权限
                 .claim("authorities", authorities)
                 .claim("userName", username)
+                .claim("roleCode", roleCode)
                 .compact();
     }
 
@@ -64,15 +66,40 @@ public class JwtTokenUtils {
      */
     public static Claims getTokenClaim(String token) {
         try {
-            token= RedisUtils.getCacheObject(token);
-            return Jwts.parser().setSigningKey(GlobalConfig.getTokenSecret()).parseClaimsJws(token).getBody();
+            token = RedisUtils.getCacheObject(token);
+            if (StringUtils.hasText(token)) {
+                return Jwts.parser().setSigningKey(GlobalConfig.getTokenSecret()).parseClaimsJws(token).getBody();
+            }
+            return null;
         } catch (Exception e) {
             log.error("getTokenClaim error:{}", e.getMessage());
             return null;
         }
     }
 
-//    /**
+
+    /**
+     * 根据token获取username
+     */
+    public static Integer getUserIdFromToken(String token) {
+        return Integer.parseInt(getClaimFromToken(token, Claims::getSubject));
+    }
+
+    /**
+     * 根据token获取角色Id
+     */
+    public static String getRoleCodeFromToken(String token) {
+        return getTokenClaim(token).get("roleCode").toString();
+    }
+
+    /**
+     * 根据token获取用户名
+     */
+    public static String getUserNameFromToken(String token) {
+        return getTokenClaim(token).get("userName").toString();
+    }
+
+    //    /**
 //     * 判断token是否失效
 //     */
 //    public static boolean isTokenExpired(String token) {
@@ -83,34 +110,12 @@ public class JwtTokenUtils {
 //            return true;
 //        }
 //    }
-
-    /**
-     * 根据token获取username
-     */
-    public static Integer getUserIdFromToken(String token) {
-        return Integer.parseInt(getClaimFromToken(token, Claims::getSubject));
-    }
-
-    /**
-     * 根据token获取角色
-     */
-    public static String getRoleCodeFromToken(String token) {
-        return getTokenClaim(token).get("role").toString().toLowerCase();
-    }
-
-    /**
-     * 根据token获取用户名
-     */
-    public static String getUserNameFromToken(String token) {
-        return getTokenClaim(token).get("userName").toString();
-    }
-
-    /**
-     * 根据token获取失效时间
-     */
-    public static Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
-    }
+//    /**
+//     * 根据token获取失效时间
+//     */
+//    public static Date getExpirationDateFromToken(String token) {
+//        return getClaimFromToken(token, Claims::getExpiration);
+//    }
 
     public static <T> T getClaimFromToken(String token, java.util.function.Function<Claims, T> claimsResolver) {
         final Claims claims = getTokenClaim(token);

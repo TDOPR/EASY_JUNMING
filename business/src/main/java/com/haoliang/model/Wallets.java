@@ -23,7 +23,7 @@ public class Wallets extends BaseModel {
     /**
      * 机器人购买金额
      */
-    private Integer robotAmount;
+    private BigDecimal robotAmount;
 
     /**
      * 机器人等级
@@ -31,36 +31,33 @@ public class Wallets extends BaseModel {
     private Integer robotLevel;
 
     /**
-     * 托管本金 (余额)
+     * 区块链充值地址
+     */
+    private String blockAddress;
+
+    /**
+     * 法币账号
+     */
+    private String legalCurrencyAccount;
+
+    /**
+     * 钱包余额
+     */
+    private BigDecimal walletAmount;
+
+    /**
+     * 托管本金
      */
     private BigDecimal principalAmount;
 
     /**
+     * 累计充值金额
+     */
+    private BigDecimal totalRechargeAmount;
+
+    /**
      * 累计提现金额
      */
-    private BigDecimal withdrawAmount;
-
-    /**
-     * 静态收益
-     */
-    private BigDecimal staticRewardAmount;
-
-    /**
-     * 团队业绩
-     */
-    private BigDecimal performanceAmount;
-
-    /**
-     * 总静态收益
-     */
-    private BigDecimal totalStaticReward;
-
-    /**
-     * 历史总金额
-     */
-    private BigDecimal totalAmount;
-
-
-
+    private BigDecimal totalWithdrawAmount;
 
 }

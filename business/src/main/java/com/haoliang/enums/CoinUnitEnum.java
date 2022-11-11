@@ -3,6 +3,8 @@ package com.haoliang.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 /**
  * @author Dominick Li
  * @Description 提现的货币类型
@@ -10,24 +12,42 @@ import lombok.Getter;
  **/
 @Getter
 @AllArgsConstructor
-public enum  CoinUnitEnum {
+public enum CoinUnitEnum {
 
-    LEGAL_CURRENCY(1,"法币",0.02d),
-    USDT(2,"Usdt数字货币",0.01d);
+    LEGAL_CURRENCY(1, "法币", new BigDecimal(0.03)),
+    USDT(2, "Usdt数字货币", new BigDecimal(0.01));
 
     /**
      * 类型id
      */
-    private Integer value;
+    private Integer type;
 
     /**
      * 货币名称
      */
-    private String coinUnitName;
+    private String desc;
 
     /**
      * 提现手续费
      */
-    private Double interestRate;
+    private BigDecimal interestRate;
 
+
+    public static CoinUnitEnum valueOfByType(Integer type) {
+        for (CoinUnitEnum coinUnitEnum : values()) {
+            if (type.equals(coinUnitEnum.getType())) {
+                return coinUnitEnum;
+            }
+        }
+        return null;
+    }
+    
+    public static String getDescByType(Integer type){
+        for (CoinUnitEnum coinUnitEnum : values()) {
+            if (type.equals(coinUnitEnum.getType())) {
+                return coinUnitEnum.getDesc();
+            }
+        }
+        return "";
+    }
 }

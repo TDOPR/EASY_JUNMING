@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.AppUserRebotRefMapper">
+
+    <select id="countByUserId" resultType="java.lang.Integer">
+        select count(1) from app_user_rebot_ref where userId=#{userId}
+    </select>
+    <select id="findByInviteUserId" resultType="com.haoliang.model.AppUserRebotRef">
+        select * from app_user_rebot_ref where inviteUserId=#{inviteUserId}
+    </select>
+
+</mapper>

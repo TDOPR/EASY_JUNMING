@@ -2,6 +2,8 @@ package com.haoliang.controller.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haoliang.annotation.OperationLog;
+import com.haoliang.common.constant.OperationAction;
+import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.bo.IntIdListBO;
@@ -48,7 +50,7 @@ public class SysNoticeController {
      * 批量删除
      * @param idList Id数组
      */
-    @OperationLog(module = "公告管理", description = "批量删除")
+    @OperationLog(module = OperationModel.SYS_NOTICE, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:notice:remove')")
     public JsonResult deleteByIds(@RequestBody IntIdListBO intIdListBO) {
@@ -58,7 +60,7 @@ public class SysNoticeController {
     /**
      * 新增或修改
      */
-    //@OperationLog(module = "公告管理", description = "新增或修改")
+    @OperationLog(module = OperationModel.SYS_NOTICE, description = OperationAction.REMOVE)
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:notice:add','sys:notice:edit')")
     public JsonResult save(@Valid @RequestBody SysNotice sysNotice) {

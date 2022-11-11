@@ -22,12 +22,16 @@ public class MyUserDetail implements org.springframework.security.core.userdetai
     public MyUserDetail(Claims claims) {
         this.username = claims.getSubject();
         authorities = new ArrayList<>();
-        if(claims.containsKey("authorities")){
+        if (claims.containsKey("authorities")) {
             String authoritiesStr = claims.get("authorities").toString();
             List<String> authoritieList = JSONObject.parseArray(authoritiesStr, String.class);
             for (String str : authoritieList) {
                 authorities.add(new SimpleGrantedAuthority(str));
             }
+        }
+        if (claims.containsKey("roleCode")) {
+            SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_" + claims.get("role", String.class));
+            authorities.add(simpleGrantedAuthority);
         }
     }
 

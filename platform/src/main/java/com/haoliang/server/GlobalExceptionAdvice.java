@@ -25,7 +25,7 @@ public class GlobalExceptionAdvice {
     @ResponseBody
     public JsonResult exceptionHndler(Exception e) {
         if (e instanceof AccessDeniedException) {
-            return JsonResult.failureResult(HttpStatus.FORBIDDEN.value(), "没有权限执行该操作!");
+            return JsonResult.failureResult(HttpStatus.FORBIDDEN.value(), "No permission to perform this operation!");
         }
         log.error("globale exception  msg={}", e);
         ErrorLogUtil.save(e);
@@ -42,7 +42,7 @@ public class GlobalExceptionAdvice {
             // 获取错误验证字段名
             field = fieldError.getField();
             msg = fieldError.getDefaultMessage();
-            sb.append("参数名[").append(field).append("]").append(msg).append(",");
+            sb.append("param[").append(field).append("]").append(msg).append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
         return JsonResult.failureResult(sb.toString());

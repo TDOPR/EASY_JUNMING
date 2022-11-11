@@ -1,27 +1,23 @@
 package com.haoliang.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.math.BigDecimal;
 
+@Getter
+@AllArgsConstructor
 public enum RobotEnum {
 
-    ROBOT_ONE(1, new BigDecimal("100"),new BigDecimal("1000")),
-    ROBOT_TW0(2, new BigDecimal("200"),new BigDecimal("5000")),
-    ROBOT_THREE(3, new BigDecimal("300"),new BigDecimal("10000")),
-    ROBOT_FOUR(4, new BigDecimal("400"),BigDecimal.ONE);
+    ZERO(0, BigDecimal.ZERO, new BigDecimal(1000)),
+    ROBOT_ONE(1, new BigDecimal(100), new BigDecimal(1000)),
+    ROBOT_TW0(2, new BigDecimal(200), new BigDecimal(5000)),
+    ROBOT_THREE(3, new BigDecimal(300), new BigDecimal(10000)),
+    ROBOT_FOUR(4, new BigDecimal(400), BigDecimal.ZERO);
 
-    private int code;
+    private int value;
     private BigDecimal price;
     private BigDecimal rechargeMax;
-
-    RobotEnum(int value, BigDecimal price,BigDecimal rechargeMax) {
-        this.code = value;
-        this.price = price;
-        this.rechargeMax = rechargeMax;
-    }
-
-    public int getCode() {
-        return code;
-    }
 
 
     public BigDecimal getPrice() {
@@ -32,19 +28,18 @@ public enum RobotEnum {
         return rechargeMax;
     }
 
-    public static BigDecimal getRechargeMaxByCode(int code) {
+    public static BigDecimal getRechargeMaxByValue(int value) {
         for (RobotEnum robotEnum : RobotEnum.values()) {
-            if (code == robotEnum.getCode()) {
+            if (value == robotEnum.getValue()) {
                 return robotEnum.getRechargeMax();
             }
         }
         return BigDecimal.ZERO;
     }
 
-    public static RobotEnum parseValue(int value) {
-
+    public static RobotEnum valueOf(int value) {
         for (final RobotEnum sys : RobotEnum.values()) {
-            if (sys.getCode() == value) {
+            if (sys.getValue() == value) {
                 return sys;
             }
         }

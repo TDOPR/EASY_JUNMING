@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.AppUserMapper">
+
+    <select id="findInviteIdByUserId" resultType="java.lang.Integer">
+        SELECT  inviteId from app_users where id=#{userId}
+    </select>
+
+    <select id="page" resultType="com.haoliang.model.vo.AppUsersVO"  parameterType="com.haoliang.model.condition.AppUsersCondition" >
+        SELECT
+            u.*
+        FROM
+        app_users u
+        LEFT JOIN
+        wallets  w
+        ON  w.userId=u.id
+        WHERE
+        1=1
+        <if test="param.enabled>-1 ">
+            AND w.enabled=  #{param.enabled}
+        </if>
+        <if test="param.email!=null and param.email!=''">
+            AND u.email=  #{param.email}
+        </if>
+        <if test="param.beginDate!=null">
+            AND w.createTime <![CDATA[ >= ]]> #{param.beginDate}
+        </if>
+        <if test="param.endDate!=null">
+            AND w.createTime <![CDATA[ <= ]]> #{param.endDate}
+        </if>
+    </select>
+
+</mapper>

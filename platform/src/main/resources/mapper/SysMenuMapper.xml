@@ -43,6 +43,12 @@
         <collection property="children" ofType="com.haoliang.model.dto.MenuIdDTO" column="id" select="findIdByParentId"/>
     </resultMap>
 
+    <resultMap type="com.haoliang.model.vo.MenuTreeVO" id="MenuTreeVO">
+        <result column="id" property="id"/>
+        <result column="title" property="title"/>
+        <collection property="children" ofType="com.haoliang.model.vo.MenuTreeVO" column="id" select="MenuTreeVOByParentId"/>
+    </resultMap>
+
     <select id="findAllByParentIdOrderBySortIndexAsc" resultMap="menuTree">
         SELECT
             *
@@ -60,10 +66,11 @@
         FROM
             sys_menu
         WHERE
-            parentId =#{parentId}
+            parentId =#{id}
         ORDER BY
             sortIndex
     </select>
+
 
 
     <select id="findMenuNameById" resultType="java.lang.String">
@@ -87,7 +94,7 @@
             sys_role_menu srm
             ON sm.id=srm.menuId
         WHERE
-            srm.roleId=#{roleId} and sm.type>1 and sm.authorityStr != ''
+            srm.roleId=#{roleId} and sm.type>1 and sm.display=1 and sm.authorityStr != ''
     </select>
 
     <select id="findAllAuthority" resultType="java.lang.String">
@@ -96,7 +103,7 @@
         FROM
             sys_menu
         WHERE
-            type>1 and authorityStr != ''
+            type>1 and display=1 and authorityStr != ''
     </select>
 
 
@@ -153,6 +160,30 @@
 
     <select id="findIdByParentId" resultMap="menuIdTree">
         select id from sys_menu WHERE parentId=#{parentId}
+    </select>
+
+
+    <!--获取添加角色需要的菜单数据 -->
+    <select id="getTree" resultMap="MenuTreeVO">
+        SELECT
+            id,title
+        FROM
+            sys_menu
+        WHERE
+            parentId=0 and display=1
+        ORDER BY
+            sortIndex
+    </select>
+
+    <select id="MenuTreeVOByParentId" resultMap="MenuTreeVO">
+        SELECT
+            id,title
+        FROM
+            sys_menu
+        WHERE
+            parentId=#{id} and display=1
+        ORDER BY
+            sortIndex
     </select>
 
 </mapper>

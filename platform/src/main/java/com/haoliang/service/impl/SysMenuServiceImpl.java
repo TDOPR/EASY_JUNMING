@@ -2,6 +2,7 @@ package com.haoliang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.enums.RoleTypeEnum;
@@ -83,8 +84,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             }
         }
         this.saveOrUpdateBatch(saveSysMenuList);
-        String roleCode = JwtTokenUtils.getRoleCodeFromToken(token);
-        return JsonResult.successResult(this.findAllByRoleId(sysRoleService.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, roleCode)).getId()));
+        return JsonResult.successResult(this.findAllByRoleCode(JwtTokenUtils.getRoleCodeFromToken(token)));
     }
 
 
@@ -95,8 +95,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         Integer existsId = sysRoleMenuMapper.findAllByMenuIdIn(id);
         //只能删除单个
         if (existsId != null) {
-            String menuName = sysMenuMapper.findMenuNameById(existsId);
-            return JsonResult.failureResult("[" + menuName + "]已被角色使用,不能删除!");
+            return JsonResult.failureResult(ReturnMessageEnum.MENU_EXISTS_USE);
         } else {
             //根据id查询子菜单Id
             List<MenuIdDTO> menuIdDTOList = sysMenuMapper.findIdByParentId(id);
@@ -113,8 +112,9 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
 
     /**
      * 递归获取树节点的所有Id
+     *
      * @param menuIdDTO 当前节点
-     * @param allId id存储容器
+     * @param allId     id存储容器
      */
     private void recursionId(MenuIdDTO menuIdDTO, List<Integer> allId) {
         allId.add(menuIdDTO.getId());
@@ -133,5 +133,22 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @CacheEvict(allEntries = true)
     public JsonResult saveMenu(SysMenu sysMenu) {
         return JsonResult.build(this.saveOrUpdate(sysMenu));
+    }
+
+    @Override
+    public JsonResult getTree() {
+        return JsonResult.successResult(sysMenuMapper.getTree());
+    }
+
+    //@Cacheable(key = "'authority'#roleId")
+    @Override
+    public List<String> findAuthorityByRoleId(Integer roleId) {
+        List<String> authorityList;
+        if (roleId.equals(RoleTypeEnum.ADMIN.getCode())) {
+            authorityList = sysMenuMapper.findAllAuthority();
+        } else {
+            authorityList = sysMenuMapper.findAllAuthorityByRoleId(roleId);
+        }
+        return authorityList;
     }
 }

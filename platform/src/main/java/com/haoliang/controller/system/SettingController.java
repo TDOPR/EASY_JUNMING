@@ -1,6 +1,8 @@
 package com.haoliang.controller.system;
 
 import com.haoliang.annotation.OperationLog;
+import com.haoliang.common.constant.OperationAction;
+import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.service.SysDictionaryService;
 import com.haoliang.service.SystemService;
@@ -37,7 +39,7 @@ public class SettingController {
     /**
      * 修改字典信息
      */
-    @OperationLog(module = "系统设置",description = "修改基础字典")
+    @OperationLog(module = OperationModel.SYS_SETTING,description = OperationAction.ADD_OR_EDIT)
     @PostMapping("/setting")
     @PreAuthorize("hasAuthority('sys:system:list')")
     public JsonResult saveSetting(@RequestBody Map<String, String> map){

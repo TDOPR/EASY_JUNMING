@@ -20,13 +20,13 @@ public class UpdatePasswordBO {
     /**
      * 原密码
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String oldPassword;
 
     /**
      * 新密码
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String password;
 
 }

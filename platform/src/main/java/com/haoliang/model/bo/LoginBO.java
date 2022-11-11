@@ -10,13 +10,13 @@ public class LoginBO {
     /**
      * 用户名
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String username;
 
     /**
      * 密码
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String password;
 
     /**

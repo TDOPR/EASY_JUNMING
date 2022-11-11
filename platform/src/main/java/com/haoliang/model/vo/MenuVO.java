@@ -1,5 +1,6 @@
 package com.haoliang.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class MenuVO  {
     /**
      * 菜单图标样式
      */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String icon;
 
     /**
@@ -50,6 +52,7 @@ public class MenuVO  {
     /**
      * 子菜单列表
      */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<MenuVO> children;
 
 

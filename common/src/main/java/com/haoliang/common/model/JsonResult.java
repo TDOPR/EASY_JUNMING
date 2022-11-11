@@ -1,5 +1,7 @@
 package com.haoliang.common.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.haoliang.common.enums.ReturnMessageEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
@@ -10,12 +12,12 @@ import java.io.Serializable;
  * @CreateTime 2021/10/9 14:05
  * @description 返回数据封装
  **/
-public class JsonResult<T>  implements Serializable {
+public class JsonResult<T> implements Serializable {
 
     /**
      * 成功标识 200成功，其它异常
      */
-    private int code=200;
+    private int code = 200;
 
     /**
      * 提示信息
@@ -25,25 +27,26 @@ public class JsonResult<T>  implements Serializable {
     /**
      * 数据
      */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private T data;
 
-    /**
-     * 响应时间戳
-     */
-    private String timestamp;
+//    /**
+//     * 响应时间戳
+//     */
+//    private String timestamp;
 
     private static final long serialVersionUID = -7268040542410707954L;
 
-    protected static String successMessage = "ok";
+    protected static String successMessage = ReturnMessageEnum.OK.getKey();
 
-    protected static String errorMessage = "error";
+    protected static String errorMessage = ReturnMessageEnum.ERROR.getKey();
 
     public JsonResult() {
     }
 
     public JsonResult(int code) {
         this.setCode(code);
-        this.setTimestamp(String.valueOf(System.currentTimeMillis()));
+        //this.setTimestamp(String.valueOf(System.currentTimeMillis()));
     }
 
     public JsonResult(int code, String msg) {
@@ -56,8 +59,8 @@ public class JsonResult<T>  implements Serializable {
         this.setData(data);
     }
 
-    public static JsonResult build(boolean flag){
-        return new JsonResult(flag?HttpStatus.OK.value():HttpStatus.INTERNAL_SERVER_ERROR.value(),flag? successMessage:errorMessage);
+    public static JsonResult build(boolean flag) {
+        return new JsonResult(flag ? HttpStatus.OK.value() : HttpStatus.INTERNAL_SERVER_ERROR.value(), flag ? successMessage : errorMessage);
     }
 
     public static JsonResult successResult() {
@@ -74,7 +77,7 @@ public class JsonResult<T>  implements Serializable {
     }
 
 
-    public static  <T>  JsonResult<T> successResult(String msg, T obj) {
+    public static <T> JsonResult<T> successResult(String msg, T obj) {
         return new JsonResult(HttpStatus.OK.value(), defaultSuccessMsg(msg), obj);
     }
 
@@ -93,6 +96,9 @@ public class JsonResult<T>  implements Serializable {
 
     public static JsonResult failureResult(String msg) {
         return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), defautlErrorMsg(msg));
+    }
+    public static JsonResult failureResult(ReturnMessageEnum returnMessageEnum) {
+        return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(),returnMessageEnum.getKey());
     }
 
     public static JsonResult failureResult(Object data) {
@@ -139,11 +145,11 @@ public class JsonResult<T>  implements Serializable {
         this.data = data;
     }
 
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
+//    public String getTimestamp() {
+//        return timestamp;
+//    }
+//
+//    public void setTimestamp(String timestamp) {
+//        this.timestamp = timestamp;
+//    }
 }

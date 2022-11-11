@@ -1,6 +1,8 @@
 package com.haoliang.controller.system;
 
 import com.haoliang.annotation.OperationLog;
+import com.haoliang.common.constant.OperationAction;
+import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.bo.IntIdListBO;
@@ -36,7 +38,7 @@ public class RoleController {
      * 批量删除
      * @param idList Id数组
      */
-    @OperationLog(module = "角色管理", description = "批量删除")
+    @OperationLog(module = OperationModel.SYS_ROLE, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:role:remove')")
     public JsonResult deleteByIds(@RequestBody IntIdListBO intIdListBO) {
@@ -46,7 +48,7 @@ public class RoleController {
     /**
      * 新增或修改
      */
-    @OperationLog(module = "角色管理", description = "新增或修改")
+    @OperationLog(module = OperationModel.SYS_ROLE, description = OperationAction.ADD_OR_EDIT)
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:role:add','sys:role:edit')")
     public JsonResult save(@RequestBody SysRoleBO sysRoleBO) {

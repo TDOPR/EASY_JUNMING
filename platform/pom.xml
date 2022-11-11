@@ -36,11 +36,6 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
-        <!--spring Security-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
 
         <!--健康监测监控-->
         <dependency>

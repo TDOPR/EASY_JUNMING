@@ -20,56 +20,56 @@ public class SysNotice extends BaseModelCID {
      * 排序
      * @required
      */
-    @NotNull(message = "不能为空")
+    @NotNull
     private Integer sortIndex;
 
     /**
      * 显示状态 1=可见,0=隐藏
      * @required
      */
-    @NotNull(message = "不能为空")
+    @NotNull
     private Integer display;
 
     /**
      * 中文标题
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String cnTitle;
 
     /**
      * 中文简介
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String cnDescription;
 
     /**
      * 中文内容
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String cnText;
 
     /**
      * 英文标题
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String enTitle;
 
     /**
      * 英文简介
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String enDescription;
 
     /**
      * 英文内容
      * @required
      */
-    @NotEmpty(message = "不能为空")
+    @NotEmpty
     private String enText;
 
 

@@ -2,6 +2,8 @@ package com.haoliang.controller.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haoliang.annotation.OperationLog;
+import com.haoliang.common.constant.OperationAction;
+import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.bo.IntIdListBO;
@@ -44,7 +46,7 @@ public class SysMessageController {
      * 批量删除
      * @param idList Id数组
      */
-    @OperationLog(module = "国际化", description = "批量删除")
+    @OperationLog(module =  OperationModel.SYS_MSG, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:msg:remove')")
     public JsonResult deleteByIds(@RequestBody IntIdListBO intIdListBO) {
@@ -54,7 +56,7 @@ public class SysMessageController {
     /**
      * 新增或修改
      */
-    @OperationLog(module = "国际化", description = "新增或修改")
+    @OperationLog(module = OperationModel.SYS_MSG, description = OperationAction.ADD_OR_EDIT)
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:msg:add','sys:msg:edit')")
     public JsonResult save(@RequestBody SysMessage sysMessage) {
@@ -63,11 +65,12 @@ public class SysMessageController {
 
     /**
      * 导出成json文件
+     * @param type  -1 全部 0=管理端 1=客户端
      */
     @PreAuthorize("hasAuthority('sys:msg:export')")
-    @GetMapping("/export")
-    public void exportJson(HttpServletResponse httpServletResponse) {
-         sysMessageService.exportJson(httpServletResponse);
+    @GetMapping("/export/{type}")
+    public void exportJson(@PathVariable Integer type,  HttpServletResponse httpServletResponse) {
+         sysMessageService.exportJson(type,httpServletResponse);
     }
 
 

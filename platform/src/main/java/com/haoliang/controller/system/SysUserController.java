@@ -3,6 +3,8 @@ package com.haoliang.controller.system;
 
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.annotation.PrintLog;
+import com.haoliang.common.constant.OperationAction;
+import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.bo.IntIdListBO;
@@ -65,7 +67,7 @@ public class SysUserController {
     /**
      * 启用或禁用用户
      */
-    @OperationLog(module = "用户管理", description = "禁用或者启用")
+    @OperationLog(module = OperationModel.SYS_USER, description = OperationAction.ENABLED_OR_DIABLED)
     @PostMapping("/userEnabled")
     @PreAuthorize("hasAuthority('sys:user:enabled')")
     public JsonResult userEnabled(@RequestBody UpdateUserStatus updateUserStatus) {
@@ -76,7 +78,7 @@ public class SysUserController {
      * 批量删除用户
      * @param idList id数组
      */
-    @OperationLog(module = "用户管理", description = "删除")
+    @OperationLog(module = OperationModel.SYS_USER, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:user:remove')")
     public JsonResult deleteUsersByIds(@RequestBody IntIdListBO intIdListBO) {
@@ -86,7 +88,7 @@ public class SysUserController {
     /**
      * 添加或修改用户
      */
-    @OperationLog(module = "用户管理", description = "添加或修改")
+    @OperationLog(module = OperationModel.SYS_USER, description = OperationAction.ADD_OR_EDIT)
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:user:add','sys:user:edit')")
     public JsonResult save(@RequestBody SysUser sysUser) {
@@ -96,7 +98,7 @@ public class SysUserController {
     /**
      * 重置密码
      */
-    @OperationLog(module = "用户管理", description = "重置密码")
+    @OperationLog(module = OperationModel.SYS_USER, description = OperationAction.ENABLED_OR_DIABLED)
     @GetMapping("/restPassword/{id}")
     @PreAuthorize("hasAuthority('sys:user:resetPwd')")
     public JsonResult restPassword(@PathVariable Integer id) {

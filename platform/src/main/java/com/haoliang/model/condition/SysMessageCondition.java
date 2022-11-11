@@ -34,10 +34,17 @@ public class SysMessageCondition extends BaseCondition<SysMessage> {
      */
     private String enUs;
 
+    /**
+     * 类型 0=管理端 1=客户端
+     */
+    private Integer type;
 
     @Override
     public QueryWrapper buildQueryParam() {
         this.buildBaseQueryWrapper();
+        if (type != null) {
+            this.getQueryWrapper().eq("type", type);
+        }
         if (StringUtils.hasText(keyName)) {
             keyName = keyName.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("keyName", keyName);

@@ -101,14 +101,14 @@ mybatis-plus:
     # 如果查询结果中包含空值的列，则 MyBatis 在映射的时候，不会映射这个字段
     call-setters-on-nulls: true
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #########################  java Web Token 配置  #########################
 jwt:
   # 加密密钥
   secret: iwqjhda8232bjgh432[cicada-smile]
   # token有效时长(单位: 秒) 设置为一天
-  expire: 86400
+  expire: 8640000000000000
   #请求头参数
   tokenName: token
 
@@ -142,7 +142,7 @@ login:
     # 字符验证码长度
     charLength: 4
     #失效时间(单位:分钟)
-    expirationTime: 2
+    expirationTime: 30
 
 #########################  邮件配置 ##################################
 mail:
@@ -177,4 +177,5 @@ app:
     - /captchaImage
     - /wallet/**
     - /sendCaptchaToEmail/*
+    - /home/*
     - /druid/**

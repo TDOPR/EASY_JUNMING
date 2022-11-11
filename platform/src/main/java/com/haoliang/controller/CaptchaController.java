@@ -5,16 +5,18 @@ import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.IdUtil;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
+import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.vo.CaptchaVO;
 import com.haoliang.common.utils.IdUtils;
-import com.haoliang.common.utils.redis.RedisUtils;
 import com.haoliang.common.utils.ReflectUtils;
 import com.haoliang.common.utils.SpringUtil;
+import com.haoliang.common.utils.redis.RedisUtils;
 import com.haoliang.config.LoginConfig;
 import com.haoliang.enums.CaptchaCategory;
 import com.haoliang.enums.CaptchaType;
 import com.haoliang.model.dto.EmailTemplateDTO;
+import com.haoliang.model.vo.UuidVO;
 import com.haoliang.server.EmailServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +46,7 @@ public class CaptchaController {
      * @return 验证码id
      */
     @GetMapping("/sendCaptchaToEmail/{email}")
-    public JsonResult<String> sendCaptchaToEmail(@PathVariable String email) {
+    public JsonResult<UuidVO> sendCaptchaToEmail(@PathVariable String email) {
         CodeGenerator codeGenerator = ReflectUtils.newInstance(CaptchaType.CHAR.getClazz(), loginConfig.getCaptcha().getCharLength());
         String code = codeGenerator.generate();
         boolean flag = EmailServer.send(emailTemplate.getTitle(), emailTemplate.getContent().replace("{{code}}", code).replace("{{time}}", loginConfig.getCaptcha().getExpirationTime().toString()), email);
@@ -52,10 +54,11 @@ public class CaptchaController {
             String uuid = IdUtils.simpleUUID();
             String verifyKey = CacheKeyPrefixConstants.CAPTCHA_CODE + uuid;
             RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(loginConfig.getCaptcha().getExpirationTime()));
-            return JsonResult.successResult("ok",uuid);
+            return JsonResult.successResult("ok",new UuidVO(uuid));
         }
-        return JsonResult.failureResult();
+        return JsonResult.failureResult(ReturnMessageEnum.SEND_EMAIL_ERROR);
     }
+
 
 
     /**

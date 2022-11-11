@@ -1,5 +1,7 @@
 package com.haoliang.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.mapper.ProfitLogsMapper;
 import com.haoliang.model.ProfitLogs;
@@ -22,6 +24,11 @@ public class ProfitLogsServiceImpl extends ServiceImpl<ProfitLogsMapper, ProfitL
 
     @Override
     public boolean updateUseByIdList(List<Long> idList) {
+        UpdateWrapper<ProfitLogs> wrapper = Wrappers.update();
+        wrapper.lambda()
+                .set(ProfitLogs::getGrantToUser, 1)
+                .in(ProfitLogs::getId, idList);
+        update(null, wrapper);
         return profitLogsMapper.updateUseByIdList(idList)==0;
     }
 }

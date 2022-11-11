@@ -1,26 +1,25 @@
 package com.haoliang.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @author Administrator
  */
 @Data
 @TableName("tree_paths")
-public class TreePath implements Serializable  {
+public class TreePath implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     /**
      * 父
      */
-    @TableId(type = IdType.AUTO)
     private Integer ancestor;
     /**
      * 子
@@ -30,26 +29,25 @@ public class TreePath implements Serializable  {
      * 子是父的几级
      */
     private Integer level;
-    /**
-     * 父等级
-     */
-    private Integer aLevel;
-    /**
-     * 子等级
-     */
-    private Integer dLevel;
-    /**
-     * 子给父的返佣
-     */
-    private BigDecimal commission;
-    /**
-     * 是否团队成员 0是 1否
-     */
-    private Integer isGroup;
 
     /**
-     * 矿机模块等级
+     * 创建时间
+     * @ignore
      */
-    @TableField(exist = false)
-    private Integer mineLevel;
+    @TableField(fill = FieldFill.INSERT)
+    private Date createTime;
+//    /**
+//     * 父等级
+//     */
+//    private Integer aLevel;
+//    /**
+//     * 子等级
+//     */
+//    private Integer dLevel;
+//    /**
+//     * 子给父的返佣
+//     */
+//    private BigDecimal commission;
+
+
 }

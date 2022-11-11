@@ -2,6 +2,8 @@ package com.haoliang.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.haoliang.common.base.BaseModel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,16 +15,12 @@ import java.math.BigDecimal;
  * @CreateTime 2022/11/1 17:17
  **/
 @Data
+@Builder
 @TableName("profit_logs")
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProfitLogs extends BaseModel {
 
-    public ProfitLogs(Integer userId, BigDecimal principal, BigDecimal profitRate, BigDecimal generatedAmount) {
-        this.userId = userId;
-        this.principal = principal;
-        this.profitRate = profitRate;
-        this.generatedAmount = generatedAmount;
-    }
 
     /**
      * 所属用户的Id
