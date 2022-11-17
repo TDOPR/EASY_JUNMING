@@ -2,18 +2,18 @@ package com.haoliang.server;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RedisLock;
+import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.model.SysErrorLog;
+import com.haoliang.common.model.SysLoginLog;
+import com.haoliang.common.model.SysOperationLog;
 import com.haoliang.common.model.WorkspaceHarDiskInfo;
 import com.haoliang.common.service.SysErrorLogService;
+import com.haoliang.common.service.SysLoginLogService;
+import com.haoliang.common.service.SysOperationLogService;
 import com.haoliang.common.utils.DateUtil;
 import com.haoliang.common.utils.GetWorkspaceHarDiskInfoUtil;
 import com.haoliang.config.AppParam;
-import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.model.dto.EmailTemplateDTO;
-import com.haoliang.common.model.SysLoginLog;
-import com.haoliang.common.model.SysOperationLog;
-import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.service.SysOperationLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 
@@ -61,15 +61,15 @@ public class ScheduledServer {
     public void deletExpiredFiles() {
         log.info("-------------执行清理过期文件任务--------------");
         //清理登录日志,操作日志,错误日志
-        Date nowDate = new Date();
+        LocalDateTime localDate=LocalDateTime.now();
         if (SysSettingParam.getErrorLogSaveDay() >= 0) {
-            sysErrorLogService.remove(new LambdaQueryWrapper<SysErrorLog>().le(SysErrorLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -SysSettingParam.getErrorLogSaveDay(), TimeUnit.DAYS)));
+            sysErrorLogService.remove(new LambdaQueryWrapper<SysErrorLog>().le(SysErrorLog::getCreateTime, DateUtil.getDateStrIncrement(localDate, -SysSettingParam.getErrorLogSaveDay(), TimeUnit.DAYS)));
         }
         if (SysSettingParam.getLoginLogSaveDay() >= 0) {
-            sysLoginLogService.remove(new LambdaQueryWrapper<SysLoginLog>().le(SysLoginLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -SysSettingParam.getLoginLogSaveDay(), TimeUnit.DAYS)));
+            sysLoginLogService.remove(new LambdaQueryWrapper<SysLoginLog>().le(SysLoginLog::getCreateTime, DateUtil.getDateStrIncrement(localDate, -SysSettingParam.getLoginLogSaveDay(), TimeUnit.DAYS)));
         }
         if (SysSettingParam.getOperationLogSaveDay() >= 0) {
-            sysOperationLogService.remove(new LambdaQueryWrapper<SysOperationLog>().le(SysOperationLog::getCreateTime, DateUtil.getDateStrIncrement(nowDate, -SysSettingParam.getOperationLogSaveDay(), TimeUnit.DAYS)));
+            sysOperationLogService.remove(new LambdaQueryWrapper<SysOperationLog>().le(SysOperationLog::getCreateTime, DateUtil.getDateStrIncrement(localDate, -SysSettingParam.getOperationLogSaveDay(), TimeUnit.DAYS)));
         }
     }
 

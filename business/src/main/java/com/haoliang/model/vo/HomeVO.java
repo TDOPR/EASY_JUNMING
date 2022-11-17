@@ -1,6 +1,5 @@
 package com.haoliang.model.vo;
 
-import com.haoliang.constant.EasyTradeConfig;
 import lombok.Data;
 
 /**
@@ -14,27 +13,42 @@ public class HomeVO {
     /**
      * 24h新增地址
      */
-    private String address;
+    private Integer address;
 
     /**
      * 总地址
      */
-    private String totalAddress;
+    private Integer totalAddress;
 
     /**
      * 我的托管量
      */
-    private String trusteeshipAmount;
+    private String trusteeshipAmount="268,578.89";
+
+    /**
+     * 总托管量
+     */
+    private String totalTrusteeshipAmount="1,200,000.00";
 
     /**
      * 周收益率
      */
-    private String week;
+    private String weekRate;
 
     /**
      * 日收益率
      */
-    private String day= EasyTradeConfig.PROFIT_RATE.toString();
+    private String dayRate;
+
+    /**
+     * 周收益率 区间
+     */
+    private String weekRateSection;
+
+    /**
+     * 日收益率 区间
+     */
+    private String dayRateSection;
 
 
 }

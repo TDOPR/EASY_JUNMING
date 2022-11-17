@@ -1,8 +1,11 @@
 package com.haoliang.security;
 
+import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.service.SysMenuService;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,13 +27,21 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
+    @Autowired
+    private SysMenuService sysMenuService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String tokenKey = request.getHeader(JwtTokenUtils.TOKEN_NAME);
         if (tokenKey != null) {
             Claims claims = JwtTokenUtils.getTokenClaim(tokenKey);
             if (claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails = new MyUserDetail(claims);
+                UserDetails userDetails = null;
+                if (tokenKey.contains(CacheKeyPrefixConstants.APP_TOKEN)) {
+                    userDetails = new MyUserDetail();
+                } else {
+                    userDetails = new MyUserDetail(claims.get("username", String.class), claims.get("roleCode", String.class), sysMenuService.findAuthorityByRoleId(claims.get("roleId", Integer.class)));
+                }
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 logger.debug("authorication user: " + claims.getSubject() + ", setting security context");

@@ -19,7 +19,9 @@ public interface AppUserService extends IService<AppUsers> {
 
     JsonResult findPassword(FindPasswordDTO findPasswordDTO);
 
-    JsonResult home();
+    JsonResult home(String token);
 
     JsonResult<PageVO<AppUsersVO>> pageList(PageParam<AppUsers, AppUsersCondition> pageParam);
+
+
 }

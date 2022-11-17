@@ -15,6 +15,7 @@ import com.haoliang.model.vo.MenuVO;
 import com.haoliang.model.vo.RouterVO;
 import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysRoleService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @Service
 @CacheConfig(cacheNames = "sys_menu")
+@Slf4j
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
 
     @Resource
@@ -140,7 +142,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
         return JsonResult.successResult(sysMenuMapper.getTree());
     }
 
-    //@Cacheable(key = "'authority'#roleId")
+    @Cacheable(key = "'authority:' +#roleId")
     @Override
     public List<String> findAuthorityByRoleId(Integer roleId) {
         List<String> authorityList;
@@ -150,5 +152,11 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             authorityList = sysMenuMapper.findAllAuthorityByRoleId(roleId);
         }
         return authorityList;
+    }
+
+    @Override
+    @CacheEvict(allEntries = true)
+    public void updateRoleMenu() {
+        log.info("reload  authority cache");
     }
 }

@@ -1,6 +1,5 @@
 package com.haoliang.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -43,8 +42,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -97,7 +96,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         String tokenKey = CacheKeyPrefixConstants.TOKEN + sysUser.getId() + ":" + IdUtils.simpleUUID();
         SysRole sysRole=sysRoleMapper.selectById(sysUser.getRoleId());
-        String token = JwtTokenUtils.getToken(sysUser.getId(), JSONObject.toJSONString(sysMenuService.findAuthorityByRoleId(sysUser.getRoleId())), sysUser.getUsername(), sysRole.getRoleCode());
+        String token = JwtTokenUtils.getToken(sysUser.getId(), sysUser.getUsername(), sysRole.getRoleCode(),sysRole.getId());
 
         //单点登录需要删除用户在其它地方登录的Token
         if (SysSettingParam.isEnableSso()) {
@@ -126,7 +125,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     .set(SysUser::getName, sysUser.getName())
                     .set(SysUser::getMobile, sysUser.getMobile())
                     .set(SysUser::getEmail, sysUser.getEmail())
-                    .set(SysUser::getChannelId, sysUser.getChannelId())
+                    //.set(SysUser::getChannelId, sysUser.getChannelId())
                     .eq(SysUser::getId,sysUser.getId());
             update(null, wrapper);
         }
@@ -135,7 +134,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public JsonResult<PageVO<UserVO>> queryByCondition(PageParam<SysUser, SysUserCondition> pageParam) {
-        Date endDate = pageParam.getSearchParam().getEndDate();
+        LocalDateTime endDate = pageParam.getSearchParam().getEndDate();
         if (endDate != null) {
             endDate = DateUtil.getDateStrIncrement(endDate, 1, TimeUnit.DAYS);
             pageParam.getSearchParam().setEndDate(endDate);

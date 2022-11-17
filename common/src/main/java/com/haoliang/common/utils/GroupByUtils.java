@@ -73,8 +73,8 @@ public class GroupByUtils {
      * @param <V>     对象
      * @return 分组后的map集合
      */
-    public static <K, V> Map<K, List<V>> collectionToMap(Collection<V> list, GroupBy<K, V> groupBy) {
-        Map<K, List<V>> resultMap = new LinkedHashMap<K, List<V>>();
+    public static <K, V> LinkedHashMap<K, List<V>> collectionToMap(Collection<V> list, GroupBy<K, V> groupBy) {
+        LinkedHashMap<K, List<V>> resultMap = new LinkedHashMap<K, List<V>>();
         for (V e : list) {
             K k = groupBy.groupBy(e);
             if (resultMap.containsKey(k)) {

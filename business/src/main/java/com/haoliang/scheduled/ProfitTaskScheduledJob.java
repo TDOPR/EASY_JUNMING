@@ -5,12 +5,11 @@ import com.haoliang.common.annotation.RedisLock;
 import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
+import com.haoliang.model.DayRate;
 import com.haoliang.model.ProfitLogs;
 import com.haoliang.model.WalletLogs;
 import com.haoliang.model.Wallets;
-import com.haoliang.service.ProfitLogsService;
-import com.haoliang.service.WalletLogsService;
-import com.haoliang.service.WalletService;
+import com.haoliang.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,13 +33,19 @@ import java.util.stream.Collectors;
 public class ProfitTaskScheduledJob {
 
     @Autowired
-    private WalletService walletService;
+    private WalletsService walletsService;
 
     @Autowired
     private WalletLogsService walletLogsService;
 
+    @Autowired
+    private AsyncService asyncService;
+
     @Resource
     private ProfitLogsService profitLogsService;
+
+    @Autowired
+    private DayRateService dayRateService;
 
     /**
      * 每天晚上0点计算托管收益
@@ -50,29 +56,33 @@ public class ProfitTaskScheduledJob {
     public void calculationDayProfit() {
         log.info("-------------计算日收益任务开始--------------");
         //查询托管金额大于0的用户钱包信息
-        List<Wallets> walletsList = walletService.list(new LambdaQueryWrapper<Wallets>().ge(Wallets::getPrincipalAmount, 0));
+        List<Wallets> walletsList = walletsService.list(new LambdaQueryWrapper<Wallets>().ge(Wallets::getPrincipalAmount, 0));
         List<ProfitLogs> profitLogsList = new ArrayList<>(walletsList.size());
         ProfitLogs profitLogs;
+        HashMap<Integer, BigDecimal> userAmount = new HashMap<>();
+        BigDecimal amount;
+        DayRate dayRate = dayRateService.selectNewDayRate();
         for (Wallets wallets : walletsList) {
+            amount = wallets.getPrincipalAmount().multiply(dayRateService.getDayRateByLevel(dayRate, wallets.getRobotLevel()));
+            userAmount.put(wallets.getUserId(), amount);
             profitLogs = ProfitLogs.builder()
                     .userId(wallets.getUserId())
                     .principal(wallets.getPrincipalAmount())
-                    .profitRate(EasyTradeConfig.PROFIT_RATE)
-                    .generatedAmount(wallets.getPrincipalAmount().multiply(EasyTradeConfig.PROFIT_RATE))
+                    .generatedAmount(amount)
                     .build();
             profitLogsList.add(profitLogs);
         }
         //批量插入日收益日志
         profitLogsService.saveBatch(profitLogsList);
         log.info("-------------计算日收益任务结束--------------");
-        //发放团队奖
-
-        //发放领导奖
-
-        //发放特别奖
-
-        //更新当天的的利率
-
+        //发放团队奖只拿三代
+        log.info("-------------发放团队奖开始--------------");
+        for (Wallets wallets : walletsList) {
+            if (wallets.getPrincipalAmount().compareTo(EasyTradeConfig.PROXY_MIN_MONEY) >= 0) {
+                //只有托管金额>=300的有资格获取团队奖
+                asyncService.grantItemPrizeToUser(wallets, userAmount);
+            }
+        }
     }
 
     /**
@@ -84,7 +94,7 @@ public class ProfitTaskScheduledJob {
     @Transactional(rollbackFor = Exception.class)
     public void grantToUser() {
         log.info("-------------发放周收益给用户任务开始--------------");
-        List<Wallets> walletsList = walletService.list();
+        List<Wallets> walletsList = walletsService.list();
         List<ProfitLogs> profitLogsList;
         List<Long> allIdList = new ArrayList<>();
         BigDecimal total;
@@ -113,22 +123,22 @@ public class ProfitTaskScheduledJob {
             profitLogsService.updateUseByIdList(allIdList);
         }
         //提交钱包静态收益金额变更记录
-        walletService.updateBatchById(walletsList);
+        walletsService.updateBatchById(walletsList);
         //提交钱包流水日志
         walletLogsService.saveBatch(walletLogList);
         log.info("-------------发放周收益给用户任务结束--------------");
     }
 
-    public static void main(String[] args) {
-        //小数加减乘除用BigDecimal
-        BigDecimal b1 = new BigDecimal("1.8");
-        BigDecimal b2 = new BigDecimal("0.1");
-        BigDecimal b3 = b1.add(b2);//小数相加
-        BigDecimal b4 = b1.subtract(b2);//小数相减
-        BigDecimal b5 = b1.multiply(b2);//小数相乘
-        System.out.println("1.8 + 0.1 = " + b3);
-        System.out.println("1.8 - 0.1 = " + b4);
-        System.out.println("1.8 * 0.1 = " + b5);
-    }
+//    public static void main(String[] args) {
+//        //小数加减乘除用BigDecimal
+//        BigDecimal b1 = new BigDecimal("1.8");
+//        BigDecimal b2 = new BigDecimal("0.1");
+//        BigDecimal b3 = b1.add(b2);//小数相加
+//        BigDecimal b4 = b1.subtract(b2);//小数相减
+//        BigDecimal b5 = b1.multiply(b2);//小数相乘
+//        System.out.println("1.8 + 0.1 = " + b3);
+//        System.out.println("1.8 - 0.1 = " + b4);
+//        System.out.println("1.8 * 0.1 = " + b5);
+//    }
 
 }

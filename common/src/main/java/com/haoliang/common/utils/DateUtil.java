@@ -1,6 +1,8 @@
 package com.haoliang.common.utils;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -116,28 +118,26 @@ public class DateUtil {
      * @param timeUnit 单位
      * @return
      */
-    public static Date getDateStrIncrement(Date date, Integer time, TimeUnit timeUnit) {
-        Calendar cal = Calendar.getInstance();
-        //设置开始时间
-        cal.setTime(date);
+    public static LocalDateTime getDateStrIncrement(LocalDateTime date, Integer time, TimeUnit timeUnit) {
+        LocalDateTime newDate=LocalDateTime.now();
         switch (timeUnit) {
             case SECONDS:
-                cal.add(Calendar.SECOND, time);
+                newDate=date.plusSeconds(time);
                 break;
             case MINUTES:
                 //增加分钟
-                cal.add(Calendar.MINUTE, time);
+                newDate=date.plusMinutes(time);
                 break;
             case HOURS:
                 //增加小时
-                cal.add(Calendar.HOUR, time);
+                newDate=date.plusHours(time);
                 break;
             case DAYS:
                 //增加天
-                cal.add(Calendar.DATE, time);
+                newDate= date.plusDays(time);
                 break;
         }
-        return cal.getTime();
+        return newDate;
     }
 
 
@@ -166,5 +166,17 @@ public class DateUtil {
         return false;
     }
 
+    /**
+     * 获取今日的时间
+     *
+     * @return
+     */
+    public static LocalDate getNowDateNotHours() {
+        return LocalDate.now();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getNowDateNotHours());
+    }
 
 }

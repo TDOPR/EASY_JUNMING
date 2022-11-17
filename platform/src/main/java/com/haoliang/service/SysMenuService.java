@@ -29,4 +29,6 @@ public interface SysMenuService extends IService<SysMenu> {
     JsonResult getTree();
 
     List<String> findAuthorityByRoleId(Integer roleId);
+
+    void updateRoleMenu();
 }

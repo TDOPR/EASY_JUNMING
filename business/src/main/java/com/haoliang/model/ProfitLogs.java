@@ -1,7 +1,7 @@
 package com.haoliang.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.haoliang.common.base.BaseModel;
+import com.haoliang.common.base.BaseModelNoModifyTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 @TableName("profit_logs")
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProfitLogs extends BaseModel {
+public class ProfitLogs extends BaseModelNoModifyTime {
 
 
     /**
@@ -31,11 +31,6 @@ public class ProfitLogs extends BaseModel {
      * 本金
      */
     private BigDecimal principal;
-
-    /**
-     * 收益率
-     */
-    private BigDecimal profitRate;
 
     /**
      * 产生的收益金额

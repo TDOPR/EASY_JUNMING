@@ -14,7 +14,7 @@ spring:
         #监控中心地址,多个以逗号隔开,并把localhost换成ip
         url: http://localhost:9091
         instance:
-          prefer-ip: false
+          prefer-ip: true
         register-once: true
         username: admin
         password: 123456
@@ -29,9 +29,12 @@ spring:
         max-active: 8
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    #    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    #    username: root
+    #    password: 123456
+    url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
     username: root
-    password: 123456
+    password: LXYx29K1rJhiOWtc
     type: com.alibaba.druid.pool.DruidDataSource
     # 数据连接池配置
     druid:
@@ -98,14 +101,14 @@ mybatis-plus:
     # 如果查询结果中包含空值的列，则 MyBatis 在映射的时候，不会映射这个字段
     call-setters-on-nulls: true
     # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
-    #log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #########################  java Web Token 配置  #########################
 jwt:
   # 加密密钥
   secret: iwqjhda8232bjgh432[cicada-smile]
   # token有效时长(单位: 秒) 设置为一天
-  expire: 86400
+  expire: 8640000000000000
   #请求头参数
   tokenName: token
 
@@ -139,7 +142,7 @@ login:
     # 字符验证码长度
     charLength: 4
     #失效时间(单位:分钟)
-    expirationTime: 2
+    expirationTime: 30
 
 #########################  邮件配置 ##################################
 mail:
@@ -149,6 +152,14 @@ mail:
   username: 826853123@qq.com
   password: eddwoukjplfbbdba
   formName: 皓亮君
+
+#########################  异步线程池配置 ##################################
+
+asyncExecutor:
+  prefixName: async-task-
+  codeSize: 50
+  maxSize: 100
+  queueSize: -1
 
 #########################  应用其它配置   ############################
 app:
@@ -174,4 +185,5 @@ app:
     - /captchaImage
     - /wallet/**
     - /sendCaptchaToEmail/*
+    - /home/*
     - /druid/**

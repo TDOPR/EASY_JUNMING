@@ -153,6 +153,14 @@ mail:
   password: eddwoukjplfbbdba
   formName: 皓亮君
 
+#########################  异步线程池配置 ##################################
+
+asyncExecutor:
+  prefixName: async-task-
+  codeSize: 50
+  maxSize: 100
+  queueSize: -1
+
 #########################  应用其它配置   ############################
 app:
   #文件存储根路径
@@ -177,5 +185,6 @@ app:
     - /captchaImage
     - /wallet/**
     - /sendCaptchaToEmail/*
+    - /home
     - /home/*
     - /druid/**

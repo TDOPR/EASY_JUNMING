@@ -70,7 +70,6 @@ CREATE TABLE `profit_logs`  (
   `id` bigint UNSIGNED NOT NULL,
   `userId` int(0) UNSIGNED NOT NULL COMMENT '关联的用户ID',
   `principal` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '托管本金',
-  `profitRate` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '收益率 0.35%~0.55%',
   `generatedAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '托管本金',
   `grantToUser` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '结算类型 1=已结算 0=未结算',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -128,7 +127,7 @@ CREATE TABLE `app_user_withdraw`  (
   `address`varchar(256) NOT NULL DEFAULT '' COMMENT '区块链提现地址',
   `chainFee` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '链上手续费花费',
   `auditTime`  datetime(0) NULL DEFAULT NULL  COMMENT '审批时间',
-  `auditStatus`  tinyint   NOT NULL DEFAULT -1  COMMENT '-1=不需要审核小额提现  1待审核 2=审核通过 3=驳回',
+  `auditStatus`  tinyint   NOT NULL DEFAULT -1  COMMENT '-1=不需要审核小额提现  0待审核 2=审核通过 3=驳回',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
    PRIMARY KEY (`id`) USING BTREE,
@@ -144,16 +143,33 @@ CREATE TABLE `tree_paths`  (
   `ancestor` int(0) UNSIGNED NOT NULL DEFAULT  0  COMMENT '父Id',
   `descendant` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '子Id',
   `level` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '子是父的第几代',,
-  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`ancestor`, `descendant`) USING BTREE
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户邀请关系表' ROW_FORMAT = Dynamic;
 
 -- -------------------------------
 -- Table structure for tree_paths
 -- -------------------------------
 DROP TABLE IF EXISTS `app_user_rebot_ref`;
-CREATE TABLE `app_user_rebot_ref`  (
+CREATE TABLE `app_user_rebot_ref`
   `userId` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '用户Id',
   `inviteId` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '邀请的用户Id',
   `level` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '邀请的用户是用户的第几位购买机器',
-  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`userId`, `inviteId`) USING BTREE
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户机器人邀请关系' ROW_FORMAT = Dynamic;
+
+-- -------------------------------
+-- Table structure for dayrate
+-- -------------------------------
+DROP TABLE IF EXISTS `dayrate`;
+CREATE TABLE `dayrate`  (
+  `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '邀请的用户Id',
+  `level0` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '未购买机器人收益率',
+  `level1` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '一级机器人收益率',
+  `level2` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '二级机器人收益率',
+  `level3` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '三级机器人收益率',
+  `level4` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '四级机器人收益率',
+  `level5` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '五级机器人收益率',
+  UNIQUE INDEX `UK_dayrate_createDate`(`createDate`) USING BTREE
+) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '日收益表' ROW_FORMAT = Dynamic;

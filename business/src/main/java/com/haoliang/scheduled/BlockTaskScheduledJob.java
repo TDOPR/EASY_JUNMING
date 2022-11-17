@@ -11,7 +11,7 @@ import com.haoliang.model.AppUserRecharge;
 import com.haoliang.model.AppUserWithdraw;
 import com.haoliang.service.AppUserRechargeService;
 import com.haoliang.service.AppUserWithdrawService;
-import com.haoliang.service.WalletService;
+import com.haoliang.service.WalletsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ public class BlockTaskScheduledJob {
     private AppUserRechargeService appUserRechargeService;
 
     @Autowired
-    private WalletService walletService;
+    private WalletsService walletsService;
 
     /**
      * 每隔30秒拉取充值记录表任务状态
@@ -55,7 +55,7 @@ public class BlockTaskScheduledJob {
 
         List<Long> idList = new ArrayList<>();
         for (AppUserRecharge appUserRecharge : list) {
-            walletService.updateWallet(appUserRecharge.getUsdAmount(), appUserRecharge.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
+            walletsService.updateWallet(appUserRecharge.getUsdAmount(), appUserRecharge.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
             idList.add(appUserRecharge.getId());
         }
 
@@ -86,7 +86,7 @@ public class BlockTaskScheduledJob {
 
         List<Long> idList = new ArrayList<>();
         for (AppUserWithdraw appUserWithdraw : list) {
-            walletService.updateWallet(appUserWithdraw.getAmount(), appUserWithdraw.getUserId(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.WITHDRAWAL);
+            walletsService.updateWallet(appUserWithdraw.getAmount(), appUserWithdraw.getUserId(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.WITHDRAWAL);
             idList.add(appUserWithdraw.getId());
         }
 

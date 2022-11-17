@@ -6,7 +6,7 @@ import com.haoliang.common.utils.DateUtil;
 import lombok.Data;
 import org.springframework.util.StringUtils;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,13 +21,13 @@ public abstract class BaseCondition<T> {
      * 范围 开始时间 格式: yyyy-MM-dd
      */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
-    private Date beginDate;
+    private LocalDateTime beginDate;
 
     /**
      * 范围 结束时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Shanghai")
-    private Date endDate;
+    private LocalDateTime endDate;
 
     /**
      * 查询条件构造器

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.ProfitLogsMapper">
+
+
+    <select id="getYesterday" resultType="java.math.BigDecimal">
+        SELECT
+            sum(generatedAmount)
+        FROM
+            profit_logs
+        WHERE
+            userId=#{userId}
+            AND
+            createTime BETWEEN  DATE_FORMAT( DATE_SUB(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d 00:00:00')
+                       AND DATE_FORMAT( DATE_SUB(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d 23:59:59')
+
+    </select>
+
+    <select id="getLastWeek" resultType="java.math.BigDecimal">
+        SELECT
+            sum(generatedAmount)
+        FROM
+            profit_logs
+        WHERE
+            userId=#{userId}
+            AND
+            createTime BETWEEN  DATE_FORMAT( DATE_SUB( DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 1 WEEK), '%Y-%m-%d 00:00:00')
+                       AND DATE_FORMAT( SUBDATE(CURDATE(), WEEKDAY(CURDATE()) + 1), '%Y-%m-%d 23:59:59')
+    </select>
+
+    <select id="getLastMonth" resultType="java.math.BigDecimal">
+        SELECT
+            sum(generatedAmount)
+        FROM
+            profit_logs
+        WHERE
+            userId=#{userId}
+            AND
+            createTime BETWEEN  DATE_FORMAT( DATE_SUB(CURDATE(), INTERVAL 1 MONTH), '%Y-%m-01 00:00:00')
+                       AND DATE_FORMAT( LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)), '%Y-%m-%d 23:59:59')
+    </select>
+
+    <select id="getTotal" resultType="java.math.BigDecimal">
+        SELECT sum(generatedAmount) FROM profit_logs WHERE userId=#{userId}
+    </select>
+</mapper>

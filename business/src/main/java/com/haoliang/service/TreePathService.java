@@ -1,19 +1,20 @@
 package com.haoliang.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.haoliang.common.model.JsonResult;
 import com.haoliang.model.TreePath;
-import com.haoliang.model.Wallets;
+import com.haoliang.model.dto.TreePathAmountDTO;
 
 import java.util.List;
-import java.util.Map;
 
 public interface TreePathService extends IService<TreePath> {
 
-    List<Map> getNumByLevel(int uid);
-    Map getLevelById(int uid);
+    List<TreePathAmountDTO> getTreeAmountByUserId(Integer userId);
 
-    List<Map> getPathById(int uid);
+    List<TreePath> getTreePathByUserId(Integer userId);
 
-    Map getUserLevelById(int uid);
+    List<TreePath> getThreeAlgebraTreePathByUserId(Integer userId);
+
+    Integer countByAncestor(Integer userId);
+
+    void insertTreePath(Integer id, Integer inviteUserId);
 }

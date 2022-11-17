@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * @author Dominick Li
- * @Description
+ * @Description 用户机器人邀请关系
  * @CreateTime 2022/11/10 17:52
  **/
 @Data

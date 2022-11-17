@@ -2,10 +2,11 @@ package com.haoliang.controller;
 
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.model.dto.AmountDTO;
-import com.haoliang.model.dto.RebotDTO;
+import com.haoliang.model.dto.BillDetailsDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
-import com.haoliang.service.WalletService;
+import com.haoliang.model.vo.MyWalletsVO;
+import com.haoliang.service.WalletLogsService;
+import com.haoliang.service.WalletsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,14 +23,17 @@ import javax.validation.Valid;
 public class WalletController {
 
     @Autowired
-    private WalletService walletService;
+    private WalletsService walletsService;
+
+    @Autowired
+    private WalletLogsService walletLogService;
 
     /**
      * 我的钱包
      */
     @GetMapping
-    public JsonResult getMyWallet(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
-        return walletService.getMyWallet(token);
+    public JsonResult<MyWalletsVO> getMyWallet(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
+        return walletsService.getMyWallet(token);
     }
 
     /**
@@ -37,7 +41,7 @@ public class WalletController {
      */
     @PostMapping("/recharge")
     public JsonResult recharge(@Valid @RequestBody WalletOrderDTO walletOrderDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
-        return walletService.recharge(walletOrderDTO, token);
+        return walletsService.recharge(walletOrderDTO, token);
     }
 
     /**
@@ -45,41 +49,14 @@ public class WalletController {
      */
     @PostMapping("/withdrawal")
     public JsonResult withdrawal(@Valid @RequestBody WalletOrderDTO walletOrderDTO,@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
-        return walletService.withdrawal(walletOrderDTO,token);
+        return walletsService.withdrawal(walletOrderDTO,token);
     }
 
     /**
-     * 托管金额充值
+     * 账单明细
      */
-    @PostMapping("/trusteeship_recharge")
-    public JsonResult entrustWithdrawal(@Valid @RequestBody AmountDTO amountDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
-        return walletService.trusteeshipRecharge(amountDTO,token);
+    @PostMapping("/billDetails")
+    public JsonResult  billDetails(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token,@RequestBody BillDetailsDTO billDetailsDTO){
+        return walletLogService.getMybillDetails(token,billDetailsDTO);
     }
-
-    /**
-     * 托管金额提现到钱包
-     */
-    @PostMapping("/trusteeship_withdrawal")
-    public JsonResult trusteeshipWithdrawal(@Valid @RequestBody AmountDTO amountDTO,@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
-        return walletService.trusteeshipWithdrawal(amountDTO,token);
-    }
-
-    /**
-     * 购买机器人
-     */
-    @PostMapping("/buyRebot")
-    public JsonResult buyRebot(@RequestBody RebotDTO rebotDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
-        return walletService.buyRebot(rebotDTO,token);
-    }
-
-    /**
-     * 升级机器人等级
-     */
-    @PostMapping("/upgradeRebot")
-    public JsonResult upgradeRebot(@RequestBody RebotDTO rebotDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
-        return walletService.upgradeRebot(rebotDTO,token);
-    }
-
-
-
 }

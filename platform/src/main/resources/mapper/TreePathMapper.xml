@@ -16,40 +16,14 @@
                1
     </insert>
 
-    <select id="getNumByLevel" resultType="java.util.Map">
-        SELECT b.LEVEL,
-               count(1) AS NUM
-        FROM tree_paths a
-                 LEFT JOIN user_info b ON a.descendant = b.id
-        WHERE a.ancestor = #{uid}
-        GROUP BY b.LEVEL;
-    </select>
-
-    <select id="getLevelById" resultType="java.util.Map">
-        SELECT b.ID,
-               b.LEVEL
-        FROM tree_paths a
-                 LEFT JOIN user_info b ON a.ancestor = b.id
-        WHERE a.ancestor = #{uid}
-        GROUP BY b.ID;
-    </select>
-
-    <select id="getUserLevelById" resultType="java.util.Map">
-        SELECT b.ID,
-               b.LEVEL
-        FROM user_info b
-                 LEFT JOIN tree_paths a ON b.id = a.ancestor
-        WHERE b.id = #{uid}
-          AND a.descendant = #{uid}
-    </select>
-
-    <select id="getPathById" resultType="java.util.Map">
-        SELECT a.ancestor,
-               a.LEVEL
-        FROM tree_paths a
-        WHERE a.descendant = #{uid}
-          AND a.LEVEL
-            IN (1, 2, 3)
+    <select id="getTreeAmountByUserId" resultType="com.haoliang.model.dto.TreePathAmountDTO">
+        SELECT
+         w.walletAmount,w.robotAmount,t.descendant
+        FROM tree_paths t
+        LEFT JOIN
+            wallets w
+            ON t.descendant=w.userId
+        WHERE t.ancestor=#{uid}
     </select>
 
 </mapper>

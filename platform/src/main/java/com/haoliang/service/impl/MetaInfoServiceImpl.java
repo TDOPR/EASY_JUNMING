@@ -25,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -162,7 +162,7 @@ public class MetaInfoServiceImpl extends ServiceImpl<MetaInfoMapper, MetaInfo> i
 
     @Override
     public JsonResult findAll(PageParam<MetaInfo, MetaInfoCondition> pageParam) {
-        Date endDate = pageParam.getSearchParam().getEndDate();
+        LocalDateTime endDate = pageParam.getSearchParam().getEndDate();
         if (endDate != null) {
             endDate = DateUtil.getDateStrIncrement(endDate, 1, TimeUnit.DAYS);
             pageParam.getSearchParam().setEndDate(endDate);

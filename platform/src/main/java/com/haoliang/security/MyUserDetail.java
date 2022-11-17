@@ -1,7 +1,6 @@
 package com.haoliang.security;
 
-import com.alibaba.fastjson.JSONObject;
-import io.jsonwebtoken.Claims;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -13,26 +12,21 @@ import java.util.List;
  * @author Dominick Li
  * @description 自定义认证用户详细信息
  **/
+@NoArgsConstructor
 public class MyUserDetail implements org.springframework.security.core.userdetails.UserDetails {
 
 
     private String username;
     private Collection<SimpleGrantedAuthority> authorities;
 
-    public MyUserDetail(Claims claims) {
-        this.username = claims.getSubject();
+    public MyUserDetail(String username, String roleCode, List<String> authoritieList) {
+        this.username = username;
         authorities = new ArrayList<>();
-        if (claims.containsKey("authorities")) {
-            String authoritiesStr = claims.get("authorities").toString();
-            List<String> authoritieList = JSONObject.parseArray(authoritiesStr, String.class);
-            for (String str : authoritieList) {
-                authorities.add(new SimpleGrantedAuthority(str));
-            }
+        for (String str : authoritieList) {
+            authorities.add(new SimpleGrantedAuthority(str));
         }
-        if (claims.containsKey("roleCode")) {
-            SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_" + claims.get("role", String.class));
-            authorities.add(simpleGrantedAuthority);
-        }
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_" + roleCode);
+        authorities.add(simpleGrantedAuthority);
     }
 
 

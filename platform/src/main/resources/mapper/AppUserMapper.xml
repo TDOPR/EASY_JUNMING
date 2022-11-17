@@ -8,26 +8,53 @@
 
     <select id="page" resultType="com.haoliang.model.vo.AppUsersVO"  parameterType="com.haoliang.model.condition.AppUsersCondition" >
         SELECT
-            u.*
+            u.id,u.email,u.nickName,u.enabled,u.loginCount,u.level,u.inviteCode,
+            w.walletAmount,w.principalAmount,w.robotLevel
         FROM
-        app_users u
+            app_users u
         LEFT JOIN
-        wallets  w
-        ON  w.userId=u.id
+            wallets  w
+            ON  w.userId=u.id
         WHERE
         1=1
-        <if test="param.enabled>-1 ">
-            AND w.enabled=  #{param.enabled}
+        <if test="param.enabled!=null and param.enabled>-1 ">
+            AND u.enabled=  #{param.enabled}
         </if>
         <if test="param.email!=null and param.email!=''">
             AND u.email=  #{param.email}
         </if>
         <if test="param.beginDate!=null">
-            AND w.createTime <![CDATA[ >= ]]> #{param.beginDate}
+            AND u.createTime <![CDATA[ >= ]]> #{param.beginDate}
         </if>
         <if test="param.endDate!=null">
-            AND w.createTime <![CDATA[ <= ]]> #{param.endDate}
+            AND u.createTime <![CDATA[ <= ]]> #{param.endDate}
         </if>
+    </select>
+
+    <select id="getValidUserCountByInviteId" resultType="java.lang.Integer">
+        SELECT
+            count(1)
+        FROM
+            app_users u
+        LEFT JOIN
+            wallets  w
+            ON  w.userId=u.id
+        WHERE
+            u.inviteId=#{userId}
+            AND
+            w.principalAmount  <![CDATA[ > ]]> 0
+    </select>
+
+    <select id="selectUserRebotRef" resultType="java.math.BigDecimal">
+        SELECT
+            w.robotAmount
+        FROM
+            wallets w
+        LEFT JOIN
+            app_user_rebot_ref u
+            ON  w.userId=u.inviteUserId
+        WHERE
+            u.userId=#{userId}
     </select>
 
 </mapper>

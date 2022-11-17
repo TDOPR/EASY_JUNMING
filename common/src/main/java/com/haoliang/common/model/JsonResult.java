@@ -27,7 +27,7 @@ public class JsonResult<T> implements Serializable {
     /**
      * 数据
      */
-    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
 //    /**

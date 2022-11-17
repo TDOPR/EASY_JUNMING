@@ -16,7 +16,7 @@ import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.enums.WithdrawStateEnum;
 import com.haoliang.mapper.AppUserWithdrawMapper;
 import com.haoliang.mapper.WalletLogsMapper;
-import com.haoliang.mapper.WalletMapper;
+import com.haoliang.mapper.WalletsMapper;
 import com.haoliang.model.AppUserWithdraw;
 import com.haoliang.model.WalletLogs;
 import com.haoliang.model.Wallets;
@@ -41,7 +41,7 @@ import java.util.Date;
 public class AppUserWithdrawServiceImpl extends ServiceImpl<AppUserWithdrawMapper, AppUserWithdraw> implements AppUserWithdrawService {
 
     @Resource
-    private WalletMapper walletMapper;
+    private WalletsMapper walletsMapper;
 
     @Resource
     private WalletLogsMapper walletLogsMapper;
@@ -51,6 +51,9 @@ public class AppUserWithdrawServiceImpl extends ServiceImpl<AppUserWithdrawMappe
 
     @Override
     public JsonResult pageList(PageParam<AppUserWithdraw, AppUserWithdrawCondition> pageParam) {
+        if(pageParam.getSearchParam()==null){
+            pageParam.setSearchParam(new AppUserWithdrawCondition());
+        }
         IPage<AppUserWithdrawVO> iPage = appUserWithdrawMapper.page(pageParam.getPage(), pageParam.getSearchParam());
         for (AppUserWithdrawVO appUserWithdrawVO : iPage.getRecords()) {
             appUserWithdrawVO.setAuditStatusName(WithdrawStateEnum.getDescByState(appUserWithdrawVO.getAuditStatus()));
@@ -69,7 +72,7 @@ public class AppUserWithdrawServiceImpl extends ServiceImpl<AppUserWithdrawMappe
         if (auditCheckDTO.getState() == WithdrawStateEnum.CHECK_SUCCESS.getState()) {
             //审核通过 触发提现逻辑
             AppUserWithdraw appUserWithdra = this.getById(auditCheckDTO.getId());
-            Wallets wallets = walletMapper.selectOne(new LambdaQueryWrapper<Wallets>().select(Wallets::getId,Wallets::getWalletAmount, Wallets::getBlockAddress).eq(Wallets::getUserId, appUserWithdra.getUserId()));
+            Wallets wallets = walletsMapper.selectOne(new LambdaQueryWrapper<Wallets>().select(Wallets::getId,Wallets::getWalletAmount, Wallets::getBlockAddress).eq(Wallets::getUserId, appUserWithdra.getUserId()));
             wallets.setUserId(appUserWithdra.getUserId());
             this.withdraw(appUserWithdra, wallets);
         }
@@ -101,7 +104,7 @@ public class AppUserWithdrawServiceImpl extends ServiceImpl<AppUserWithdrawMappe
             wrapper.lambda()
                     .set(Wallets::getWalletAmount, wallets.getWalletAmount().subtract(appUserWithdraw.getAmount()))
                     .eq(Wallets::getId, wallets.getId());
-            walletMapper.update(null, wrapper);
+            walletsMapper.update(null, wrapper);
             //添加钱包流水记录
             WalletLogs walletLogs = WalletLogs.builder()
                     .userId(wallets.getUserId())

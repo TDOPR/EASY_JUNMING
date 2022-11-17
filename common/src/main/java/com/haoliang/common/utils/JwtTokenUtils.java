@@ -3,10 +3,8 @@ package com.haoliang.common.utils;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.utils.redis.RedisUtils;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Clock;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.DefaultClock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -21,12 +19,10 @@ public class JwtTokenUtils {
 
     public static final String TOKEN_NAME = "token";
 
-    private static final Clock clock = DefaultClock.INSTANCE;
-
     /**
      * 根据身份ID标识，生成Token
      */
-    public static String getToken(Integer identityId, String authorities, String username,String roleCode) {
+    public static String getToken(Integer identityId,  String username,String roleCode,Integer roleId) {
         Date nowDate = new Date();
         //过期时间
         Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
@@ -38,9 +34,9 @@ public class JwtTokenUtils {
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, GlobalConfig.getTokenSecret())
                 //自定义属性 放入用户拥有请求权限
-                .claim("authorities", authorities)
                 .claim("userName", username)
                 .claim("roleCode", roleCode)
+                .claim("roleId", roleId)
                 .compact();
     }
 
@@ -89,14 +85,14 @@ public class JwtTokenUtils {
      * 根据token获取角色Id
      */
     public static String getRoleCodeFromToken(String token) {
-        return getTokenClaim(token).get("roleCode").toString();
+        return getTokenClaim(token).get("roleCode",String.class);
     }
 
     /**
      * 根据token获取用户名
      */
     public static String getUserNameFromToken(String token) {
-        return getTokenClaim(token).get("userName").toString();
+        return getTokenClaim(token).get("userName",String.class);
     }
 
     //    /**

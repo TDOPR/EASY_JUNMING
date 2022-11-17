@@ -3,6 +3,8 @@ package com.haoliang.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 
 /**
  * @author Dominick Li
@@ -13,11 +15,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ProxyLevelEnum {
 
-    ONE(1, 5, 10000),
-    TWO(2, 10, 30000),
-    THREE(3, 15, 100000),
-    FOUR(4, 20, 300000),
-    FIVE(5, 25, 1000000),
+    ONE(1, new BigDecimal("0.05"), new BigDecimal(10000)),
+    TWO(2, new BigDecimal("0.10"), new BigDecimal(30000)),
+    THREE(3, new BigDecimal("0.15"), new BigDecimal(100000)),
+    FOUR(4, new BigDecimal("0.20"), new BigDecimal(300000)),
+    FIVE(5, new BigDecimal("0.30"), new BigDecimal(1000000)),
     ;
 
     /**
@@ -28,12 +30,12 @@ public enum ProxyLevelEnum {
     /**
      * 收益比
      */
-    private Integer IncomeRatio;
+    private BigDecimal IncomeRatio;
 
     /**
      * 量化金额
      */
-    private Integer money;
+    private BigDecimal money;
 
     public static ProxyLevelEnum getByLevel(Integer level) {
         for (ProxyLevelEnum proxyLevelEnum : values()) {
@@ -44,4 +46,28 @@ public enum ProxyLevelEnum {
         return null;
     }
 
+
+    /**
+     * 根据业绩范围获取代理商等级对象
+     * @param amount 业绩
+     * @return  代理商等级对象
+     */
+    public static ProxyLevelEnum valueOfByAmount(BigDecimal amount) {
+        if (amount.compareTo(ONE.money) < 0) {
+            return null;
+        } else if (amount.compareTo(TWO.money) < 0) {
+            return ONE;
+        } else if (amount.compareTo(THREE.money) < 0) {
+            return TWO;
+        } else if (amount.compareTo(FOUR.money) < 0) {
+            return THREE;
+        } else if (amount.compareTo(FIVE.money) < 0) {
+            return FOUR;
+        }
+        return THREE;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new BigDecimal("30000").compareTo(ProxyLevelEnum.ONE.money));
+    }
 }

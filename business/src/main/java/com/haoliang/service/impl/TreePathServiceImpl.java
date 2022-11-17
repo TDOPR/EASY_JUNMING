@@ -1,20 +1,16 @@
 package com.haoliang.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.mapper.TreePathMapper;
-import com.haoliang.mapper.WalletMapper;
 import com.haoliang.model.TreePath;
-import com.haoliang.model.Wallets;
+import com.haoliang.model.dto.TreePathAmountDTO;
 import com.haoliang.service.TreePathService;
-import com.haoliang.service.WalletService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Dominick Li
@@ -28,22 +24,27 @@ public class TreePathServiceImpl extends ServiceImpl<TreePathMapper, TreePath> i
     private TreePathMapper treePathMapper;
 
     @Override
-    public List<Map> getNumByLevel(int uid) {
-        return treePathMapper.getNumByLevel(uid);
+    public List<TreePath> getThreeAlgebraTreePathByUserId(Integer userId) {
+        return this.list(new LambdaQueryWrapper<TreePath>().select(TreePath::getDescendant, TreePath::getLevel).eq(TreePath::getAncestor, userId).in(TreePath::getLevel, EasyTradeConfig.ALGEBRA_LEVEL));
     }
 
     @Override
-    public Map getLevelById(int uid) {
-        return treePathMapper.getLevelById(uid);
+    public List<TreePath> getTreePathByUserId(Integer userId) {
+        return this.list(new LambdaQueryWrapper<TreePath>().select(TreePath::getDescendant, TreePath::getLevel).eq(TreePath::getAncestor, userId));
     }
 
     @Override
-    public List<Map> getPathById(int uid){
-        return treePathMapper.getPathById(uid);
+    public List<TreePathAmountDTO> getTreeAmountByUserId(Integer userId) {
+        return treePathMapper.getTreeAmountByUserId(userId);
     }
 
     @Override
-    public Map getUserLevelById(int uid){
-        return treePathMapper.getUserLevelById(uid);
+    public Integer countByAncestor(Integer userId) {
+        return (int) this.count(new LambdaQueryWrapper<TreePath>().eq(TreePath::getAncestor, userId));
+    }
+
+    @Override
+    public void insertTreePath(Integer id, Integer inviteUserId) {
+         treePathMapper.insertTreePath(id, inviteUserId);
     }
 }

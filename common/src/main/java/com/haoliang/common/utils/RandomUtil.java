@@ -35,10 +35,6 @@ public class RandomUtil {
 //            }
 //        }
 //        System.out.println(count);
-        for (int i = 0; i < 100; i++) {
-            BigDecimal num = generate(35, 55);
-            System.out.println(num);
-        }
     }
 
 }

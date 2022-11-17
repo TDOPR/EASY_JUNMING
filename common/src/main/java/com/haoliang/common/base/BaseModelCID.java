@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author Dominick Li
@@ -28,13 +28,13 @@ public  class BaseModelCID  {
      * @ignore
      */
     @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 修改时间
      * @ignore
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date lastmodifiedTime;
+    private LocalDateTime lastmodifiedTime;
 
 }

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @Date 2019/3/13 14:18
@@ -31,13 +31,13 @@ public  class BaseModel{
      * @ignore
      */
     @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 修改时间
      * @ignore
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
-    private Date lastmodifiedTime;
+    private LocalDateTime lastmodifiedTime;
 
 }

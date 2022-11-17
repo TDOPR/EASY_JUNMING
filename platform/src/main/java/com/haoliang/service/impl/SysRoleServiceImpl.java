@@ -19,8 +19,10 @@ import com.haoliang.model.bo.SysRoleBO;
 import com.haoliang.model.condition.SysRoleCondition;
 import com.haoliang.model.vo.RoleVO;
 import com.haoliang.model.vo.SelectVO;
+import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysRoleService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +43,9 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Resource
     private SysRoleMenuMapper sysRoleMenuMapper;
+
+    @Autowired
+    private SysMenuService sysMenuService;
 
     @Override
     public JsonResult queryByCondition(PageParam<SysRole, SysRoleCondition> pageParam) {
@@ -63,6 +68,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Override
     public JsonResult saveRole(SysRoleBO sysRole) {
+        boolean reload=false;
         if (sysRole.getId() == null) {
             //角色名称和编码不能重复
             SysRole exists = this.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleName, sysRole.getRoleName()));
@@ -78,6 +84,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             this.save(newRole);
             sysRole.setId(newRole.getId());
         } else {
+            reload=true;
             SysRole oldSysRole = this.getById(sysRole.getId());
             oldSysRole.setRoleCode(sysRole.getRoleCode());
             oldSysRole.setRoleName(sysRole.getRoleName());
@@ -87,11 +94,15 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
         List<Integer> menuIds = sysRole.getMenuIds();
         if (menuIds != null && menuIds.size() > 0) {
+            if(reload){
+                sysMenuService.updateRoleMenu();
+            }
             menuIds.forEach(menuId -> {
                 SysRoleMenu sysRoleMenu = new SysRoleMenu(sysRole.getId(), menuId);
                 sysRoleMenuMapper.insert(sysRoleMenu);
             });
         }
+
         return JsonResult.successResult();
     }
 

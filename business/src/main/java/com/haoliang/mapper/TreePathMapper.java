@@ -2,28 +2,17 @@ package com.haoliang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.haoliang.model.TreePath;
-import org.apache.ibatis.annotations.MapKey;
+import com.haoliang.model.dto.TreePathAmountDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Administrator
  */
 public interface TreePathMapper extends BaseMapper<TreePath> {
 
-    @MapKey("uid")
-    List<Map> getNumByLevel(@Param("uid") int uid);
+    int insertTreePath( int uid,@Param("pid") int pid);
 
-    @MapKey("uid")
-    Map getLevelById(@Param("uid") int uid);
-
-    @MapKey("ancestor")
-    List<Map> getPathById(int uid);
-
-    @MapKey("id")
-    Map getUserLevelById(int uid);
-
-    int insertTreePath(@Param("uid") int uid,@Param("pid") int pid);
+    List<TreePathAmountDTO> getTreeAmountByUserId(@Param("uid")Integer userId);
 }

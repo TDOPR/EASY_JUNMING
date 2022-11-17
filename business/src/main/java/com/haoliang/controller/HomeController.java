@@ -2,6 +2,7 @@ package com.haoliang.controller;
 
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.IpAddrUtil;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.dto.AppUserLoginDTO;
 import com.haoliang.model.dto.AppUserRegisterDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
@@ -28,9 +29,9 @@ public class HomeController {
     /**
      * 主页信息
      */
-    @GetMapping("/")
-    public JsonResult<HomeVO> home(){
-        return appUserService.home();
+    @GetMapping
+    public JsonResult<HomeVO> home(@RequestHeader(value = JwtTokenUtils.TOKEN_NAME,required = false)String token){
+        return appUserService.home(token);
     }
 
     /**

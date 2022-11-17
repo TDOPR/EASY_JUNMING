@@ -12,15 +12,13 @@ import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.utils.AESUtil;
-import com.haoliang.common.utils.IdUtils;
-import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.common.utils.StringUtil;
+import com.haoliang.common.utils.*;
 import com.haoliang.common.utils.redis.RedisUtils;
+import com.haoliang.enums.RobotEnum;
 import com.haoliang.mapper.AddressPoolMapper;
 import com.haoliang.mapper.AppUserMapper;
-import com.haoliang.mapper.TreePathMapper;
 import com.haoliang.model.AppUsers;
+import com.haoliang.model.TreePath;
 import com.haoliang.model.Wallets;
 import com.haoliang.model.condition.AppUsersCondition;
 import com.haoliang.model.dto.AppUserLoginDTO;
@@ -29,14 +27,16 @@ import com.haoliang.model.dto.FindPasswordDTO;
 import com.haoliang.model.vo.AppUsersVO;
 import com.haoliang.model.vo.HomeVO;
 import com.haoliang.model.vo.TokenVO;
-import com.haoliang.service.AppUserService;
-import com.haoliang.service.WalletService;
+import com.haoliang.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
 /**
  * @author Dominick Li
@@ -49,22 +49,50 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Autowired
     private SysLoginLogService sysLoginLogService;
 
+    @Autowired
+    private WalletsService walletsService;
+
+    @Autowired
+    private DayRateService dayRateService;
+
+    @Autowired
+    private TreePathService treePathService;
+
     @Resource
     private AddressPoolMapper addressPoolMapper;
-
-    @Resource
-    private WalletService walletService;
-
-    @Resource
-    private TreePathMapper treePathMapper;
 
     @Resource
     private AppUserMapper appUserMapper;
 
     @Override
-    public JsonResult home() {
-        //获取主页显示的数据 TODO
-        return JsonResult.successResult(new HomeVO());
+    public JsonResult home(String token) {
+        Integer robotLevel = 0;
+        BigDecimal principalAmount = BigDecimal.ZERO;
+        if (StringUtils.hasText(token)) {
+            Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+            Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
+            robotLevel = wallets.getRobotLevel();
+            principalAmount = wallets.getPrincipalAmount();
+        }
+        HomeVO homeVO = new HomeVO();
+        RobotEnum robotEnum = RobotEnum.levelOf(robotLevel);
+        homeVO.setDayRate(NumberUtils.formatBigDecimalToRateStr(dayRateService.selectNewDayRate(robotLevel)));
+        homeVO.setWeekRate(NumberUtils.formatBigDecimalToRateStr(dayRateService.selectNewWeekRate(robotLevel)));
+        homeVO.setDayRateSection(robotEnum.getDayRateSection());
+        homeVO.setWeekRateSection(robotEnum.getWeekRateSection());
+        //总地址
+        homeVO.setTotalAddress((int) this.count());
+        //24小时新增地址
+        LocalDateTime dateTime = LocalDateTime.now();
+        dateTime.minusDays(1);
+        homeVO.setAddress((int) this.count(new LambdaQueryWrapper<AppUsers>().ge(AppUsers::getCreateTime, dateTime)));
+        //我的托管量和平台托管基恩
+        homeVO.setTrusteeshipAmount(NumberUtils.toMoeny(principalAmount));
+        BigDecimal totalAmount = walletsService.getPlatformTotalLockAmount();
+        homeVO.setTotalTrusteeshipAmount(NumberUtils.toMoeny(totalAmount));
+        //获取主页显示的折线图数据 TODO
+
+        return JsonResult.successResult(homeVO);
     }
 
     @Override
@@ -86,7 +114,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         }
 
         //把token存储到缓存中
-        String tokenKey=CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId()+":"+IdUtils.simpleUUID();
+        String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtils.simpleUUID();
         RedisUtils.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(appUsers.getEmail(), localIp, 2));
         return JsonResult.successResult(new TokenVO(tokenKey));
@@ -135,11 +163,17 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
                 wallets.setBlockAddress(address);
                 addressPoolMapper.deleteByAddress(address);
             }
-            walletService.save(wallets);
-
+            walletsService.save(wallets);
+            //添加一条默认的treepath记录
+            TreePath treePath = TreePath.builder()
+                    .ancestor(appUsers.getId())
+                    .descendant(appUsers.getId())
+                    .level(1)
+                    .build();
+            treePathService.save(treePath);
             if (inviteUserId != null) {
                 //保存上下级关系
-                treePathMapper.insertTreePath(appUsers.getId(),inviteUserId);
+                treePathService.insertTreePath(appUsers.getId(), inviteUserId);
             }
             return JsonResult.successResult();
         } else {
@@ -187,10 +221,12 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Override
     public JsonResult<PageVO<AppUsersVO>> pageList(PageParam<AppUsers, AppUsersCondition> pageParam) {
         IPage<AppUsersVO> iPage = appUserMapper.page(pageParam.getPage(), pageParam.getSearchParam());
-        //TODO
+        //查询下机数量
         for (AppUsersVO appUsersVO : iPage.getRecords()) {
-
+            appUsersVO.setSubordinateNumber(treePathService.countByAncestor(appUsersVO.getId()));
         }
-        return JsonResult.successResult(new PageVO<>(iPage.getTotal(), iPage.getPages(),iPage.getRecords()));
+        return JsonResult.successResult(new PageVO<>(iPage.getTotal(), iPage.getPages(), iPage.getRecords()));
     }
+
+
 }
