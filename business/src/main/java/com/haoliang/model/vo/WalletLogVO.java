@@ -1,6 +1,7 @@
 package com.haoliang.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,7 @@ import java.math.BigDecimal;
 public class WalletLogVO {
 
     /**
-     * 金额
+     * 金额数值
      */
     @JsonIgnore
     private BigDecimal bigDecimalAmount;
@@ -42,7 +43,13 @@ public class WalletLogVO {
     private Integer type;
 
     /**
-     * 金额字符串
+     * 金额
      */
     private String amount;
+
+    /**
+     * 收支 1=收入 0=支出
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer status;
 }

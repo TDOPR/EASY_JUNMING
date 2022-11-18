@@ -32,7 +32,7 @@ public class SysDictionaryServiceImpl extends ServiceImpl<SysDictionaryMapper, S
 
     @PostConstruct
     public void init() {
-        List<SysDictionary> dictionaryList = this.list(new LambdaQueryWrapper<SysDictionary>().eq(SysDictionary::getParentId, 0));
+        List<SysDictionary> dictionaryList = this.list(new LambdaQueryWrapper<SysDictionary>().eq(SysDictionary::getParentId, 1));
         if (dictionaryList.size() > 0) {
             SysSettingParam.setLoading(true);
             log.info("初始化把字典信息加入缓存中...");

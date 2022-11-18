@@ -1,4 +1,4 @@
-package com.haoliang.model.bo;
+package com.haoliang.common.model.dto;
 
 import lombok.Data;
 
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotEmpty;
  * @description 修改密码
  **/
 @Data
-public class UpdatePasswordBO {
+public class UpdatePasswordDTO {
 
     /**
      * 用户Id

@@ -29,7 +29,7 @@ public class ProfitLogsServiceImpl extends ServiceImpl<ProfitLogsMapper, ProfitL
     public boolean updateUseByIdList(List<Long> idList) {
         UpdateWrapper<ProfitLogs> wrapper = Wrappers.update();
         wrapper.lambda()
-                .set(ProfitLogs::getGrantToUser, 1)
+                .set(ProfitLogs::getStatus, 1)
                 .in(ProfitLogs::getId, idList);
         return this.update(wrapper);
     }

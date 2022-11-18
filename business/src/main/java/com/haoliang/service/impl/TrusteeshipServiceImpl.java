@@ -114,8 +114,8 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
                 .eq(WalletLogs::getUserId, userId).eq(WalletLogs::getType, FlowingTypeEnum.STATIC.getValue()));
         BigDecimal sum = walletLogsList.stream().map(WalletLogs::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         TrusteeshipAmountVO trusteeshipAmountVO = new TrusteeshipAmountVO();
-        trusteeshipAmountVO.setAmount(NumberUtils.saveTwoDecimal(wallets.getPrincipalAmount()));
-        trusteeshipAmountVO.setProfit(NumberUtils.saveTwoDecimal(sum));
+        trusteeshipAmountVO.setAmount(NumberUtils.toTwoDecimal(wallets.getPrincipalAmount()));
+        trusteeshipAmountVO.setProfit(NumberUtils.toTwoDecimal(sum));
         trusteeshipAmountVO.setRobotName(robotName);
         if (sum.compareTo(BigDecimal.ZERO) == 0) {
             trusteeshipAmountVO.setProfitRate("0.0%");

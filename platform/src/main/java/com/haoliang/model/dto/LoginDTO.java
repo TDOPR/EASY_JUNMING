@@ -1,11 +1,11 @@
-package com.haoliang.model.bo;
+package com.haoliang.model.dto;
 
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 
 @Data
-public class LoginBO {
+public class LoginDTO {
 
     /**
      * 用户名

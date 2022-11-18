@@ -12,7 +12,7 @@ import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.service.SysOperationLogService;
 import com.haoliang.common.utils.DateUtil;
 import com.haoliang.common.utils.GetWorkspaceHarDiskInfoUtil;
-import com.haoliang.config.AppParam;
+import com.haoliang.common.config.AppParam;
 import com.haoliang.model.dto.EmailTemplateDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

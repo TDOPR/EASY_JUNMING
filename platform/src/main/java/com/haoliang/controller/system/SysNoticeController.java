@@ -6,7 +6,7 @@ import com.haoliang.common.constant.OperationAction;
 import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
-import com.haoliang.common.model.bo.IntIdListBO;
+import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.model.SysMessage;
 import com.haoliang.model.SysNotice;
@@ -53,8 +53,8 @@ public class SysNoticeController {
     @OperationLog(module = OperationModel.SYS_NOTICE, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:notice:remove')")
-    public JsonResult deleteByIds(@RequestBody IntIdListBO intIdListBO) {
-        return JsonResult.build(sysNoticeService.removeByIds(intIdListBO.getIdList()));
+    public JsonResult deleteByIds(@RequestBody IntIdListDTO intIdListDTO) {
+        return JsonResult.build(sysNoticeService.removeByIds(intIdListDTO.getIdList()));
     }
 
     /**

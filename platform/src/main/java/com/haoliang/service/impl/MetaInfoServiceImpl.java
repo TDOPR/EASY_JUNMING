@@ -17,7 +17,7 @@ import com.haoliang.model.MetaInfo;
 import com.haoliang.model.SysMenu;
 import com.haoliang.model.SysRoleMenu;
 import com.haoliang.model.condition.MetaInfoCondition;
-import com.haoliang.model.vo.SelectVO;
+import com.haoliang.model.vo.ViewSelectVO;
 import com.haoliang.server.NativeQueryServer;
 import com.haoliang.service.MetaColumnService;
 import com.haoliang.service.MetaInfoService;
@@ -153,11 +153,11 @@ public class MetaInfoServiceImpl extends ServiceImpl<MetaInfoMapper, MetaInfo> i
 
     @Override
     public JsonResult getDataTypeList() {
-        List<SelectVO> selectVOList = new ArrayList<>();
+        List<ViewSelectVO> viewSelectVOList = new ArrayList<>();
         for (DataTypeEnum dataTypeEnum : DataTypeEnum.values()) {
-            selectVOList.add(new SelectVO(dataTypeEnum.getValue(), dataTypeEnum.getName()));
+            viewSelectVOList.add(new ViewSelectVO(dataTypeEnum.getValue(), dataTypeEnum.getName()));
         }
-        return JsonResult.successResult(selectVOList);
+        return JsonResult.successResult(viewSelectVOList);
     }
 
     @Override

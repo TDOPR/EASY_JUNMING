@@ -107,6 +107,8 @@ public class EmailServer {
         return send(subject, text, new String[]{to}, null);
     }
 
+
+
     /**
      * 发送邮件的主要代码
      */
@@ -119,19 +121,22 @@ public class EmailServer {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, multipart, "utf-8");
             BeanUtils.copyProperties(CONFIG, jms);
             //设置邮件内容的编码格式
-            Properties p = new Properties();
-            p.setProperty("mail.smtp.auth", "true");
-            if (CONFIG.isSsl()) {
+            Properties props = new Properties();
+            props.setProperty("mail.smtp.auth", "true");
+            if (CONFIG.isEnableSSL()) {
                 //设置ssl认证信息
-                p.setProperty("mail.transport.protocol", "smtp");
-                p.put("mail.smtp.ssl.enable", "true");
+                props.setProperty("mail.transport.protocol", "smtp");
+                props.put("mail.smtp.ssl.enable", "true");
                 //开启安全协议
                 MailSSLSocketFactory sf = null;
                 sf = new MailSSLSocketFactory();
                 sf.setTrustAllHosts(true);
-                p.put("mail.smtp.ssl.socketFactory", sf);
+                props.put("mail.smtp.ssl.socketFactory", sf);
             }
-            jms.setJavaMailProperties(p);
+            if(CONFIG.getHost().contains("gmail")){
+                props.put("mail.smtp.starttls.enable", "true");
+            }
+            jms.setJavaMailProperties(props);
             //设置发送人
             helper.setFrom(CONFIG.getUsername(), CONFIG.getFormName());
             //设置收集人的账号信息       也可以把集合转换成字符串数组   String to[] = new String[List.size]; List.toArray(to);

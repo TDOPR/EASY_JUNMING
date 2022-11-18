@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.util.Date;
+import java.util.function.Function;
 
 /**
  * @author Dominick Li
@@ -78,7 +79,8 @@ public class JwtTokenUtils {
      * 根据token获取username
      */
     public static Integer getUserIdFromToken(String token) {
-        return Integer.parseInt(getClaimFromToken(token, Claims::getSubject));
+        String subject=getClaimFromToken(token, Claims::getSubject);
+        return StringUtil.isNotEmpty(subject)?Integer.parseInt(subject):null;
     }
 
     /**
@@ -113,9 +115,9 @@ public class JwtTokenUtils {
 //        return getClaimFromToken(token, Claims::getExpiration);
 //    }
 
-    public static <T> T getClaimFromToken(String token, java.util.function.Function<Claims, T> claimsResolver) {
+    public static <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getTokenClaim(token);
-        return claimsResolver.apply(claims);
+        return claims!=null?claimsResolver.apply(claims):null;
     }
 
 

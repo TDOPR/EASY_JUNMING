@@ -16,8 +16,8 @@ public class BillDetailsDTO {
     private Integer type;
 
     /**
-     * 月份 -1=查所有
+     * 年月 -1=查询所有 '2022-11'
      */
-    private Integer month;
+    private String yearMonth;
 
 }

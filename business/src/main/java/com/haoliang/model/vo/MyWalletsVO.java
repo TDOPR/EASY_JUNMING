@@ -11,7 +11,30 @@ import lombok.NoArgsConstructor;
  * @CreateTime 2022/11/16 10:40
  **/
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MyWalletsVO {
+
+    /**
+     * 区块链地址
+     */
+    private String blockAddress;
+
+    /**
+     * 当前余额
+     */
+    private String balance;
+
+    /**
+     * 提现到USDT手续费比例
+     */
+    private Integer usdtInterestRate;
+
+    /**
+     * 提现到法币手续费
+     */
+    private Integer lcInterestRate;
 
     /**
      * 我的团队
@@ -27,6 +50,7 @@ public class MyWalletsVO {
      * 我的代理收益
      */
     private Proxy proxy;
+
 
     /**
      * 量化收益

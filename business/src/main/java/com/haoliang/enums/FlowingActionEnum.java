@@ -12,7 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FlowingActionEnum {
     INCOME(1, "收入"),
-    EXPENDITURE(2, "支出"),
+    EXPENDITURE(0, "支出"),
     ;
     private Integer value;
     private String name;

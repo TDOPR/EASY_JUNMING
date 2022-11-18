@@ -4,11 +4,11 @@ package com.haoliang.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
+import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.model.SysUser;
-import com.haoliang.model.bo.LoginBO;
-import com.haoliang.model.bo.UpdatePasswordBO;
-import com.haoliang.model.bo.UpdateUserStatus;
 import com.haoliang.model.condition.SysUserCondition;
+import com.haoliang.model.dto.LoginDTO;
+import com.haoliang.model.dto.UpdateUserStatusDTO;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -19,18 +19,18 @@ public interface SysUserService extends IService<SysUser> {
     /**
      * 登录认证
      */
-    JsonResult login(LoginBO loginBO, String clientIp);
+    JsonResult login(LoginDTO loginDTO, String clientIp);
 
 
     /**
      * 启用或者禁用用户
      */
-    JsonResult userEnabled(UpdateUserStatus updateUserStatus);
+    JsonResult userEnabled(UpdateUserStatusDTO updateUserStatusDTO);
 
     /**
      * 修改密码
      */
-    JsonResult updatePassword(UpdatePasswordBO updatePasswordBO);
+    JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO);
 
 
 

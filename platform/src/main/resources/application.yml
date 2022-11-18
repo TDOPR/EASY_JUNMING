@@ -29,13 +29,13 @@ spring:
         max-active: 8
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
-#    username: root
-#    password: 123456
-    url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
     username: root
-    password: LXYx29K1rJhiOWtc
-    type: com.alibaba.druid.pool.DruidDataSource
+    password: 123456
+#    url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+#    username: root
+#    password: LXYx29K1rJhiOWtc
+#    type: com.alibaba.druid.pool.DruidDataSource
     # 数据连接池配置
     druid:
       #连接池最大连接数  (cpu核数量 * 2 + 硬盘数量)
@@ -146,12 +146,18 @@ login:
 
 #########################  邮件配置 ##################################
 mail:
+  #是否开启邮件预警功能
   enable: true
-  host: smtp.qq.com
-  port: 25
-  username: 826853123@qq.com
-  password: eddwoukjplfbbdba
-  formName: 皓亮君
+  enableSSL: false
+  #  host: smtp.qq.com
+  #  port: 25
+  #  username: 826853123@qq.com
+  #  password: eddwoukjplfbbdba
+  host: smtp.gmail.com
+  port: 587
+  username: zbowen856@gmail.com
+  password: qexsuvodarlbtqav
+  formName: easyTrade
 
 #########################  异步线程池配置 ##################################
 
@@ -165,8 +171,16 @@ asyncExecutor:
 app:
   #文件存储根路径
   rootPath: D:\data\
+  #头像存储路径
+  userHeadImageSavePath: ${app.rootPath}userHeadImage\
+  #虚拟路径前缀
+  virtualPathPrefix: /userHeadImage
+  #虚拟路径URL
+  virtualPathURL: http://127.0.0.1:9090${app.virtualPathPrefix}/
+  #文件上传限制 MB
+  fileMaxSize: 30
   #服务名称
-  serverName: HaoLiang
+  serverName: easyTrade
   #是否加载redisson的RateLimit限流相关Bean   依赖reids
   enableRateLimit: false
   #限流模式  single=单实例限流,all=全局限流(分布式限流)
@@ -188,3 +202,4 @@ app:
     - /home
     - /home/*
     - /druid/**
+    - ${app.virtualPathPrefix}/*

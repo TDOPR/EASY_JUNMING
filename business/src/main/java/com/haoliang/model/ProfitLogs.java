@@ -40,6 +40,6 @@ public class ProfitLogs extends BaseModelNoModifyTime {
     /**
      * 是否发放给用户 1=已发放, 0=未发放
      */
-    private Integer grantToUser;
+    private Integer status;
 
 }

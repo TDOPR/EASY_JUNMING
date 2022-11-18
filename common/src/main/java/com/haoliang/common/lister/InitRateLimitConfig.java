@@ -1,4 +1,4 @@
-package com.haoliang.common.listen;
+package com.haoliang.common.lister;
 
 import com.haoliang.common.annotation.RateLimit;
 import com.haoliang.common.aspect.RateLimitAspect;
@@ -33,7 +33,6 @@ public class InitRateLimitConfig implements ApplicationContextAware {
 
     @Value("${app.rateLimitModel}")
     private String rateLimitModel;
-
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

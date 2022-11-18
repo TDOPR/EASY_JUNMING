@@ -66,8 +66,8 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
 
     @Override
     public JsonResult<MyWalletsVO> getMyWallet(String token) {
-        MyWalletsVO myWalletsVO = new MyWalletsVO();
         Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getWalletAmount, Wallets::getBlockAddress);
 
         //获取我的团队信息
         MyItemAmountDTO myItemAmountDTO = this.getMyItemAmountByUserId(userId);
@@ -79,7 +79,6 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
                 .aiAmount(NumberUtils.downToInt(myItemAmountDTO.getFirstAmount()))
                 .validUserCount(appUserMapper.getValidUserCountByInviteId(userId))
                 .build();
-        myWalletsVO.setMyItem(myItemVO);
 
         //获取我的代理收益
         BigDecimal algebra = BigDecimal.ZERO, rebot = BigDecimal.ZERO, team = BigDecimal.ZERO, special = BigDecimal.ZERO;
@@ -96,17 +95,25 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
             }
         }
 
-        myWalletsVO.setProxy(MyWalletsVO.Proxy.builder()
+        MyWalletsVO.Proxy proxy = MyWalletsVO.Proxy.builder()
                 .algebra(NumberUtils.toMoeny(algebra))
                 .rebot(NumberUtils.toMoeny(rebot))
                 .team(NumberUtils.toMoeny(team))
                 .special(NumberUtils.toMoeny(special))
-                .build());
+                .build();
 
         //获取我的量化收益 昨天,上周,上月,累计
         MyWalletsVO.Quantification quantification = profitLogsService.getMyQuantification(userId);
-        myWalletsVO.setQuantification(quantification);
-        return JsonResult.successResult(myWalletsVO);
+
+        return JsonResult.successResult(MyWalletsVO.builder()
+                .quantification(quantification)
+                .proxy(proxy)
+                .myItem(myItemVO)
+                .usdtInterestRate(CoinUnitEnum.USDT.getInterestRate().multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP).intValue())
+                .lcInterestRate(CoinUnitEnum.LEGAL_CURRENCY.getInterestRate().multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP).intValue())
+                .blockAddress(wallets.getBlockAddress())
+                .balance(NumberUtils.toTwoDecimal(wallets.getWalletAmount()))
+                .build());
     }
 
     @Override
@@ -198,10 +205,6 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     }
 
 
-
-
-
-
     /**
      * 判断是否有区块链地址，如果没有则重地址池中取出然后设置到钱包里
      *
@@ -221,7 +224,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
             wrapper.lambda()
                     .set(Wallets::getBlockAddress, address)
                     .eq(Wallets::getId, wallets.getId());
-            this.update( wrapper);
+            this.update(wrapper);
         }
         return true;
     }
@@ -280,7 +283,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
                 //计算总业绩(托管金额+购买机器人金额)
                 userAmount = amountDTO.getWalletAmount().add(amountDTO.getRobotAmount());
                 if (amountDTO.getDescendant().equals(id)) {
-                    fistAmount=fistAmount.add(userAmount);
+                    fistAmount = fistAmount.add(userAmount);
                 }
                 itemIncome = itemIncome.add(userAmount);
             }
@@ -318,7 +321,6 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
         List<AppUsers> appUsersList = appUserMapper.selectList(new LambdaQueryWrapper<AppUsers>().select(AppUsers::getId).eq(AppUsers::getInviteId, userId));
         return getMyItemAmount(appUsersList.stream().map(AppUsers::getId).collect(Collectors.toList()));
     }
-
 
     @Override
     public BigDecimal getPlatformTotalLockAmount() {

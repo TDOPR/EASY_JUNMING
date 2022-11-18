@@ -1,4 +1,4 @@
-package com.haoliang.config;
+package com.haoliang.common.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,7 +16,11 @@ public class AppParam {
 
     private String serverName;
 
-    private String rateLimitModel;
+    private String virtualPathPrefix;
+
+    private Integer fileMaxSize;
+
+    private String userHeadImageSavePath;
 
     private List<String> securityExcludes;
 

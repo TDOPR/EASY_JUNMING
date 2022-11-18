@@ -12,4 +12,5 @@ public interface ProfitLogsService extends IService<ProfitLogs> {
     boolean updateUseByIdList(List<Long> idList);
 
     MyWalletsVO.Quantification getMyQuantification(Integer userId);
+
 }

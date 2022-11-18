@@ -15,7 +15,7 @@ import com.haoliang.mapper.SysRoleMenuMapper;
 import com.haoliang.mapper.SysUserMapper;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.SysRoleMenu;
-import com.haoliang.model.bo.SysRoleBO;
+import com.haoliang.model.dto.SysRoleDTO;
 import com.haoliang.model.condition.SysRoleCondition;
 import com.haoliang.model.vo.RoleVO;
 import com.haoliang.model.vo.SelectVO;
@@ -67,7 +67,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     }
 
     @Override
-    public JsonResult saveRole(SysRoleBO sysRole) {
+    public JsonResult saveRole(SysRoleDTO sysRole) {
         boolean reload=false;
         if (sysRole.getId() == null) {
             //角色名称和编码不能重复
@@ -110,13 +110,13 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
     @Override
     public JsonResult<List<SelectVO>> findSelectList() {
         List<SysRole> sysRoleList = this.list();
-        List<SelectVO> selectVOList = new ArrayList<>();
+        List<SelectVO> monthSelectVOList = new ArrayList<>();
         sysRoleList.forEach(sysRole -> {
             if (!sysRole.getId().equals(RoleTypeEnum.ADMIN.getCode())) {
-                selectVOList.add(new SelectVO(sysRole.getId(), sysRole.getRoleName()));
+                monthSelectVOList.add(new SelectVO(sysRole.getId(), sysRole.getRoleName()));
             }
         });
-        return JsonResult.successResult(selectVOList);
+        return JsonResult.successResult(monthSelectVOList);
     }
 
     @Override

@@ -12,7 +12,6 @@ public class TokenVO {
     private String token;
 
 
-
     public TokenVO(String token) {
         this.token = token;
     }

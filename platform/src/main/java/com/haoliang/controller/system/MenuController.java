@@ -5,7 +5,7 @@ import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.constant.OperationAction;
 import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.model.bo.IntIdListBO;
+import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.model.SysMenu;
 import com.haoliang.model.vo.MenuTreeVO;
 import com.haoliang.service.SysMenuService;
@@ -63,8 +63,8 @@ public class MenuController {
     @OperationLog(module = OperationModel.SYS_MENU, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:menu:remove')")
-    public JsonResult deleteById(@RequestBody IntIdListBO intIdListBO) {
-        return sysMenuService.deleteByIdList(intIdListBO.getIdList());
+    public JsonResult deleteById(@RequestBody IntIdListDTO intIdListDTO) {
+        return sysMenuService.deleteByIdList(intIdListDTO.getIdList());
     }
 
     //    /**

@@ -12,6 +12,7 @@ import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.SysLoginLog;
+import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.utils.AESUtil;
@@ -25,14 +26,12 @@ import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysUserMapper;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.SysUser;
-import com.haoliang.model.bo.LoginBO;
-import com.haoliang.model.bo.UpdatePasswordBO;
-import com.haoliang.model.bo.UpdateUserStatus;
 import com.haoliang.model.condition.SysUserCondition;
+import com.haoliang.model.dto.LoginDTO;
+import com.haoliang.model.dto.UpdateUserStatusDTO;
 import com.haoliang.model.vo.ExportUserVO;
 import com.haoliang.model.vo.TokenVO;
 import com.haoliang.model.vo.UserVO;
-import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,22 +67,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Resource
     private SysRoleMapper sysRoleMapper;
 
-    @Autowired
-    private SysMenuService sysMenuService;
-
     @Override
-    public JsonResult login(LoginBO loginBO, String clientIp) {
+    public JsonResult login(LoginDTO loginDTO, String clientIp) {
         //校验验证码
-        JsonResult jsonResult = checkCaptcha(loginBO);
+        JsonResult jsonResult = checkCaptcha(loginDTO);
         if (jsonResult.getCode() != HttpStatus.OK.value()) {
             return jsonResult;
         }
 
-        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, loginBO.getUsername()).eq(SysUser::getDeleted, 0));
+        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, loginDTO.getUsername()).eq(SysUser::getDeleted, 0));
         boolean loginFlag = true;
         if (sysUser == null) {
             return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_NOT_EXISTS);
-        } else if (!sysUser.getPassword().equals(AESUtil.encrypt(loginBO.getPassword(), sysUser.getSalt()))) {
+        } else if (!sysUser.getPassword().equals(AESUtil.encrypt(loginDTO.getPassword(), sysUser.getSalt()))) {
             //验证错误次数,当在指定时间内达到指定次数则锁定用户
             loginFlag = false;
         } else if (sysUser.getEnabled() == 0) {
@@ -127,7 +123,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     .set(SysUser::getEmail, sysUser.getEmail())
                     //.set(SysUser::getChannelId, sysUser.getChannelId())
                     .eq(SysUser::getId,sysUser.getId());
-            update(null, wrapper);
+            update( wrapper);
         }
         return JsonResult.successResult();
     }
@@ -144,12 +140,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
 
     @Override
-    public JsonResult userEnabled(UpdateUserStatus updateUserStatus) {
+    public JsonResult userEnabled(UpdateUserStatusDTO updateUserStatusDTO) {
         UpdateWrapper<SysUser> wrapper = Wrappers.update();
         wrapper.lambda()
-                .set(SysUser::getEnabled, updateUserStatus.getEnabled())
-                .eq(SysUser::getId, updateUserStatus.getId());
-        update(null, wrapper);
+                .set(SysUser::getEnabled, updateUserStatusDTO.getEnabled())
+                .eq(SysUser::getId, updateUserStatusDTO.getId());
+        update( wrapper);
         return JsonResult.successResult();
     }
 
@@ -159,20 +155,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         wrapper.lambda()
                 .set(SysUser::getDeleted, 1)
                 .in(SysUser::getId, idList);
-        update(null, wrapper);
+        update( wrapper);
         return JsonResult.successResult();
     }
 
     @Override
-    public JsonResult updatePassword(UpdatePasswordBO updatePasswordBO) {
-        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getSalt, SysUser::getPassword).eq(SysUser::getId, updatePasswordBO.getUserId()));
-        String oldPwd = AESUtil.encrypt(updatePasswordBO.getOldPassword(), sysUser.getSalt());
+    public JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO) {
+        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getSalt, SysUser::getPassword).eq(SysUser::getId, updatePasswordDTO.getUserId()));
+        String oldPwd = AESUtil.encrypt(updatePasswordDTO.getOldPassword(), sysUser.getSalt());
         if (sysUser.getPassword().equals(oldPwd)) {
             UpdateWrapper<SysUser> wrapper = Wrappers.update();
             wrapper.lambda()
-                    .set(SysUser::getPassword, AESUtil.encrypt(updatePasswordBO.getPassword(), sysUser.getSalt()))
-                    .in(SysUser::getId, updatePasswordBO.getUserId());
-            update(null, wrapper);
+                    .set(SysUser::getPassword, AESUtil.encrypt(updatePasswordDTO.getPassword(), sysUser.getSalt()))
+                    .eq(SysUser::getId, updatePasswordDTO.getUserId());
+            update( wrapper);
             return JsonResult.successResult();
         }
         return JsonResult.failureResult(ReturnMessageEnum.ORIGINAL_PASSWORD_ERROR);
@@ -186,7 +182,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         wrapper.lambda()
                 .set(SysUser::getPassword, AESUtil.encrypt("123456", sysUser.getSalt()))
                 .in(SysUser::getId, id);
-        update(null, wrapper);
+        update( wrapper);
         return JsonResult.successResult();
     }
 
@@ -194,13 +190,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 校验验证码
      */
-    private JsonResult checkCaptcha(LoginBO loginBO) {
+    private JsonResult checkCaptcha(LoginDTO loginDTO) {
         if (loginConfig.getCaptcha().isEnable()) {
-            String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + loginBO.getUuid();
+            String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + loginDTO.getUuid();
             String code = RedisUtils.getCacheObject(cacheKey);
             if (code == null) {
                 return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_EXPIRE);
-            } else if (!code.equals(loginBO.getCode())) {
+            } else if (!code.equals(loginDTO.getCode())) {
                 return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_ERROR);
             }
         }

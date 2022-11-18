@@ -56,11 +56,6 @@ public class AppUsers extends BaseModelCID {
     private Integer loginCount;
 
     /**
-     * 用户等级
-     */
-    private Integer level;
-
-    /**
      * 邀请码
      */
     private String inviteCode;

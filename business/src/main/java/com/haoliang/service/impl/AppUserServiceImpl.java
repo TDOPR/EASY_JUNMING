@@ -1,8 +1,13 @@
 package com.haoliang.service.impl;
 
+import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.config.AppParam;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
@@ -10,6 +15,7 @@ import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.SysLoginLog;
+import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.utils.*;
@@ -21,19 +27,27 @@ import com.haoliang.model.AppUsers;
 import com.haoliang.model.TreePath;
 import com.haoliang.model.Wallets;
 import com.haoliang.model.condition.AppUsersCondition;
+import com.haoliang.model.dto.AppUserDTO;
 import com.haoliang.model.dto.AppUserLoginDTO;
 import com.haoliang.model.dto.AppUserRegisterDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
+import com.haoliang.model.vo.AppTokenVO;
 import com.haoliang.model.vo.AppUsersVO;
 import com.haoliang.model.vo.HomeVO;
-import com.haoliang.model.vo.TokenVO;
-import com.haoliang.service.*;
+import com.haoliang.service.AppUserService;
+import com.haoliang.service.DayRateService;
+import com.haoliang.service.TreePathService;
+import com.haoliang.service.WalletsService;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -58,21 +72,28 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Autowired
     private TreePathService treePathService;
 
+    @Autowired
+    private AppParam appParam;
+
     @Resource
     private AddressPoolMapper addressPoolMapper;
 
     @Resource
     private AppUserMapper appUserMapper;
 
+
     @Override
     public JsonResult home(String token) {
         Integer robotLevel = 0;
         BigDecimal principalAmount = BigDecimal.ZERO;
+        //判断当前用户是否登录
         if (StringUtils.hasText(token)) {
             Integer userId = JwtTokenUtils.getUserIdFromToken(token);
-            Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
-            robotLevel = wallets.getRobotLevel();
-            principalAmount = wallets.getPrincipalAmount();
+            if (userId != null) {
+                Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
+                robotLevel = wallets.getRobotLevel();
+                principalAmount = wallets.getPrincipalAmount();
+            }
         }
         HomeVO homeVO = new HomeVO();
         RobotEnum robotEnum = RobotEnum.levelOf(robotLevel);
@@ -117,7 +138,10 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtils.simpleUUID();
         RedisUtils.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(appUsers.getEmail(), localIp, 2));
-        return JsonResult.successResult(new TokenVO(tokenKey));
+        AppTokenVO appTokenVO = new AppTokenVO();
+        BeanUtils.copyProperties(appUsers, appTokenVO);
+        appTokenVO.setToken(tokenKey);
+        return JsonResult.successResult(appTokenVO);
     }
 
     @Override
@@ -228,5 +252,53 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         return JsonResult.successResult(new PageVO<>(iPage.getTotal(), iPage.getPages(), iPage.getRecords()));
     }
 
+    @Override
+    public JsonResult modifyUserDetail(String token, AppUserDTO appUserDTO) {
+        UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();
+        updateWrapper.lambda()
+                .set(AppUsers::getNickName, appUserDTO.getNickName())
+                .set(AppUsers::getAutograph, appUserDTO.getAutograph())
+                .eq(AppUsers::getId, JwtTokenUtils.getUserIdFromToken(token));
+        boolean flag = this.update(updateWrapper);
+        return JsonResult.build(flag);
+    }
 
+    @Override
+    public JsonResult uploadHeadImage(String token, MultipartFile file) throws Exception {
+        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+
+        String suffix = FileUtil.getSuffix(file.getOriginalFilename());
+        String fileName = userId + "." + suffix;
+        String savePath = appParam.getUserHeadImageSavePath();
+        String url = GlobalConfig.getVirtualPathURL() + fileName;
+        //复制文件流到本地文件
+        FileUtils.copyInputStreamToFile(file.getInputStream(), new File(savePath, fileName));
+        UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();
+        updateWrapper.lambda()
+                .set(AppUsers::getHeadImage, url)
+                .eq(AppUsers::getId, JwtTokenUtils.getUserIdFromToken(token));
+        boolean flag = this.update(updateWrapper);
+
+        if (flag) {
+            JSONObject object = new JSONObject();
+            object.put("url", url);
+            return JsonResult.successResult(object);
+        }
+        return JsonResult.failureResult();
+    }
+
+    @Override
+    public JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO) {
+        AppUsers sysUser = this.getOne(new LambdaQueryWrapper<AppUsers>().select(AppUsers::getSalt, AppUsers::getPassword).eq(AppUsers::getId, updatePasswordDTO.getUserId()));
+        String oldPwd = AESUtil.encrypt(updatePasswordDTO.getOldPassword(), sysUser.getSalt());
+        if (sysUser.getPassword().equals(oldPwd)) {
+            UpdateWrapper<AppUsers> wrapper = Wrappers.update();
+            wrapper.lambda()
+                    .set(AppUsers::getPassword, AESUtil.encrypt(updatePasswordDTO.getPassword(), sysUser.getSalt()))
+                    .eq(AppUsers::getId, updatePasswordDTO.getUserId());
+            update(null, wrapper);
+            return JsonResult.successResult();
+        }
+        return JsonResult.failureResult(ReturnMessageEnum.ORIGINAL_PASSWORD_ERROR);
+    }
 }

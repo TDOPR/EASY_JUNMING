@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.model.SysRole;
-import com.haoliang.model.bo.SysRoleBO;
+import com.haoliang.model.dto.SysRoleDTO;
 import com.haoliang.model.condition.SysRoleCondition;
 import com.haoliang.model.vo.SelectVO;
 
@@ -17,7 +17,7 @@ public interface SysRoleService extends IService<SysRole> {
 
     JsonResult queryByCondition(PageParam<SysRole, SysRoleCondition> pageParam);
 
-    JsonResult saveRole(SysRoleBO sysRoleBO);
+    JsonResult saveRole(SysRoleDTO sysRoleDTO);
 
     JsonResult deleteByIdList(List<Integer> idList);
 }

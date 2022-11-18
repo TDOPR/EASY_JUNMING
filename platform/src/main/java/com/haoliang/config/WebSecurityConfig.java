@@ -1,5 +1,6 @@
 package com.haoliang.config;
 
+import com.haoliang.common.config.AppParam;
 import com.haoliang.security.JwtAuthenticationTokenFilter;
 import com.haoliang.security.MyAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;

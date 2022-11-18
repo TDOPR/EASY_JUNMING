@@ -63,7 +63,7 @@ public class AsyncServiceImpl implements AsyncService {
                 //如果团队收益大于0,则发放团队奖励给用户
                 wallets.setWalletAmount(wallets.getWalletAmount().add(totalIncome));
                 //插入流水变更记录
-                walletLogsService.insertWalletLogs(totalIncome, wallets.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.ALGEBRA);
+                walletLogsService.insertWalletLogs(totalIncome, wallets.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.TEAM);
                 log.info("发放代数奖: userId={} ,amount={} ", wallets.getUserId(), totalIncome);
             }
         }

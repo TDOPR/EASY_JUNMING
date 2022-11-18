@@ -48,9 +48,9 @@ public class ProfitTaskScheduledJob {
     private DayRateService dayRateService;
 
     /**
-     * 每天晚上0点计算托管收益
+     * 每天晚上21点计算托管收益
      */
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 21 0 * * ?")
     //@Scheduled(fixedDelay = 5000)//测试5秒执行一次
     @RedisLock
     public void calculationDayProfit() {
@@ -102,7 +102,7 @@ public class ProfitTaskScheduledJob {
         WalletLogs walletLogs;
         for (Wallets wallets : walletsList) {
             //获取用户未结算的收益信息
-            profitLogsList = profitLogsService.list(new LambdaQueryWrapper<ProfitLogs>().eq(ProfitLogs::getGrantToUser, 0).eq(ProfitLogs::getUserId, wallets.getUserId()));
+            profitLogsList = profitLogsService.list(new LambdaQueryWrapper<ProfitLogs>().eq(ProfitLogs::getStatus, 0).eq(ProfitLogs::getUserId, wallets.getUserId()));
             allIdList.addAll(profitLogsList.stream().map(ProfitLogs::getId).collect(Collectors.toList()));
             //获取周收益金额
             total = new BigDecimal("0.0");
@@ -129,16 +129,5 @@ public class ProfitTaskScheduledJob {
         log.info("-------------发放周收益给用户任务结束--------------");
     }
 
-//    public static void main(String[] args) {
-//        //小数加减乘除用BigDecimal
-//        BigDecimal b1 = new BigDecimal("1.8");
-//        BigDecimal b2 = new BigDecimal("0.1");
-//        BigDecimal b3 = b1.add(b2);//小数相加
-//        BigDecimal b4 = b1.subtract(b2);//小数相减
-//        BigDecimal b5 = b1.multiply(b2);//小数相乘
-//        System.out.println("1.8 + 0.1 = " + b3);
-//        System.out.println("1.8 - 0.1 = " + b4);
-//        System.out.println("1.8 * 0.1 = " + b5);
-//    }
 
 }

@@ -61,7 +61,7 @@ public class RobotServiceImpl implements RobotService {
             robotList.add(RobotDetailVO.RobotVO.builder()
                     .level(robotEnum.getLevel())
                     .price(robotEnum.getPrice())
-                    .rechargeMax(robotEnum.getRechargeMax())
+                    .rechargeMax("$"+robotEnum.getRechargeMax())
                     //如果机器人等级小于等于已购买的等级,则设置为不可购买状态
                     .selected(robotEnum.getLevel() <= hasRobotEnum.getLevel())
                     .build());

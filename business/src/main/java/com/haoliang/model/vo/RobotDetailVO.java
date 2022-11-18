@@ -40,7 +40,7 @@ public class RobotDetailVO {
         /**
          * 托管金额上限
          */
-        private BigDecimal rechargeMax;
+        private String rechargeMax;
         /**
          * 是否持有 true=已购买,false=未购买
          */

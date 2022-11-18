@@ -30,7 +30,7 @@ public class EmailConfig {
      * 设置ssl访问
      * qq邮箱=false  腾讯企业邮箱=true
      */
-    private boolean ssl;
+    private boolean enableSSL;
 
     /**
      * 发件人

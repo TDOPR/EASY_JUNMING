@@ -1,4 +1,4 @@
-package com.haoliang.model.bo;
+package com.haoliang.model.dto;
 
 import lombok.Data;
 
@@ -8,7 +8,7 @@ import lombok.Data;
  * @CreateTime 2022/10/26 18:34
  **/
 @Data
-public class UpdateUserStatus {
+public class UpdateUserStatusDTO {
 
     /**
      * 用户状态

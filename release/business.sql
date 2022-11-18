@@ -17,8 +17,8 @@ CREATE TABLE `app_users`  (
   `loginCount` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '登录次数',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
-  UNIQUE INDEX `UK_app_users_email`(`eamil`) USING BTREE,
-	UNIQUE INDEX `UK_app_users_inviteCode`(`inviteCode`) USING BTREE,
+  UNIQUE INDEX `UK_app_users_email`(`email`) USING BTREE,
+  UNIQUE INDEX `UK_app_users_inviteCode`(`inviteCode`) USING BTREE,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = 'app用户表' ROW_FORMAT = Dynamic;
 
@@ -51,7 +51,7 @@ CREATE TABLE `wallets`  (
 DROP TABLE IF EXISTS `wallet_logs`;
 CREATE TABLE `wallet_logs`  (
   `id` bigint UNSIGNED NOT NULL,
-  `userId` int(0)  NOT NULL DEFAULT 0 COMMENT '用户ID',
+  `userId` int(0) UNSIGNED  NOT NULL DEFAULT 0 COMMENT '用户ID',
   `targetUserId` int(0)   NOT NULL DEFAULT 0  COMMENT '目标用户ID',
   `amount` decimal(12, 4) UNSIGNED NOT NULL COMMENT '本次变动金额',
   `action` tinyint UNSIGNED NOT NULL COMMENT '收支动作:1-收入 2-支出',
@@ -71,7 +71,7 @@ CREATE TABLE `profit_logs`  (
   `userId` int(0) UNSIGNED NOT NULL COMMENT '关联的用户ID',
   `principal` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '托管本金',
   `generatedAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '托管本金',
-  `grantToUser` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '结算类型 1=已结算 0=未结算',
+  `status` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '结算状态 1=已结算 0=未结算',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
    PRIMARY KEY (`id`) USING BTREE,
@@ -86,7 +86,7 @@ DROP TABLE IF EXISTS `address_pool`;
 CREATE TABLE `address_pool`  (
   `id` int(0) UNSIGNED NOT NULL AUTO_INCREMENT,
   `address` varchar(255)  NOT NULL DEFAULT ''  COMMENT '区块链交易地址',
-  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '区块链地址池' ROW_FORMAT = Dynamic;
 
@@ -100,7 +100,7 @@ CREATE TABLE `app_user_recharge`  (
   `txid`varchar(64) NOT NULL DEFAULT '' COMMENT '交易id',
   `coinUnit` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '货币类型 1=法币 2=usdt',
   `amount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '充值金额',
-  `status` tinyint UNSIGNED NOT NULL DEFAULT 0.00000000 COMMENT '充值状态 1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
+  `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '充值状态 1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
   `address`varchar(256) NOT NULL DEFAULT '' COMMENT '区块链充值地址',
    `exchangeRate` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '多少金额等于1$',
    `usdAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '充值金额等值的美元',
@@ -123,7 +123,7 @@ CREATE TABLE `app_user_withdraw`  (
   `amount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '提现金额',
   `fee` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '手续费',
   `actualAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '实际提现金额',
-  `status` tinyint UNSIGNED NOT NULL DEFAULT 0.00000000 COMMENT '提现状态0=未审核  1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
+  `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '提现状态0=未审核  1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
   `address`varchar(256) NOT NULL DEFAULT '' COMMENT '区块链提现地址',
   `chainFee` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '链上手续费花费',
   `auditTime`  datetime(0) NULL DEFAULT NULL  COMMENT '审批时间',
@@ -142,8 +142,8 @@ DROP TABLE IF EXISTS `tree_paths`;
 CREATE TABLE `tree_paths`  (
   `ancestor` int(0) UNSIGNED NOT NULL DEFAULT  0  COMMENT '父Id',
   `descendant` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '子Id',
-  `level` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '子是父的第几代',,
-  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `level` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '子是父的第几代',
+  `createTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`ancestor`, `descendant`) USING BTREE
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户邀请关系表' ROW_FORMAT = Dynamic;
 
@@ -151,7 +151,7 @@ CREATE TABLE `tree_paths`  (
 -- Table structure for tree_paths
 -- -------------------------------
 DROP TABLE IF EXISTS `app_user_rebot_ref`;
-CREATE TABLE `app_user_rebot_ref`
+CREATE TABLE `app_user_rebot_ref`(
   `userId` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '用户Id',
   `inviteId` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '邀请的用户Id',
   `level` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '邀请的用户是用户的第几位购买机器',

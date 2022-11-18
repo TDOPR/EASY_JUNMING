@@ -1,6 +1,5 @@
 package com.haoliang.common.config;
 
-import org.redisson.api.RateType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,18 +12,19 @@ import org.springframework.stereotype.Component;
 public class GlobalConfig {
 
 
-    private static RateType rateType;
-
     private static long tokenExpire;
 
     private static String tokenSecret;
 
-    public static RateType getRateType() {
-        return rateType;
+    private static String virtualPathURL;
+
+    public static String getVirtualPathURL() {
+        return virtualPathURL;
     }
 
-    public static void setRateType(RateType rateType) {
-        GlobalConfig.rateType = rateType;
+    @Value("${app.virtualPathURL}")
+    public  void setVirtualPathURL(String virtualPathURL) {
+        GlobalConfig.virtualPathURL = virtualPathURL;
     }
 
     public static long getTokenExpire() {
@@ -44,4 +44,5 @@ public class GlobalConfig {
     public  void setTokenSecret(String tokenSecret) {
         GlobalConfig.tokenSecret = tokenSecret;
     }
+
 }

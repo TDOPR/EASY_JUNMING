@@ -3,6 +3,7 @@ package com.haoliang.common.utils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
@@ -119,22 +120,22 @@ public class DateUtil {
      * @return
      */
     public static LocalDateTime getDateStrIncrement(LocalDateTime date, Integer time, TimeUnit timeUnit) {
-        LocalDateTime newDate=LocalDateTime.now();
+        LocalDateTime newDate = LocalDateTime.now();
         switch (timeUnit) {
             case SECONDS:
-                newDate=date.plusSeconds(time);
+                newDate = date.plusSeconds(time);
                 break;
             case MINUTES:
                 //增加分钟
-                newDate=date.plusMinutes(time);
+                newDate = date.plusMinutes(time);
                 break;
             case HOURS:
                 //增加小时
-                newDate=date.plusHours(time);
+                newDate = date.plusHours(time);
                 break;
             case DAYS:
                 //增加天
-                newDate= date.plusDays(time);
+                newDate = date.plusDays(time);
                 break;
         }
         return newDate;
@@ -177,6 +178,51 @@ public class DateUtil {
 
     public static void main(String[] args) {
         System.out.println(getNowDateNotHours());
+    }
+
+
+    /**
+     * 计算两个日期之前相差的月数
+     *
+     * @param startLocalDate 开始日期
+     * @param endLocalDate   结束日期
+     * @return
+     */
+    public static int betweenMonths(LocalDate startLocalDate, LocalDate endLocalDate) {
+        LocalDate start = LocalDate.of(startLocalDate.getYear(), startLocalDate.getMonth(), 1);
+        LocalDate end = LocalDate.of(endLocalDate.getYear(), endLocalDate.getMonth(), 1);
+        return (int) ChronoUnit.MONTHS.between(start, end);
+    }
+
+    public static String getMonthEnglish(Integer month) {
+        switch (month) {
+            case 1:
+                return "Jan";
+            case 2:
+                return "Feb";
+            case 3:
+                return "Mar";
+            case 4:
+                return "Apr";
+            case 5:
+                return "May";
+            case 6:
+                return "Jun";
+            case 7:
+                return "Jul";
+            case 8:
+                return "Aug";
+            case 9:
+                return "Sept";
+            case 10:
+                return "Oct";
+            case 11:
+                return "Nov";
+            case 12:
+                return "Dec";
+            default:
+                return "";
+        }
     }
 
 }

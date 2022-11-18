@@ -18,7 +18,7 @@ public class NumberUtils {
     @NoArgsConstructor
     @AllArgsConstructor
     public enum AmountTypeEnum {
-
+        USD("美元格式", "$1110.11", "$0.00"),
         MONEY("千分号+小数点", "1,110.11", "##,##0.00"),
         TWO_DECIMAL("小数点无逗号", "1110.11", "0.00"),
         INT("无小数无逗号", "1110", "0"),
@@ -34,7 +34,6 @@ public class NumberUtils {
         public String getFormat() {
             return format;
         }
-
 
     }
 
@@ -83,8 +82,15 @@ public class NumberUtils {
     /**
      * 格式化成两位小数百分比并向下取整
      */
-    public static String saveTwoDecimal(BigDecimal money){
+    public static String toTwoDecimal(BigDecimal money){
         return formartMoney(money, AmountTypeEnum.TWO_DECIMAL);
+    }
+
+    /**
+     * 格式化成两位小数百分比并向下取整
+     */
+    public static String toUSD(BigDecimal money){
+        return formartMoney(money, AmountTypeEnum.USD);
     }
 
     /**

@@ -6,7 +6,9 @@ import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.model.WalletLogs;
 import com.haoliang.model.dto.BillDetailsDTO;
+import com.haoliang.model.vo.ProfitLogsDetailVO;
 import com.haoliang.model.vo.WalletLogVO;
+import com.haoliang.model.vo.WalletLogsDetailVO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,5 +40,9 @@ public interface WalletLogsService extends IService<WalletLogs> {
      */
     List<WalletLogs> getMyProxyWalletLogs(Integer userId);
 
-    JsonResult getMybillDetails(String token, BillDetailsDTO billDetailsDTO);
+    JsonResult<WalletLogsDetailVO> getMybillDetails(String token, BillDetailsDTO billDetailsDTO);
+
+    JsonResult<ProfitLogsDetailVO> quantificationDetail(String token);
+
+    JsonResult<List<WalletLogVO>> proxyDetail(String token);
 }

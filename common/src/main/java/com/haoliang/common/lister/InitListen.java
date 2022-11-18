@@ -1,9 +1,6 @@
-package com.haoliang.common.listen;
+package com.haoliang.common.lister;
 
-import com.haoliang.common.config.GlobalConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RateType;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -23,14 +20,10 @@ public class InitListen implements CommandLineRunner {
         return serverIp;
     }
 
-    @Value("${app.rateLimitModel}")
-    private String rateLimitModel;
-
     @Override
     public void run(String... args) {
         try {
             //根据配置文件决定限流模式使用全局限流还是单实例限流
-            GlobalConfig.setRateType("all".equals(rateLimitModel) ? RateType.OVERALL : RateType.PER_CLIENT);
             InetAddress addr = InetAddress.getLocalHost();
             String serverIP = addr.getHostAddress(); //获取本机ip
             String hostName = addr.getHostName(); //获取本机计算机名称

@@ -6,7 +6,7 @@ import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.constant.OperationAction;
 import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.*;
-import com.haoliang.common.model.bo.IntIdListBO;
+import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.vo.ExportErrorLogVO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysErrorLogService;
@@ -67,8 +67,8 @@ public class LogController {
     @OperationLog(module = OperationModel.SYS_LOGIN_LOG, description = OperationAction.REMOVE)
     @PostMapping("/loginlog/delete")
     @PreAuthorize("hasAuthority('sys:loginlog:remove')")
-    public JsonResult deleteLoginLogsByIds(@RequestBody IntIdListBO intIdListBO) {
-        return JsonResult.build(sysLoginLogService.removeByIds(intIdListBO.getIdList()));
+    public JsonResult deleteLoginLogsByIds(@RequestBody IntIdListDTO intIdListDTO) {
+        return JsonResult.build(sysLoginLogService.removeByIds(intIdListDTO.getIdList()));
     }
 
     /**
@@ -143,8 +143,8 @@ public class LogController {
     @OperationLog(module =  OperationModel.SYS_ERROR_LOG, description = OperationAction.REMOVE)
     @PostMapping("/errorlog/delete")
     @PreAuthorize("hasAuthority('sys:errorlog:remove')")
-    public JsonResult deleteErrorLogsByIds(@RequestBody IntIdListBO intIdListBO) {
-        return JsonResult.build(sysErrorLogService.removeByIds(intIdListBO.getIdList()));
+    public JsonResult deleteErrorLogsByIds(@RequestBody IntIdListDTO intIdListDTO) {
+        return JsonResult.build(sysErrorLogService.removeByIds(intIdListDTO.getIdList()));
     }
 
     /**

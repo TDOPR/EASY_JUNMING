@@ -7,17 +7,17 @@ import com.haoliang.common.constant.OperationAction;
 import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
-import com.haoliang.common.model.bo.IntIdListBO;
+import com.haoliang.common.model.dto.IntIdListDTO;
+import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.utils.IpAddrUtil;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.SysUser;
-import com.haoliang.model.bo.LoginBO;
-import com.haoliang.model.bo.UpdatePasswordBO;
-import com.haoliang.model.bo.UpdateUserStatus;
 import com.haoliang.model.condition.SysUserCondition;
+import com.haoliang.model.dto.LoginDTO;
+import com.haoliang.model.dto.UpdateUserStatusDTO;
+import com.haoliang.model.vo.AppTokenVO;
 import com.haoliang.model.vo.RouterVO;
-import com.haoliang.model.vo.TokenVO;
 import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +70,8 @@ public class SysUserController {
     @OperationLog(module = OperationModel.SYS_USER, description = OperationAction.ENABLED_OR_DIABLED)
     @PostMapping("/userEnabled")
     @PreAuthorize("hasAuthority('sys:user:enabled')")
-    public JsonResult userEnabled(@RequestBody UpdateUserStatus updateUserStatus) {
-        return sysUserService.userEnabled(updateUserStatus);
+    public JsonResult userEnabled(@RequestBody UpdateUserStatusDTO updateUserStatusDTO) {
+        return sysUserService.userEnabled(updateUserStatusDTO);
     }
 
     /**
@@ -81,8 +81,8 @@ public class SysUserController {
     @OperationLog(module = OperationModel.SYS_USER, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:user:remove')")
-    public JsonResult deleteUsersByIds(@RequestBody IntIdListBO intIdListBO) {
-        return sysUserService.deleteByIdList(intIdListBO.getIdList());
+    public JsonResult deleteUsersByIds(@RequestBody IntIdListDTO intIdListDTO) {
+        return sysUserService.deleteByIdList(intIdListDTO.getIdList());
     }
 
     /**
@@ -109,9 +109,9 @@ public class SysUserController {
      * 修改密码
      */
     @PostMapping("/updatePassword")
-    public JsonResult updatePassword(@RequestBody UpdatePasswordBO updatePasswordBO,@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token) {
-        updatePasswordBO.setUserId(JwtTokenUtils.getUserIdFromToken(token));
-        return sysUserService.updatePassword(updatePasswordBO);
+    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token) {
+        updatePasswordDTO.setUserId(JwtTokenUtils.getUserIdFromToken(token));
+        return sysUserService.updatePassword(updatePasswordDTO);
     }
 
     /**
@@ -119,8 +119,8 @@ public class SysUserController {
      */
     @PrintLog
     @PostMapping("/login")
-    public JsonResult<TokenVO> login(@Valid @RequestBody LoginBO loginBO, HttpServletRequest request) {
-        return sysUserService.login(loginBO, IpAddrUtil.getLocalIp(request));
+    public JsonResult<AppTokenVO> login(@Valid @RequestBody LoginDTO loginDTO, HttpServletRequest request) {
+        return sysUserService.login(loginDTO, IpAddrUtil.getLocalIp(request));
     }
 
     /**

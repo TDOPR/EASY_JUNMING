@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.haoliang.common.base.BaseCondition;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
-import com.haoliang.common.model.bo.IntIdListBO;
+import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.mapper.TestMapper;
 import com.haoliang.model.Test;
@@ -102,10 +102,10 @@ public class TestCRUDController {
      * 删除数据
      */
     @PostMapping("/deletebyIds")
-    public JsonResult deletebyIds(@RequestBody IntIdListBO intIdListBO) {
+    public JsonResult deletebyIds(@RequestBody IntIdListDTO intIdListDTO) {
         //testService.removeById(1);//根据Id删除数据
         //testService.remove(new LambdaQueryWrapper<Test>().eq(Test::getName, "张三")); //根据条件删除数据
-        return JsonResult.build(testService.removeByIds(intIdListBO.getIdList()));
+        return JsonResult.build(testService.removeByIds(intIdListDTO.getIdList()));
     }
 
 }

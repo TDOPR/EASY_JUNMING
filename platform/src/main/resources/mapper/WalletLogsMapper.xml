@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haoliang.mapper.WalletLogsMapper">
 
-
     <select id="getMyProxyWalletLogs" resultType="com.haoliang.model.WalletLogs">
         SELECT
             type,sum(amount)
@@ -15,4 +14,9 @@
         </foreach>
         GROUP BY TYPE;
     </select>
+
+    <select id="getDateSection" resultType="com.haoliang.model.dto.DateSection">
+        SELECT min(createTime) minDate,max(createTime) maxDate  FROM wallet_logs  WHERE userId=#{userId}
+    </select>
+
 </mapper>

@@ -5,12 +5,16 @@ import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.dto.BillDetailsDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
 import com.haoliang.model.vo.MyWalletsVO;
+import com.haoliang.model.vo.ProfitLogsDetailVO;
+import com.haoliang.model.vo.WalletLogVO;
+import com.haoliang.model.vo.WalletLogsDetailVO;
 import com.haoliang.service.WalletLogsService;
 import com.haoliang.service.WalletsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 钱包接口
@@ -37,7 +41,7 @@ public class WalletController {
     }
 
     /**
-     * 钱包充值
+     * 充值
      */
     @PostMapping("/recharge")
     public JsonResult recharge(@Valid @RequestBody WalletOrderDTO walletOrderDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
@@ -45,7 +49,7 @@ public class WalletController {
     }
 
     /**
-     * 钱包提现
+     * 提现
      */
     @PostMapping("/withdrawal")
     public JsonResult withdrawal(@Valid @RequestBody WalletOrderDTO walletOrderDTO,@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
@@ -56,7 +60,23 @@ public class WalletController {
      * 账单明细
      */
     @PostMapping("/billDetails")
-    public JsonResult  billDetails(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token,@RequestBody BillDetailsDTO billDetailsDTO){
+    public JsonResult<WalletLogsDetailVO>  billDetails(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token, @RequestBody BillDetailsDTO billDetailsDTO){
         return walletLogService.getMybillDetails(token,billDetailsDTO);
+    }
+
+    /**
+     * 量化收益明细
+     */
+    @PostMapping("/quantificationDetail")
+    public JsonResult<ProfitLogsDetailVO> quantificationDetail(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token){
+        return walletLogService.quantificationDetail(token);
+    }
+
+    /**
+     * 代理收益明细
+     */
+    @PostMapping("/proxyDetail")
+    public JsonResult<List<WalletLogVO>> proxyDetail(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token){
+        return walletLogService.proxyDetail(token);
     }
 }

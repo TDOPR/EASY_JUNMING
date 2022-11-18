@@ -1,4 +1,4 @@
-package com.haoliang.common.model.bo;
+package com.haoliang.common.model.dto;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.util.List;
  * @description
  **/
 @Data
-public class IntIdListBO {
+public class IntIdListDTO {
 
     /**
      * 唯一标识数组

@@ -16,7 +16,7 @@ public enum FlowingTypeEnum {
     ALGEBRA(1, "AI奖励"),
     ROBOT(2, "推广奖励"),
     TEAM(3, "团队奖励"),
-    SPECIAL(4, "分红奖"),
+    SPECIAL(4, "分红奖励"),
     RECHARGE(5, "充值"),
     WITHDRAWAL(6, "提现"),
     STATIC(7, "量化收益"),
@@ -46,11 +46,11 @@ public enum FlowingTypeEnum {
         } else if (value.equals(WITHDRAWAL.value)) {
             return WITHDRAWAL.desc;
         } else if (value.equals(ENTRUSTMENT.value)) {
-            return "量化收益存入";
+            return ENTRUSTMENT.desc;
         } else if (value.equals(WITHDRAWL_WALLET.value)) {
             return WITHDRAWL_WALLET.desc;
         } else if (value.equals(STATIC.value)) {
-            return STATIC.desc;
+            return "量化收益存入";
         } else if (value.equals(BUY_ROBOT.value) || value.equals(UPGRADE_ROBOT.value)) {
             return BUY_ROBOT.desc;
         }

@@ -5,9 +5,9 @@ import com.haoliang.common.constant.OperationAction;
 import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
-import com.haoliang.common.model.bo.IntIdListBO;
+import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.model.SysRole;
-import com.haoliang.model.bo.SysRoleBO;
+import com.haoliang.model.dto.SysRoleDTO;
 import com.haoliang.model.condition.SysRoleCondition;
 import com.haoliang.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +41,8 @@ public class RoleController {
     @OperationLog(module = OperationModel.SYS_ROLE, description = OperationAction.REMOVE)
     @PostMapping("/delete")
     @PreAuthorize("hasAuthority('sys:role:remove')")
-    public JsonResult deleteByIds(@RequestBody IntIdListBO intIdListBO) {
-        return roleService.deleteByIdList(intIdListBO.getIdList());
+    public JsonResult deleteByIds(@RequestBody IntIdListDTO intIdListDTO) {
+        return roleService.deleteByIdList(intIdListDTO.getIdList());
     }
 
     /**
@@ -51,8 +51,8 @@ public class RoleController {
     @OperationLog(module = OperationModel.SYS_ROLE, description = OperationAction.ADD_OR_EDIT)
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:role:add','sys:role:edit')")
-    public JsonResult save(@RequestBody SysRoleBO sysRoleBO) {
-        return roleService.saveRole(sysRoleBO);
+    public JsonResult save(@RequestBody SysRoleDTO sysRoleDTO) {
+        return roleService.saveRole(sysRoleDTO);
     }
 
     /**

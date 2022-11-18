@@ -183,8 +183,6 @@ CREATE TABLE `sys_notice`  (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统公告' ROW_FORMAT = Dynamic;
 
-
-
 INSERT INTO sys_dictionary (id, createTime, lastmodifiedTime, dicKey, parentId, dicValue) VALUES (1, '2020-11-03 10:46:11', '2020-11-03 10:46:11', 'loginLogSaveDay', 0, '-1');
 INSERT INTO sys_dictionary (id, createTime, lastmodifiedTime, dicKey, parentId, dicValue) VALUES (2, '2020-11-03 10:46:11', '2020-11-03 10:46:11', 'loginLogSaveDay', 1, '-1');
 INSERT INTO sys_dictionary (id, createTime, lastmodifiedTime, dicKey, parentId, dicValue) VALUES (3, '2020-11-03 10:46:11', '2020-11-03 10:46:11', 'operationLogSaveDay', 1, '-1');
