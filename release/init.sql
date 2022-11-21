@@ -48,6 +48,7 @@ CREATE TABLE `sys_user`  (
   `username` varchar(255)  NOT NULL DEFAULT '' COMMENT '用户名',
   `email` varchar(36)  NOT NULL DEFAULT '' COMMENT '邮箱号',
   `mobile` varchar(18)  NOT NULL DEFAULT '' COMMENT '手机号',
+  `googleSecret` varchar(36) NOT NULL DEFAULT '' COMMENT '谷歌验证器的秘钥',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `UK51bvuyvihefoh4kp5syh2jpi4`(`username`) USING BTREE,
   INDEX `FKtlnkwkosadnhdypumotecrebo`(`channelId`) USING BTREE,

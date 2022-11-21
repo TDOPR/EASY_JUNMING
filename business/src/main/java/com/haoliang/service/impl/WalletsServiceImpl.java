@@ -281,7 +281,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
             itemIncome = new BigDecimal("0");
             for (TreePathAmountDTO amountDTO : treePathAmountList) {
                 //计算总业绩(托管金额+购买机器人金额)
-                userAmount = amountDTO.getWalletAmount().add(amountDTO.getRobotAmount());
+                userAmount = amountDTO.getPrincipalAmount().add(amountDTO.getRobotAmount());
                 if (amountDTO.getDescendant().equals(id)) {
                     fistAmount = fistAmount.add(userAmount);
                 }

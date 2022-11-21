@@ -27,11 +27,6 @@ public class WalletLogs extends BaseModelNoModifyTime {
     private Integer userId;
 
     /**
-     * 目标用户ID
-     */
-    private Integer targetUserId;
-
-    /**
      * 本次变动金额
      */
     private BigDecimal amount;
@@ -45,6 +40,5 @@ public class WalletLogs extends BaseModelNoModifyTime {
      * 流水类型 对应FlowingTypeEnum枚举
      */
     private Integer type;
-
 
 }

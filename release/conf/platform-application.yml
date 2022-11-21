@@ -173,6 +173,8 @@ asyncExecutor:
 app:
   #文件存储根路径
   rootPath: D:\data\
+  #临时文件存储
+  tmpSavePath: ${app.rootPath}tmp/
   #头像存储路径
   userHeadImageSavePath: ${app.rootPath}userHeadImage\
   #虚拟路径前缀

@@ -9,6 +9,7 @@ public enum ContentTypeEnum {
 
     OCTET_STREAM("application/octet-stream","二进制流数据"),
     JPG("image/jpeg","jpg图片格式"),
+    PNG("image/png","png图片格式"),
     WORD("application/msword","Word文档格式"),
     PDF("application/pdf ","pdf格式");
 

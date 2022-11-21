@@ -24,6 +24,16 @@ public class ErrorLogUtil {
         sysErrorLogService.save(errorLog);
     }
 
-
+    /**
+     * 保存错误信息
+     * @param classz 类名称
+     * @param position 位置
+     * @param message 错误信息
+     */
+    public static void save(Class classz, String position, String message) {
+        SysErrorLogService sysErrorLogService = SpringUtil.getBean(SysErrorLogService.class);
+        SysErrorLog errorLog = new SysErrorLog(classz.getName(), position, message, InitListen.getServerIp());
+        sysErrorLogService.save(errorLog);
+    }
 
 }

@@ -18,7 +18,7 @@
 
     <select id="getTreeAmountByUserId" resultType="com.haoliang.model.dto.TreePathAmountDTO">
         SELECT
-         w.walletAmount,w.robotAmount,t.descendant
+         w.principalAmount,w.robotAmount,t.descendant
         FROM tree_paths t
         LEFT JOIN
             wallets w

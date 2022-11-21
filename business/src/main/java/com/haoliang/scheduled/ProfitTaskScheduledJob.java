@@ -2,6 +2,7 @@ package com.haoliang.scheduled;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RedisLock;
+import com.haoliang.common.utils.ErrorLogUtil;
 import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 /**
@@ -51,7 +53,7 @@ public class ProfitTaskScheduledJob {
      * 每天晚上21点计算托管收益
      */
     @Scheduled(cron = "0 0 21 * * ?")
-    //@Scheduled(fixedDelay = 5000)//测试5秒执行一次
+    //@Scheduled(fixedDelay = 30000)//测试每10秒执行一次
     @RedisLock
     public void calculationDayProfit() {
         log.info("-------------计算日收益任务开始--------------");
@@ -75,14 +77,26 @@ public class ProfitTaskScheduledJob {
         //批量插入日收益日志
         profitLogsService.saveBatch(profitLogsList);
         log.info("-------------计算日收益任务结束--------------");
-        //发放团队奖只拿三代
-        log.info("-------------发放团队奖开始--------------");
-        for (Wallets wallets : walletsList) {
-            if (wallets.getPrincipalAmount().compareTo(EasyTradeConfig.PROXY_MIN_MONEY) >= 0) {
-                //只有托管金额>=300的有资格获取团队奖
-                asyncService.grantItemPrizeToUser(wallets, userAmount);
-            }
+
+        //只有托管金额>=300的有资格获取动态收益
+        List<Wallets> sendTeamWallets = walletsList.stream().filter(wallets -> wallets.getPrincipalAmount().compareTo(EasyTradeConfig.PROXY_MIN_MONEY) >= 0).collect(Collectors.toList());
+        if (sendTeamWallets.size() == 0) {
+            return;
         }
+
+        log.info("-------------发放动态收益开始--------------");
+        CountDownLatch countDownLatch = new CountDownLatch(sendTeamWallets.size());
+        for (Wallets wallets : sendTeamWallets) {
+            asyncService.grantItemPrizeToUser(wallets, userAmount, countDownLatch);
+        }
+
+        try {
+            //主线程挂起,等待所有发放动态收益的子线程处理结束
+            countDownLatch.await();
+        } catch (Exception e) {
+            ErrorLogUtil.save(ProfitTaskScheduledJob.class,"","calculationDayProfit task countDownLatch.await error");
+        }
+        log.info("-------------发放动态收益结束--------------");
     }
 
     /**

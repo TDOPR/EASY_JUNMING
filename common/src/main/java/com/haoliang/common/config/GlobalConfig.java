@@ -18,6 +18,8 @@ public class GlobalConfig {
 
     private static String virtualPathURL;
 
+    private static String tmpSavePath;
+
     public static String getVirtualPathURL() {
         return virtualPathURL;
     }
@@ -45,4 +47,12 @@ public class GlobalConfig {
         GlobalConfig.tokenSecret = tokenSecret;
     }
 
+    public static String getTmpSavePath() {
+        return tmpSavePath;
+    }
+
+    @Value("${app.tmpSavePath}")
+    public  void setTmpSavePath(String tmpSavePath) {
+        GlobalConfig.tmpSavePath = tmpSavePath;
+    }
 }

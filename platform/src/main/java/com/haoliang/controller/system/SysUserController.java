@@ -30,6 +30,7 @@ import javax.validation.Valid;
 
 /**
  * 系统用户管理
+ *
  * @author Dominick Li
  **/
 @RestController
@@ -48,7 +49,7 @@ public class SysUserController {
     @PostMapping("/pagelist")
     @PreAuthorize("hasAuthority('sys:user:list')")
     public JsonResult<PageVO<SysUser>> queryByCondition(@RequestBody PageParam<SysUser, SysUserCondition> pageParam) {
-        if(pageParam.getSearchParam()==null){
+        if (pageParam.getSearchParam() == null) {
             pageParam.setSearchParam(new SysUserCondition());
         }
         return sysUserService.queryByCondition(pageParam);
@@ -56,12 +57,13 @@ public class SysUserController {
 
     /**
      * 导出用户信息
+     *
      * @return 文件二进制流
      */
     @PostMapping("/export")
     @PreAuthorize("hasAuthority('sys:user:export')")
-    public void exportUsers(@RequestBody  PageParam<SysUser,SysUserCondition> pageParam, HttpServletResponse response) {
-        sysUserService.exportUsers(pageParam,response);
+    public void exportUsers(@RequestBody PageParam<SysUser, SysUserCondition> pageParam, HttpServletResponse response) {
+        sysUserService.exportUsers(pageParam, response);
     }
 
     /**
@@ -76,6 +78,7 @@ public class SysUserController {
 
     /**
      * 批量删除用户
+     *
      * @param idList id数组
      */
     @OperationLog(module = OperationModel.SYS_USER, description = OperationAction.REMOVE)
@@ -109,7 +112,7 @@ public class SysUserController {
      * 修改密码
      */
     @PostMapping("/updatePassword")
-    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token) {
+    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
         updatePasswordDTO.setUserId(JwtTokenUtils.getUserIdFromToken(token));
         return sysUserService.updatePassword(updatePasswordDTO);
     }
@@ -127,8 +130,15 @@ public class SysUserController {
      * 获取用户的菜单权限
      */
     @GetMapping("/getRouters")
-    public JsonResult<RouterVO> getRouters(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
+    public JsonResult<RouterVO> getRouters(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
         return sysMenuService.findAllByRoleCode(JwtTokenUtils.getRoleCodeFromToken(token));
     }
 
+    /**
+     * 生成用户google认证器的二维码图片
+     */
+    @GetMapping("/generateGoogleQRCode/{id}")
+    public void generateGoogleQRCode(@PathVariable Integer userId, HttpServletResponse response) throws Exception {
+        sysUserService.generateGoogleQRCode(userId, response);
+    }
 }

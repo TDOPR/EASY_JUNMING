@@ -32,6 +32,11 @@ public class SysUser extends BaseModelCID {
     private String salt;
 
     /**
+     * 谷歌验证器的秘钥
+     */
+    private String googleSecret;
+
+    /**
      * 用户昵称
      * @required
      */

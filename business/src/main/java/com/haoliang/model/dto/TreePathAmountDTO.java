@@ -13,9 +13,9 @@ import java.math.BigDecimal;
 public class TreePathAmountDTO {
 
     /**
-     * 钱包余额
+     * 托管金额
      */
-    private BigDecimal walletAmount;
+    private BigDecimal principalAmount;
 
     /**
      * 机器人购买金额

@@ -53,6 +53,7 @@
         <p6spy.version>1.0</p6spy.version>
         <druid-boot.version>1.2.14</druid-boot.version>
         <jsr310.version>2.9.2</jsr310.version>
+        <google-zxing.version>3.4.1</google-zxing.version>
     </properties>
 
     <dependencyManagement>
@@ -173,6 +174,12 @@
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jsr310.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.zxing</groupId>
+                <artifactId>core</artifactId>
+                <version>${google-zxing.version}</version>
             </dependency>
 
         </dependencies>

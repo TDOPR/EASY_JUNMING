@@ -13,7 +13,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FlowingTypeEnum {
 
-    ALGEBRA(1, "AI奖励"),
+    ALGEBRA(1, "代数奖励"),
     ROBOT(2, "推广奖励"),
     TEAM(3, "团队奖励"),
     SPECIAL(4, "分红奖励"),

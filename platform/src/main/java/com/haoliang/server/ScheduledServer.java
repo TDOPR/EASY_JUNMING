@@ -2,6 +2,7 @@ package com.haoliang.server;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RedisLock;
+import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.model.SysErrorLog;
 import com.haoliang.common.model.SysLoginLog;
@@ -11,6 +12,7 @@ import com.haoliang.common.service.SysErrorLogService;
 import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.service.SysOperationLogService;
 import com.haoliang.common.utils.DateUtil;
+import com.haoliang.common.utils.FileUtils;
 import com.haoliang.common.utils.GetWorkspaceHarDiskInfoUtil;
 import com.haoliang.common.config.AppParam;
 import com.haoliang.model.dto.EmailTemplateDTO;
@@ -21,6 +23,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +64,7 @@ public class ScheduledServer {
     public void deletExpiredFiles() {
         log.info("-------------执行清理过期文件任务--------------");
         //清理登录日志,操作日志,错误日志
-        LocalDateTime localDate=LocalDateTime.now();
+        LocalDateTime localDate = LocalDateTime.now();
         if (SysSettingParam.getErrorLogSaveDay() >= 0) {
             sysErrorLogService.remove(new LambdaQueryWrapper<SysErrorLog>().le(SysErrorLog::getCreateTime, DateUtil.getDateStrIncrement(localDate, -SysSettingParam.getErrorLogSaveDay(), TimeUnit.DAYS)));
         }
@@ -71,6 +74,8 @@ public class ScheduledServer {
         if (SysSettingParam.getOperationLogSaveDay() >= 0) {
             sysOperationLogService.remove(new LambdaQueryWrapper<SysOperationLog>().le(SysOperationLog::getCreateTime, DateUtil.getDateStrIncrement(localDate, -SysSettingParam.getOperationLogSaveDay(), TimeUnit.DAYS)));
         }
+        //清理临时文件
+        FileUtils.deleteFile(new File(GlobalConfig.getTmpSavePath()));
     }
 
     /**

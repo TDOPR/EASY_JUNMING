@@ -48,4 +48,5 @@ public interface SysUserService extends IService<SysUser> {
 
     JsonResult queryByCondition(PageParam<SysUser,SysUserCondition> pageParam);
 
+    void generateGoogleQRCode(Integer userId, HttpServletResponse response) throws Exception;
 }

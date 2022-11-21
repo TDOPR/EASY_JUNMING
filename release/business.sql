@@ -52,7 +52,6 @@ DROP TABLE IF EXISTS `wallet_logs`;
 CREATE TABLE `wallet_logs`  (
   `id` bigint UNSIGNED NOT NULL,
   `userId` int(0) UNSIGNED  NOT NULL DEFAULT 0 COMMENT '用户ID',
-  `targetUserId` int(0)   NOT NULL DEFAULT 0  COMMENT '目标用户ID',
   `amount` decimal(12, 4) UNSIGNED NOT NULL COMMENT '本次变动金额',
   `action` tinyint UNSIGNED NOT NULL COMMENT '收支动作:1-收入 2-支出',
   `type` tinyint UNSIGNED NOT NULL COMMENT '流水类型 1-代数奖 2-推广奖 3-团队奖 4-特别奖 5-充值 6-提现  7=量化收益 8=委托量化 9=提现到钱包 10=首次购买机器人 11=升级机器人',
@@ -153,7 +152,7 @@ CREATE TABLE `tree_paths`  (
 DROP TABLE IF EXISTS `app_user_rebot_ref`;
 CREATE TABLE `app_user_rebot_ref`(
   `userId` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '用户Id',
-  `inviteId` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '邀请的用户Id',
+  `inviteUserId` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '邀请的用户Id',
   `level` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '邀请的用户是用户的第几位购买机器',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY (`userId`, `inviteId`) USING BTREE

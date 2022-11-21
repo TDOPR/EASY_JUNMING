@@ -46,6 +46,16 @@ public class LoginConfig {
         private  boolean enable;
 
         /**
+         * 是否启动google认证器
+         */
+        private boolean  google;
+
+        /**
+         * google验证邮箱后缀
+         */
+        private String googleHost;
+
+        /**
          * 验证码类型
          */
         private CaptchaType type;

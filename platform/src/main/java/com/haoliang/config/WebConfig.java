@@ -42,12 +42,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String filePath = appParam.getRootPath();
+        String filePath = appParam.getUserHeadImageSavePath();
         if (OsUtil.isWindowOs()) {
             filePath = filePath.replaceAll("/", "\\\\");
         }
         String pathPatterns=  appParam.getVirtualPathPrefix()+"/**";
-        registry.addResourceHandler(pathPatterns).addResourceLocations("file:" + appParam.getUserHeadImageSavePath());
+        registry.addResourceHandler(pathPatterns).addResourceLocations("file:" + filePath);
         log.info("资源映射加载 --- {} --> {} ",pathPatterns,filePath);
     }
 

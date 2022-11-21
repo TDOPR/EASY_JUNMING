@@ -64,7 +64,7 @@ public enum ProxyLevelEnum {
         } else if (amount.compareTo(FIVE.money) < 0) {
             return FOUR;
         }
-        return THREE;
+        return FIVE;
     }
 
     public static void main(String[] args) {

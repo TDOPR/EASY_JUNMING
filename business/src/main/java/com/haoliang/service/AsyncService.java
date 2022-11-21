@@ -5,6 +5,7 @@ import com.haoliang.model.Wallets;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Dominick Li
@@ -18,5 +19,5 @@ public interface AsyncService {
      * @param wallets 用户钱包
      * @param userAmount 所有用户日收益map集合
      */
-    void grantItemPrizeToUser(Wallets wallets, HashMap<Integer, BigDecimal> userAmount);
+    void grantItemPrizeToUser(Wallets wallets, HashMap<Integer, BigDecimal> userAmount, CountDownLatch countDownLatch);
 }

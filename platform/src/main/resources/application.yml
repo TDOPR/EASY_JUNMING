@@ -30,8 +30,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
 #    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
-#    username: root
-#    password: 123456
+    #    username: root
+    #    password: 123456
     url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
     username: root
     password: LXYx29K1rJhiOWtc
@@ -132,16 +132,20 @@ login:
   maxErrorNumber: 3
   captcha:
     #是否启动验证码
-    enable: false
-    # 验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母 ,移动端只发送字符验证
+    enable: true
+    # 使用使用谷歌认证器   true=使用  false=使用后台算法生成图片验证码
+    google: true
+    #谷歌认证的host地址
+    googleHost: trade.google.com
+    # 图片验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母 ,移动端只发送字符验证
     type: RANDOM
-    #图像干扰策略  line=线段干扰 circle=圆圈干扰 shear=扭曲干扰  random=随机策略
+    #图片验证码 图像干扰策略  line=线段干扰 circle=圆圈干扰 shear=扭曲干扰  random=随机策略
     category: RANDOM
-    # 数字验证码位数
+    #图片验证码 数字验证码位数
     numberLength: 1
-    # 字符验证码长度
+    #图片验证码 字符验证码长度
     charLength: 4
-    #失效时间(单位:分钟)
+    #图片验证码 失效时间(单位:分钟)
     expirationTime: 30
 
 #########################  邮件配置 ##################################
@@ -172,11 +176,13 @@ app:
   #文件存储根路径
   rootPath: D:\data\
   #头像存储路径
-  userHeadImageSavePath: ${app.rootPath}userHeadImage\
+  userHeadImageSavePath: ${app.rootPath}userHeadImage/
+  #临时文件存储
+  tmpSavePath: ${app.rootPath}tmp/
   #虚拟路径前缀
   virtualPathPrefix: /userHeadImage
   #虚拟路径URL
-  virtualPathURL: http://127.0.0.1:9090${app.virtualPathPrefix}/
+  virtualPathURL: http://127.0.0.1:${server.port}${app.virtualPathPrefix}/
   #文件上传限制 MB
   fileMaxSize: 30
   #服务名称
