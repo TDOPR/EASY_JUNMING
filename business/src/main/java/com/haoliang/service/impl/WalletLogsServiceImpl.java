@@ -200,7 +200,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     private List<ViewSelectVO> getSelectListByUser(DateSection dateSection) {
         List<ViewSelectVO> viewSelectVOList = new ArrayList<>();
         viewSelectVOList.add(new ViewSelectVO("All", "-1"));
-        if (dateSection.getMaxDate() != null) {
+        if (dateSection!=null && dateSection.getMaxDate() != null) {
             viewSelectVOList.add(new ViewSelectVO(DateUtil.getMonthEnglish(dateSection.getMaxDate().getMonthValue()), dateSection.getMaxDate().getYear() + "-" + dateSection.getMaxDate().getMonthValue()));
             int monthNumber = DateUtil.betweenMonths(dateSection.getMinDate(), dateSection.getMaxDate());
             if (monthNumber > 11) {

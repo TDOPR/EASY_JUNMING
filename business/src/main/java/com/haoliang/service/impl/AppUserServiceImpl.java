@@ -43,7 +43,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -87,13 +86,11 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         Integer robotLevel = 0;
         BigDecimal principalAmount = BigDecimal.ZERO;
         //判断当前用户是否登录
-        if (StringUtils.hasText(token)) {
+        if (!JwtTokenUtils.isTokenExpired(token)) {
             Integer userId = JwtTokenUtils.getUserIdFromToken(token);
-            if (userId != null) {
-                Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
-                robotLevel = wallets.getRobotLevel();
-                principalAmount = wallets.getPrincipalAmount();
-            }
+            Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
+            robotLevel = wallets.getRobotLevel();
+            principalAmount = wallets.getPrincipalAmount();
         }
         HomeVO homeVO = new HomeVO();
         RobotEnum robotEnum = RobotEnum.levelOf(robotLevel);
@@ -147,14 +144,14 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Override
     @Transactional
     public JsonResult register(AppUserRegisterDTO appUserRegisterDTO) {
-//        String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + appUserRegisterDTO.getUuid();
-//        String code = RedisUtils.getCacheObject(cacheKey);
-//        if (code == null) {
-//            return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_EXPIRE);
-//        }
-//        if (!code.equals(appUserRegisterDTO.getCode())) {
-//            return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_ERROR);
-//        }
+        String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + appUserRegisterDTO.getUuid();
+        String code = RedisUtils.getCacheObject(cacheKey);
+        if (code == null) {
+            return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_EXPIRE);
+        }
+        if (!code.equals(appUserRegisterDTO.getCode())) {
+            return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_ERROR);
+        }
         AppUsers appUsers;
         appUsers = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getEmail, appUserRegisterDTO.getEmail()));
         if (appUsers == null) {

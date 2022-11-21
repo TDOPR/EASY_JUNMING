@@ -7,13 +7,12 @@ spring:
     #redis服务器的ip
     host: 127.0.0.1
     port: 6379
-    password: 123456
     jedis:
       pool:
         max-active: 8
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/haoliang1?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
     username: root
     password: 123456
     type: com.zaxxer.hikari.HikariDataSource
@@ -42,9 +41,12 @@ spring:
       accept_empty_string_as_null_object: true
 
 jwt:
+  # 加密密钥
+  secret: iwqjhda8232bjgh432[cicada-smile]
+  # token有效时长(单位: 秒) 设置为一天
+  expire: 8640000000000000
   #请求头参数
   tokenName: token
-
 
 # mybatis-plus相关配置
 mybatis-plus:
@@ -76,3 +78,7 @@ app:
   enableRepeatSubmit: true
   #是否启动分布式锁  依赖reids
   enableRedisLock: flase
+  #虚拟路径前缀
+  virtualPathPrefix: /userHeadImage
+  #虚拟路径URL
+  virtualPathURL: http://127.0.0.1:9090${app.virtualPathPrefix}/

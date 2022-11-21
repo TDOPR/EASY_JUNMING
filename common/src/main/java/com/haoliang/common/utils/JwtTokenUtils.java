@@ -23,7 +23,7 @@ public class JwtTokenUtils {
     /**
      * 根据身份ID标识，生成Token
      */
-    public static String getToken(Integer identityId,  String username,String roleCode,Integer roleId) {
+    public static String getToken(Integer identityId, String username, String roleCode, Integer roleId) {
         Date nowDate = new Date();
         //过期时间
         Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
@@ -62,16 +62,11 @@ public class JwtTokenUtils {
      * 根据token获取身份信息
      */
     public static Claims getTokenClaim(String token) {
-        try {
-            token = RedisUtils.getCacheObject(token);
-            if (StringUtils.hasText(token)) {
-                return Jwts.parser().setSigningKey(GlobalConfig.getTokenSecret()).parseClaimsJws(token).getBody();
-            }
-            return null;
-        } catch (Exception e) {
-            log.error("getTokenClaim error:{}", e.getMessage());
-            return null;
+        token = RedisUtils.getCacheObject(token);
+        if (StringUtils.hasText(token)) {
+            return Jwts.parser().setSigningKey(GlobalConfig.getTokenSecret()).parseClaimsJws(token).getBody();
         }
+        return null;
     }
 
 
@@ -79,45 +74,42 @@ public class JwtTokenUtils {
      * 根据token获取username
      */
     public static Integer getUserIdFromToken(String token) {
-        String subject=getClaimFromToken(token, Claims::getSubject);
-        return StringUtil.isNotEmpty(subject)?Integer.parseInt(subject):null;
+        return Integer.parseInt(getClaimFromToken(token, Claims::getSubject));
+
     }
 
     /**
      * 根据token获取角色Id
      */
     public static String getRoleCodeFromToken(String token) {
-        return getTokenClaim(token).get("roleCode",String.class);
+        return getTokenClaim(token).get("roleCode", String.class);
     }
 
     /**
      * 根据token获取用户名
      */
     public static String getUserNameFromToken(String token) {
-        return getTokenClaim(token).get("userName",String.class);
+        return getTokenClaim(token).get("userName", String.class);
     }
 
-    //    /**
-//     * 判断token是否失效
-//     */
-//    public static boolean isTokenExpired(String token) {
-//        try {
-//            final Date expiration = getExpirationDateFromToken(token);
-//            return expiration.before(clock.now());
-//        } catch (Exception e) {
-//            return true;
-//        }
-//    }
-//    /**
-//     * 根据token获取失效时间
-//     */
-//    public static Date getExpirationDateFromToken(String token) {
-//        return getClaimFromToken(token, Claims::getExpiration);
-//    }
+    /**
+     * 判断token是否失效
+     */
+    public static boolean isTokenExpired(String token) {
+        if (!StringUtils.hasText(token)) {
+            return true;
+        }
+        token = RedisUtils.getCacheObject(token);
+        if (StringUtils.hasText(token)) {
+            return false;
+        }
+        return true;
+    }
+
 
     public static <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getTokenClaim(token);
-        return claims!=null?claimsResolver.apply(claims):null;
+        return claimsResolver.apply(claims);
     }
 
 

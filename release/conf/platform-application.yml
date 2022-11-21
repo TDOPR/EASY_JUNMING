@@ -199,7 +199,6 @@ app:
     - /actuator
     - /actuator/**
     - /captchaImage
-    - /wallet/**
     - /sendCaptchaToEmail/*
     - /home
     - /home/*

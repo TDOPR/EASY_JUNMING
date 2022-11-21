@@ -29,13 +29,13 @@ spring:
         max-active: 8
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
-    username: root
-    password: 123456
-#    url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+#    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
 #    username: root
-#    password: LXYx29K1rJhiOWtc
-#    type: com.alibaba.druid.pool.DruidDataSource
+#    password: 123456
+    url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    username: root
+    password: LXYx29K1rJhiOWtc
+    type: com.alibaba.druid.pool.DruidDataSource
     # 数据连接池配置
     druid:
       #连接池最大连接数  (cpu核数量 * 2 + 硬盘数量)
@@ -197,7 +197,6 @@ app:
     - /actuator
     - /actuator/**
     - /captchaImage
-    - /wallet/**
     - /sendCaptchaToEmail/*
     - /home
     - /home/*

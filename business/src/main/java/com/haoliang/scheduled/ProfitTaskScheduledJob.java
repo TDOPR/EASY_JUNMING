@@ -50,7 +50,7 @@ public class ProfitTaskScheduledJob {
     /**
      * 每天晚上21点计算托管收益
      */
-    @Scheduled(cron = "0 21 0 * * ?")
+    @Scheduled(cron = "0 0 21 * * ?")
     //@Scheduled(fixedDelay = 5000)//测试5秒执行一次
     @RedisLock
     public void calculationDayProfit() {
