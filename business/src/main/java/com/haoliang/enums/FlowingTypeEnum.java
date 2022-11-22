@@ -54,7 +54,7 @@ public enum FlowingTypeEnum {
         } else if (value.equals(BUY_ROBOT.value) || value.equals(UPGRADE_ROBOT.value)) {
             return BUY_ROBOT.desc;
         }
-        return "";
+        return "动态收益存入";
     }
 
 }

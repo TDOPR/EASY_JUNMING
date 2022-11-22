@@ -83,7 +83,7 @@ public class RobotServiceImpl implements RobotService {
         }
 
         //判断钱包余额是否够能买机器人
-        if (wallets.getWalletAmount().intValue() < robotEnum.getPrice().intValue()) {
+        if (wallets.getWalletAmount().compareTo(robotEnum.getPrice())<0) {
             return JsonResult.failureResult(ReturnMessageEnum.AMOUNT_EXCEEDS_BALANCE);
         }
 
@@ -113,7 +113,7 @@ public class RobotServiceImpl implements RobotService {
             BigDecimal rewardRate = ProxyRebotEnum.getRewardProportionByLevel(level);
             //发送推广奖
             BigDecimal rewardAmount = robotEnum.getPrice().multiply(rewardRate);
-            sendPromotionAward(rewardAmount, inviteId, userId);
+            sendPromotionAward(rewardAmount, inviteId);
         }
 
         //添加钱包流水记录
@@ -128,13 +128,16 @@ public class RobotServiceImpl implements RobotService {
         RobotEnum robotEnum = RobotEnum.levelOf(robotDTO.getLevel());
         Integer userId = JwtTokenUtils.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getRobotAmount, Wallets::getId, Wallets::getWalletAmount);
-        if (robotEnum.getPrice().subtract(wallets.getRobotAmount()).intValue() <= 0) {
+
+        //校验升级机器人等级是否比原有的等级高
+        if (robotEnum.getPrice().compareTo(wallets.getRobotAmount()) <= 0) {
             return JsonResult.failureResult(ReturnMessageEnum.REBOT_LEVEL_ERROR);
         }
+
         //计算升级所需要的差价
         BigDecimal differencePrice = robotEnum.getPrice().subtract(wallets.getRobotAmount());
         //判断钱包余额是否够能升级机器人
-        if (wallets.getWalletAmount().intValue() < differencePrice.intValue()) {
+        if (wallets.getWalletAmount().compareTo(differencePrice)<0) {
             return JsonResult.failureResult(ReturnMessageEnum.AMOUNT_EXCEEDS_BALANCE);
         }
 
@@ -150,11 +153,11 @@ public class RobotServiceImpl implements RobotService {
         //判断用户是否有邀请人
         AppUserRebotRef appUserRebotRef = appUserRebotRefMapper.findByInviteUserId(userId);
         if (appUserRebotRef != null) {
-            //根据推广位数要求发放对应的奖励比例
+            //根据推广是第几位发放对应的奖励比例
             BigDecimal rewardRate = ProxyRebotEnum.getRewardProportionByLevel(appUserRebotRef.getLevel());
             //发放差价的推广奖
             BigDecimal rewardAmount = differencePrice.multiply(rewardRate);
-            sendPromotionAward(rewardAmount, appUserRebotRef.getUserId(), userId);
+            sendPromotionAward(rewardAmount, appUserRebotRef.getUserId());
         }
 
         //添加钱包流水记录
@@ -167,15 +170,14 @@ public class RobotServiceImpl implements RobotService {
      *
      * @param rewardAmount 奖励金额
      * @param userId       发放的用户Id
-     * @param targetUserId 购买机器人的用户ID
      */
     @Transactional(rollbackFor = Exception.class)
-    public void sendPromotionAward(BigDecimal rewardAmount, Integer userId, Integer targetUserId) {
-        Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount);
+    public void sendPromotionAward(BigDecimal rewardAmount, Integer userId) {
+        Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getWalletAmount);
         UpdateWrapper<Wallets> wrapper = Wrappers.update();
         wrapper.lambda()
                 .set(Wallets::getWalletAmount, wallets.getWalletAmount().add(rewardAmount))
-                .eq(Wallets::getId, wallets.getId());
+                .eq(Wallets::getUserId, userId);
         walletsService.update(wrapper);
 
         //添加钱包流水记录

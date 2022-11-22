@@ -18,4 +18,9 @@ public class SysRoleDTO extends SysRole {
      */
     private List<Integer> menuIds;
 
+    /**
+     * 半选的菜单
+     */
+    private List<Integer> semiMenuIds;
+
 }

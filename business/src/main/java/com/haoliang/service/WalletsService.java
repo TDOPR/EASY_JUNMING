@@ -15,13 +15,36 @@ import java.util.List;
 
 public interface WalletsService extends IService<Wallets> {
 
+    /**
+     * 获取我的钱包信息
+     * @param token 身份凭证
+     * @return
+     */
     JsonResult<MyWalletsVO> getMyWallet(String token);
 
+    /**
+     * 充值
+     * @param walletOrderDTO 充值信息
+     * @param token 身份凭证
+     * @return
+     */
     JsonResult recharge(WalletOrderDTO walletOrderDTO, String token);
 
+    /**
+     * 提现
+     * @param walletOrderDTO 提现信息
+     * @param token 身份凭证
+     * @return
+     */
     JsonResult withdrawal(WalletOrderDTO walletOrderDTO, String token);
 
 
+    /**
+     * 查询钱包对象
+     * @param userId 根据用户Id查询
+     * @param columns 需要查询的字段
+     * @return
+     */
     Wallets selectColumnsByUserId(Integer userId, SFunction<Wallets, ?>... columns);
 
     /**

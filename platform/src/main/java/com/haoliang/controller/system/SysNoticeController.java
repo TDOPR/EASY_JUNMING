@@ -8,18 +8,18 @@ import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.vo.PageVO;
+import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.SysMessage;
 import com.haoliang.model.SysNotice;
 import com.haoliang.model.condition.SysNoticeCondition;
+import com.haoliang.model.vo.SysNoticeVO;
 import com.haoliang.service.SysNoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 公告管理
@@ -64,7 +64,26 @@ public class SysNoticeController {
     @PostMapping
     @PreAuthorize("hasAnyAuthority('sys:notice:add','sys:notice:edit')")
     public JsonResult save(@Valid @RequestBody SysNotice sysNotice) {
-        return JsonResult.build(sysNoticeService.saveOrUpdate(sysNotice));
+        return sysNoticeService.saveNotice(sysNotice);
     }
+
+    /**
+     * 根据用户Id获取公告列表
+     * @param type 1=中文 0=英文
+     */
+    @GetMapping("/{type}")
+    public JsonResult<List<SysNoticeVO>> findMyNoticeList(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token,@PathVariable Integer type){
+        return sysNoticeService.findMyNoticeList(token,type);
+    }
+
+    /**
+     * 删除用户关联的公告消息
+     * @param id 公告Id
+     */
+    @DeleteMapping("/{id}")
+    public JsonResult deleteUserNoticeById(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token,@PathVariable Integer id){
+        return sysNoticeService.deleteUserNoticeById(token,id);
+    }
+
 
 }

@@ -172,3 +172,19 @@ CREATE TABLE `dayrate`  (
   `level5` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '五级机器人收益率',
   UNIQUE INDEX `UK_dayrate_createDate`(`createDate`) USING BTREE
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '日收益表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------------
+-- Table structure for app_versions
+-- ----------------------------------
+DROP TABLE IF EXISTS `app_versions`;
+CREATE TABLE `app_versions`  (
+  `id` int(0) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `systemName` varchar(255)  NOT NULL DEFAULT '' COMMENT '系统名称 ios 、android',
+  `version` varchar(255)  NOT NULL DEFAULT '' COMMENT '版本号',
+  `updateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '功能更新说明',
+  `platformDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '平台描述',
+  `downloadAddress` varchar(255)  NOT NULL DEFAULT '' COMMENT 'app下载地址',
+  `use` tinyint  NOT NULL DEFAULT 0 COMMENT '是否使用的版本 1=使用 0=未使用'
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统版本表' ROW_FORMAT = Dynamic;

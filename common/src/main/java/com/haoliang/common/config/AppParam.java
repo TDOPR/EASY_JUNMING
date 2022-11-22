@@ -20,7 +20,11 @@ public class AppParam {
 
     private Integer fileMaxSize;
 
-    private String userHeadImageSavePath;
+    private String version;
+
+    private String imageSavePath;
+
+    private String sysfileSavePath;
 
     private List<String> securityExcludes;
 

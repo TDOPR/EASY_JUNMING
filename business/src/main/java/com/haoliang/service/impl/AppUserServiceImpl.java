@@ -23,7 +23,9 @@ import com.haoliang.common.utils.redis.RedisUtils;
 import com.haoliang.enums.RobotEnum;
 import com.haoliang.mapper.AddressPoolMapper;
 import com.haoliang.mapper.AppUserMapper;
+import com.haoliang.mapper.AppVersionsMapper;
 import com.haoliang.model.AppUsers;
+import com.haoliang.model.AppVersions;
 import com.haoliang.model.TreePath;
 import com.haoliang.model.Wallets;
 import com.haoliang.model.condition.AppUsersCondition;
@@ -80,6 +82,9 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Resource
     private AppUserMapper appUserMapper;
 
+    @Resource
+    private AppVersionsMapper appVersionsMapper;
+
 
     @Override
     public JsonResult home(String token) {
@@ -114,7 +119,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     }
 
     @Override
-    public JsonResult login(AppUserLoginDTO appUserLoginDTO, String localIp) {
+    public JsonResult<AppTokenVO> login(AppUserLoginDTO appUserLoginDTO, String localIp) {
         AppUsers appUsers = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getEmail, appUserLoginDTO.getEmail()));
         if (appUsers == null) {
             return JsonResult.failureResult(ReturnMessageEnum.EMAIL_NOT_EXISTS);
@@ -123,21 +128,32 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         } else if (!appUsers.getPassword().equals(AESUtil.encrypt(appUserLoginDTO.getPassword(), appUsers.getSalt()))) {
             return JsonResult.failureResult(ReturnMessageEnum.PASSWORD_ERROR);
         }
-        appUsers.setLoginCount(appUsers.getLoginCount() + 1);
+
+        //修改登录次数
+        UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();
+        updateWrapper.lambda()
+                .set(AppUsers::getLoginCount, appUsers.getLoginCount() + 1)
+                .eq(AppUsers::getId, appUsers.getId());
+        this.update(updateWrapper);
+
         String token = JwtTokenUtils.getToken(appUsers.getId());
 
         //单点登录需要删除用户在其它地方登录的Token
         if (SysSettingParam.isEnableSso()) {
             RedisUtils.deleteObjects(CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":*");
         }
-
+        AppVersions appVersions = appVersionsMapper.selectOne(new LambdaQueryWrapper<AppVersions>().eq(AppVersions::getSystemName, appUserLoginDTO.getSystemName()));
         //把token存储到缓存中
         String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtils.simpleUUID();
         RedisUtils.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(appUsers.getEmail(), localIp, 2));
+
+        //返回token给客户端
         AppTokenVO appTokenVO = new AppTokenVO();
         BeanUtils.copyProperties(appUsers, appTokenVO);
         appTokenVO.setToken(tokenKey);
+        appTokenVO.setVersion(appVersions.getVersion());
+        appTokenVO.setPlatformDesc(appVersions.getPlatformDesc());
         return JsonResult.successResult(appTokenVO);
     }
 
@@ -244,7 +260,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         IPage<AppUsersVO> iPage = appUserMapper.page(pageParam.getPage(), pageParam.getSearchParam());
         //查询下机数量
         for (AppUsersVO appUsersVO : iPage.getRecords()) {
-            appUsersVO.setSubordinateNumber(treePathService.countByAncestor(appUsersVO.getId()));
+            appUsersVO.setSubordinateNumber(treePathService.countByAncestor(appUsersVO.getId()) - 1);
         }
         return JsonResult.successResult(new PageVO<>(iPage.getTotal(), iPage.getPages(), iPage.getRecords()));
     }
@@ -266,8 +282,8 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
 
         String suffix = FileUtil.getSuffix(file.getOriginalFilename());
         String fileName = userId + "." + suffix;
-        String savePath = appParam.getUserHeadImageSavePath();
-        String url = GlobalConfig.getVirtualPathURL() + fileName;
+        String savePath = appParam.getImageSavePath();
+        String url = GlobalConfig.getVirtualPathURL() + StringUtil.replace(appParam.getImageSavePath(), appParam.getRootPath(), "") + fileName;
         //复制文件流到本地文件
         FileUtils.copyInputStreamToFile(file.getInputStream(), new File(savePath, fileName));
         UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();

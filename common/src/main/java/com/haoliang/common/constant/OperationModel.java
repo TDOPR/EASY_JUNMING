@@ -22,4 +22,6 @@ public interface OperationModel {
     String SYS_MSG = "sys_msg";
 
     String SYS_NOTICE="sys_notice";
+
+    String SYS_FILE="sys_file";
 }

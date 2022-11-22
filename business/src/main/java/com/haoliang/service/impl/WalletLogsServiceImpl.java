@@ -3,10 +3,7 @@ package com.haoliang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.DateUtil;
-import com.haoliang.common.utils.GroupByUtils;
-import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.common.utils.NumberUtils;
+import com.haoliang.common.utils.*;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.mapper.WalletLogsMapper;
@@ -14,13 +11,9 @@ import com.haoliang.model.ProfitLogs;
 import com.haoliang.model.WalletLogs;
 import com.haoliang.model.dto.BillDetailsDTO;
 import com.haoliang.model.dto.DateSection;
-import com.haoliang.model.vo.ProfitLogsDetailVO;
-import com.haoliang.model.vo.ViewSelectVO;
-import com.haoliang.model.vo.WalletLogVO;
-import com.haoliang.model.vo.WalletLogsDetailVO;
+import com.haoliang.model.vo.*;
 import com.haoliang.service.ProfitLogsService;
 import com.haoliang.service.WalletLogsService;
-import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -97,41 +91,42 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         List<ViewSelectVO> dateSelectVOList = getSelectListByUser(dateSection);
 
 
-        //根据用户Id查询流水
-        List<Integer> typeList = new ArrayList<>();
-
-        if (billDetailsDTO.getType() == 0) {
-            //查询代理收益
-            typeList.addAll(dynamicTypeList);
-        } else if (billDetailsDTO.getType() != -1) {
-            //其它
-            typeList.add(billDetailsDTO.getType());
-        }
+        //根据类型查询
+//        List<Integer> typeList = new ArrayList<>();
+//
+//        if (billDetailsDTO.getType() == 0) {
+//            //查询代理收益
+//            typeList.addAll(dynamicTypeList);
+//        } else if (billDetailsDTO.getType() != -1) {
+//            //其它
+//            typeList.add(billDetailsDTO.getType());
+//        }
 
         LambdaQueryWrapper<WalletLogs> lambdaQueryWrapper = new LambdaQueryWrapper<WalletLogs>()
                 .select(WalletLogs::getCreateTime, WalletLogs::getAmount, WalletLogs::getType, WalletLogs::getAction)
                 .eq(WalletLogs::getUserId, userId)
                 .orderByDesc(WalletLogs::getCreateTime);
 
-        if (!Collections.isEmpty(typeList)) {
-            lambdaQueryWrapper.in(WalletLogs::getType, typeList);
-        }
+//        if (!Collections.isEmpty(typeList)) {
+//            lambdaQueryWrapper.in(WalletLogs::getType, typeList);
+//        }
 
         //判断是否查询所有还是根据指定月份查询
-        LocalDate beginDate = null, endDate = null;
-        if (!billDetailsDTO.getYearMonth().equals("-1")) {
-            //分割年月
-            String arr[] = billDetailsDTO.getYearMonth().split("-");
-            beginDate = LocalDate.of(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), 1);
-            endDate = beginDate.plusMonths(1);
-            lambdaQueryWrapper.between(WalletLogs::getCreateTime, beginDate, endDate);
-        }
+//        LocalDate beginDate = null, endDate = null;
+//        if (!billDetailsDTO.getYearMonth().equals("-1")) {
+//            //分割年月
+//            String arr[] = billDetailsDTO.getYearMonth().split("-");
+//            beginDate = LocalDate.of(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), 1);
+//            endDate = beginDate.plusMonths(1);
+//            lambdaQueryWrapper.between(WalletLogs::getCreateTime, beginDate, endDate);
+//        }
 
         List<WalletLogs> walletLogsList = this.list(lambdaQueryWrapper);
         List<WalletLogVO> walletLogVOList = new ArrayList<>();
         for (WalletLogs walletLogs : walletLogsList) {
             walletLogVOList.add(WalletLogVO.builder()
                     .type(walletLogs.getType())
+                    .yearMonth(walletLogs.getCreateTime().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM")))
                     .createTime(walletLogs.getCreateTime().toLocalDate().toString())
                     .bigDecimalAmount(walletLogs.getAmount())
                     .status(walletLogs.getAction())
@@ -153,9 +148,14 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         Map.Entry<String, List<WalletLogVO>> entry;
         //计算存入和取出金额
         BigDecimal deposit = BigDecimal.ZERO, takeOut = BigDecimal.ZERO;
+        //存入类型
         List<Integer> depositTypeList = new ArrayList<>();
         depositTypeList.addAll(Arrays.asList(FlowingTypeEnum.RECHARGE.getValue(), FlowingTypeEnum.STATIC.getValue()));
         depositTypeList.addAll(dynamicTypeList);
+
+        List<Integer> viewTypeList = new ArrayList<>();
+        Set<Integer> set = new HashSet<>();
+
         while (iterator.hasNext()) {
             dynamicAmount = BigDecimal.ZERO;
             entry = iterator.next();
@@ -172,6 +172,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
                     walletLogVO.setName(FlowingTypeEnum.getWalletDescByValue(walletLogVO.getType()));
                     walletLogVO.setAmount(NumberUtils.toUSD(walletLogVO.getBigDecimalAmount()));
                     resultList.add(walletLogVO);
+                    set.add(walletLogVO.getType());
                 }
             }
 
@@ -179,17 +180,32 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
             if (dynamicAmount.compareTo(BigDecimal.ZERO) > 0) {
                 resultList.add(WalletLogVO.builder()
                         .createTime(entry.getKey())
+                        .yearMonth(StringUtil.substring(entry.getKey(), 0, entry.getKey().lastIndexOf("-")))
                         .amount(NumberUtils.toUSD(dynamicAmount))
                         .status(1)
                         .name("动态收益存入")
                         .build());
+                set.add(0);
+
             }
         }
+
+        //根据年月对数据进行分组
+        LinkedHashMap<String, List<WalletLogVO>> resultMap = GroupByUtils.collectionToMap(resultList, new GroupByUtils.GroupBy<String, WalletLogVO>() {
+            @Override
+            public String groupBy(WalletLogVO row) {
+                return row.getYearMonth();
+            }
+        });
+
+        viewTypeList.addAll(set);
+        viewTypeList.stream().sorted();
 
         return JsonResult.successResult(WalletLogsDetailVO.builder()
                 .deposit(NumberUtils.toMoeny(deposit))
                 .takeOut(NumberUtils.toMoeny(takeOut))
-                .walletLogList(resultList)
+                .walletLogMap(resultMap)
+                .typeList(WalletLogsDetailVO.buildTypeList(viewTypeList))
                 .dateSectionList(dateSelectVOList)
                 .build());
     }
@@ -200,7 +216,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     private List<ViewSelectVO> getSelectListByUser(DateSection dateSection) {
         List<ViewSelectVO> viewSelectVOList = new ArrayList<>();
         viewSelectVOList.add(new ViewSelectVO("All", "-1"));
-        if (dateSection!=null && dateSection.getMaxDate() != null) {
+        if (dateSection != null && dateSection.getMaxDate() != null) {
             viewSelectVOList.add(new ViewSelectVO(DateUtil.getMonthEnglish(dateSection.getMaxDate().getMonthValue()), dateSection.getMaxDate().getYear() + "-" + dateSection.getMaxDate().getMonthValue()));
             int monthNumber = DateUtil.betweenMonths(dateSection.getMinDate(), dateSection.getMaxDate());
             if (monthNumber > 11) {
@@ -244,7 +260,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     }
 
     @Override
-    public JsonResult<List<WalletLogVO>> proxyDetail(String token) {
+    public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(String token) {
         Integer userId = JwtTokenUtils.getUserIdFromToken(token);
         List<WalletLogs> walletLogsList = this.list(new LambdaQueryWrapper<WalletLogs>()
                 .select(WalletLogs::getCreateTime, WalletLogs::getAmount, WalletLogs::getType)
@@ -253,13 +269,25 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
                 .orderByDesc(WalletLogs::getCreateTime));
 
         List<WalletLogVO> walletLogVOList = new ArrayList<>();
+        List<String> typeList = new ArrayList<>();
+        Set<String> set = new HashSet<>();
+        String typeName;
         for (WalletLogs walletLogs : walletLogsList) {
+            typeName = FlowingTypeEnum.getDescByValue(walletLogs.getType());
             walletLogVOList.add(WalletLogVO.builder()
                     .createTime(walletLogs.getCreateTime().toLocalDate().toString())
                     .amount(NumberUtils.toMoeny(walletLogs.getAmount()))
-                    .name(FlowingTypeEnum.getDescByValue(walletLogs.getType()))
+                    .name(typeName)
                     .build());
+            set.add(typeName);
         }
-        return JsonResult.successResult(walletLogVOList);
+        typeList.add("全部");
+        typeList.addAll(set);
+        ProxyWalletLogsDetailVO proxyWalletLogsDetailVO = new ProxyWalletLogsDetailVO();
+        proxyWalletLogsDetailVO.setList(walletLogVOList);
+        proxyWalletLogsDetailVO.setTypeList(typeList);
+        return JsonResult.successResult(proxyWalletLogsDetailVO);
     }
+
+
 }

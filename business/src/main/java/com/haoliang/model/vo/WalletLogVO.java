@@ -31,6 +31,9 @@ public class WalletLogVO {
      */
     private String createTime;
 
+    @JsonIgnore
+    private String yearMonth;
+
     /**
      * 流水类型名称
      */

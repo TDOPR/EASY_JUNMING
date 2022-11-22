@@ -33,6 +33,7 @@ import com.haoliang.model.vo.UserVO;
 import com.haoliang.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -75,12 +76,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_LOCK);
         }
 
-        JsonResult jsonResult;
         //校验图片验证码
-//        jsonResult = checkImageCaptcha(loginDTO);
-//        if (jsonResult.getCode() != HttpStatus.OK.value()) {
-//            return jsonResult;
-//        }
+        JsonResult jsonResult = checkImageCaptcha(loginDTO);
+        if (jsonResult.getCode() != HttpStatus.OK.value()) {
+            return jsonResult;
+        }
 
         SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, loginDTO.getUsername()).eq(SysUser::getDeleted, 0));
         //登录状态标识
@@ -137,6 +137,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     .set(SysUser::getName, sysUser.getName())
                     .set(SysUser::getMobile, sysUser.getMobile())
                     .set(SysUser::getEmail, sysUser.getEmail())
+                    .set(SysUser::getEnabled,sysUser.getEnabled())
                     //.set(SysUser::getChannelId, sysUser.getChannelId())
                     .eq(SysUser::getId, sysUser.getId());
             update(wrapper);

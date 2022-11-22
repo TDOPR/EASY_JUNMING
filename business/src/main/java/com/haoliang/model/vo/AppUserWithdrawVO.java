@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author Dominick Li
@@ -45,12 +45,12 @@ public class AppUserWithdrawVO {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private LocalDateTime createTime;
 
     /**
      * 审核时间
      */
-    private Date auditTime;
+    private LocalDateTime auditTime;
 
     /**
      * 审核状态

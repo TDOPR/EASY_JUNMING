@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * 我的主页
  * @author Dominick Li
- * @Description 我的主页
  * @CreateTime 2022/11/18 11:04
  **/
 @RestController

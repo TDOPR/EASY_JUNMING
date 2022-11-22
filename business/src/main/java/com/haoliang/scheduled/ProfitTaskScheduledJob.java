@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,6 +49,14 @@ public class ProfitTaskScheduledJob {
 
     @Autowired
     private DayRateService dayRateService;
+
+    /**
+     * 每天凌晨0点5分更新收益率
+     */
+    @Scheduled(cron = "0 5 0 * * ?")
+    public void randowDayRate() {
+        dayRateService.initDayRate(LocalDate.now());
+    }
 
     /**
      * 每天晚上21点计算托管收益
@@ -94,7 +103,7 @@ public class ProfitTaskScheduledJob {
             //主线程挂起,等待所有发放动态收益的子线程处理结束
             countDownLatch.await();
         } catch (Exception e) {
-            ErrorLogUtil.save(ProfitTaskScheduledJob.class,"","calculationDayProfit task countDownLatch.await error");
+            ErrorLogUtil.save(ProfitTaskScheduledJob.class, "", "calculationDayProfit task countDownLatch.await error");
         }
         log.info("-------------发放动态收益结束--------------");
     }

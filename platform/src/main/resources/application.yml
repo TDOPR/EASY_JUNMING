@@ -132,7 +132,7 @@ login:
   maxErrorNumber: 3
   captcha:
     #是否启动验证码
-    enable: true
+    enable: false
     # 使用使用谷歌认证器   true=使用  false=使用后台算法生成图片验证码
     google: true
     #谷歌认证的host地址
@@ -167,20 +167,26 @@ mail:
 
 asyncExecutor:
   prefixName: async-task-
+  #最小线程数
   codeSize: 50
+  #最大线程数
   maxSize: 100
+  #队列大小
   queueSize: -1
 
 #########################  应用其它配置   ############################
 app:
+  version: v1.0.0
   #文件存储根路径
   rootPath: D:\data\
-  #头像存储路径
-  userHeadImageSavePath: ${app.rootPath}userHeadImage/
   #临时文件存储
   tmpSavePath: ${app.rootPath}tmp/
+  #头像存储路径
+  imageSavePath: ${app.rootPath}userImage/
+  #系统文件存储路径
+  sysfileSavePath: ${app.rootPath}sysfile/
   #虚拟路径前缀
-  virtualPathPrefix: /userHeadImage
+  virtualPathPrefix: /virtual
   #虚拟路径URL
   virtualPathURL: http://127.0.0.1:${server.port}${app.virtualPathPrefix}/
   #文件上传限制 MB
@@ -192,7 +198,7 @@ app:
   #限流模式  single=单实例限流,all=全局限流(分布式限流)
   rateLimitModel: all
   #是否加载表单去重提交验证  依赖reids
-  enableRepeatSubmit: flase
+  enableRepeatSubmit: true
   #是否启动分布式锁  依赖reids
   enableRedisLock: flase
   #过滤不需要security验证的接口
@@ -207,4 +213,4 @@ app:
     - /home
     - /home/*
     - /druid/**
-    - ${app.virtualPathPrefix}/*
+    - ${app.virtualPathPrefix}/**

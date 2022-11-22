@@ -21,7 +21,7 @@ public class PageVO<T> implements java.io.Serializable {
     private long totalPages;
 
     /**
-     * 总数
+     * 列表数据
      */
     private List<T> content;
 

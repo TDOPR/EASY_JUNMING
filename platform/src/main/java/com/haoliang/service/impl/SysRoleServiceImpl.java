@@ -15,12 +15,13 @@ import com.haoliang.mapper.SysRoleMenuMapper;
 import com.haoliang.mapper.SysUserMapper;
 import com.haoliang.model.SysRole;
 import com.haoliang.model.SysRoleMenu;
-import com.haoliang.model.dto.SysRoleDTO;
 import com.haoliang.model.condition.SysRoleCondition;
+import com.haoliang.model.dto.SysRoleDTO;
 import com.haoliang.model.vo.RoleVO;
 import com.haoliang.model.vo.SelectVO;
 import com.haoliang.service.SysMenuService;
 import com.haoliang.service.SysRoleService;
+import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,8 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             roleVO = new RoleVO();
             roleVO.setUserStr(StringUtil.List2Str(sysUserMapper.findAllByUsernameByRoleId(sysRole.getId()), ","));
             BeanUtils.copyProperties(sysRole, roleVO);
-            roleVO.setMenuIds(sysRoleMenuMapper.findAllMenuIdByRoleId(sysRole.getId()));
+            roleVO.setMenuIds(sysRoleMenuMapper.findAllMenuIdByRoleId(sysRole.getId(), 1));
+            roleVO.setSemiMenuIds(sysRoleMenuMapper.findAllMenuIdByRoleId(sysRole.getId(), 0));
             roleVOList.add(roleVO);
         }
         return JsonResult.successResult(new PageVO(iPage.getTotal(), iPage.getPages(), roleVOList));
@@ -68,7 +70,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
 
     @Override
     public JsonResult saveRole(SysRoleDTO sysRole) {
-        boolean reload=false;
+        boolean reload = false;
         if (sysRole.getId() == null) {
             //角色名称和编码不能重复
             SysRole exists = this.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleName, sysRole.getRoleName()));
@@ -84,7 +86,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
             this.save(newRole);
             sysRole.setId(newRole.getId());
         } else {
-            reload=true;
+            reload = true;
             SysRole oldSysRole = this.getById(sysRole.getId());
             oldSysRole.setRoleCode(sysRole.getRoleCode());
             oldSysRole.setRoleName(sysRole.getRoleName());
@@ -93,16 +95,20 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> impl
         }
 
         List<Integer> menuIds = sysRole.getMenuIds();
-        if (menuIds != null && menuIds.size() > 0) {
-            if(reload){
-                sysMenuService.updateRoleMenu();
-            }
+        if (!Collections.isEmpty(menuIds)) {
             menuIds.forEach(menuId -> {
-                SysRoleMenu sysRoleMenu = new SysRoleMenu(sysRole.getId(), menuId);
+                SysRoleMenu sysRoleMenu = new SysRoleMenu(sysRole.getId(), menuId, 1);
                 sysRoleMenuMapper.insert(sysRoleMenu);
             });
         }
 
+        menuIds = sysRole.getSemiMenuIds();
+        if (!Collections.isEmpty(menuIds)) {
+            menuIds.forEach(menuId -> {
+                SysRoleMenu sysRoleMenu = new SysRoleMenu(sysRole.getId(), menuId, 0);
+                sysRoleMenuMapper.insert(sysRoleMenu);
+            });
+        }
         return JsonResult.successResult();
     }
 

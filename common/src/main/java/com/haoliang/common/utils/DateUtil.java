@@ -1,44 +1,22 @@
 package com.haoliang.common.utils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class DateUtil {
-    public static final String SIMPLE_FORMAT = "yyyyMMdd";
-    public static final String SIMPLE_FORMAT_LINE = "yyyy-MM-dd";
-    public static final String SIMPLE_FORMAT_PATH = "yyyy/MM/dd";
-    public static final String DETAIL_FORMAT = "yyyy年MM月dd日 HH:mm:ss";
-    public static final String DETAIL_FORMAT_LINE = "yyyy-MM-dd HH:mm:ss";
+
+    public static final String SIMPLE_FORMAT = "yyyy-MM-dd";
+
     public static final String DETAIL_FORMAT_NO_UNIT = "yyyyMMddHHmmssSSS";
 
-    /***
-     * 获取延时MINUTES分钟后的时间
-     * @param minutes
-     * @return
-     */
-    public static Date getDelayMinutes(int minutes) {
-        Date date = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        c.add(Calendar.MINUTE, minutes);
-        return c.getTime();
-    }
-
-    /***
-     * 格式化日期
-     * @param myDate
-     * @param fromatString
-     * @return
-     */
-    public static String formatDate(Date myDate, String fromatString) {
-        SimpleDateFormat myFormat = new SimpleDateFormat(fromatString);
-        return myFormat.format(myDate);
-    }
 
     /**
      * 把日期字符转换成时间戳
@@ -56,37 +34,24 @@ public class DateUtil {
     /**
      * 把日期字符转换成时间戳
      */
-    public static Date parseDate(String dateStr, String format) {
-        SimpleDateFormat myFormat = new SimpleDateFormat(format);
-        try {
-            Date date = myFormat.parse(dateStr);
-            return date;
-        } catch (Exception e) {
-            return null;
-        }
+    public static LocalDate parseDate(String dateStr) {
+        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(SIMPLE_FORMAT));
     }
 
-    /***
-     * 生成详细日期
-     * @return
+    /**
+     * 把日期字符转换成时间戳
      */
-    public static String getDetailTime() {
-        SimpleDateFormat myFormat = new SimpleDateFormat(DETAIL_FORMAT);
-        return myFormat.format(new Date());
+    public static LocalDate parseDate(String dateStr, String format) {
+        return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(format));
     }
+
 
     /***
      * 生成详细日期，不要单位。格式YYMMDDhhmmss
      * @return
      */
     public static String getDetailTimeIgnoreUnit() {
-        SimpleDateFormat myFormat = new SimpleDateFormat(DETAIL_FORMAT_NO_UNIT);
-        return myFormat.format(new Date());
-    }
-
-    public static String getSimpleDate() {
-        SimpleDateFormat myFormat = new SimpleDateFormat(SIMPLE_FORMAT);
-        return myFormat.format(new Date());
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(DETAIL_FORMAT_NO_UNIT));
     }
 
     /**
@@ -142,20 +107,6 @@ public class DateUtil {
     }
 
 
-    public static Date getDateIncrement(String dateStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(sdf.parse(dateStr));//设置起时间
-            cal.add(Calendar.DATE, 1);//增加一天
-            return cal.getTime();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
     /**
      * 检查日期是否失效了
      */
@@ -177,7 +128,9 @@ public class DateUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(getNowDateNotHours());
+        BigDecimal bigDecimal = new BigDecimal("1.1234561");
+        bigDecimal = bigDecimal.setScale(6, RoundingMode.UP);
+        System.out.println(bigDecimal);
     }
 
 
@@ -224,5 +177,4 @@ public class DateUtil {
                 return "";
         }
     }
-
 }

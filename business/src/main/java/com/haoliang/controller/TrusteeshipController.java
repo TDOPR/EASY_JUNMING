@@ -1,5 +1,6 @@
 package com.haoliang.controller;
 
+import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.dto.AmountDTO;
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 /**
+ * 托管量化
  * @author Dominick Li
- * @Description 托管量化
  * @CreateTime 2022/11/17 11:09
  **/
 @RestController
@@ -33,6 +34,7 @@ public class TrusteeshipController {
     /**
      * 托管金额充值
      */
+    @RepeatSubmit
     @PostMapping("/recharge")
     public JsonResult entrustWithdrawal(@Valid @RequestBody AmountDTO amountDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
         return trusteeshipRecharge.recharge(amountDTO,token);
@@ -41,6 +43,7 @@ public class TrusteeshipController {
     /**
      * 托管金额提现到钱包
      */
+    @RepeatSubmit
     @PostMapping("/withdrawal")
     public JsonResult trusteeshipWithdrawal(@Valid @RequestBody AmountDTO amountDTO,@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
         return trusteeshipRecharge.withdrawal(amountDTO,token);

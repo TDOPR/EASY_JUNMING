@@ -86,6 +86,7 @@ DROP TABLE IF EXISTS `sys_role_menu`;
 CREATE TABLE `sys_role_menu`  (
   `menuId` int(0) UNSIGNED NOT NULL  COMMENT '菜单Id',
   `roleId` int(0) UNSIGNED NOT NULL  COMMENT '角色Id',
+  `checked` int(0)  UNSIGNED NOT NULL DEFAULT 1 COMMENT '选中状态 1=选中 0=未选中',
   `createTime` datetime(0) NULL DEFAULT NULL,
   PRIMARY KEY (`menuId`, `roleId`) USING BTREE,
   FOREIGN KEY (`menuId`) REFERENCES `sys_menu` (`id`)
@@ -183,6 +184,36 @@ CREATE TABLE `sys_notice`  (
   `enText` text   NULL COMMENT '英文内容',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统公告' ROW_FORMAT = Dynamic;
+
+-- ----------------------------------
+-- Table structure for sys_role_menu
+-- ----------------------------------
+DROP TABLE IF EXISTS `sys_notice_user`;
+CREATE TABLE `sys_notice_user`  (
+  `noticeId` int(0) UNSIGNED NOT NULL  COMMENT '公告Id',
+  `userId` int(0) UNSIGNED NOT NULL  COMMENT 'app用户Id',
+  PRIMARY KEY (`noticeId`, `userId`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='公告和用户之前的引用关系' ROW_FORMAT = Dynamic;
+
+-- ----------------------------------
+-- Table structure for sys_message
+-- ----------------------------------
+DROP TABLE IF EXISTS `sys_file`;
+CREATE TABLE `sys_file`  (
+  `id` int(0) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `lastmodifiedTime` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
+  `username` varchar(255)  NOT NULL DEFAULT '' COMMENT '上传者',
+  `fileType` varchar(255)  NOT NULL DEFAULT '' COMMENT '文件类型',
+  `fileName` varchar(255)  NOT NULL DEFAULT '' COMMENT '文件名称',
+  `fileDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '文件描述',
+  `filePath` varchar(255)  NOT NULL DEFAULT '' COMMENT '文件存储地址',
+  `downloadPath` varchar(255)  NOT NULL DEFAULT '' COMMENT '文件下载地址',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统文件表' ROW_FORMAT = Dynamic;
+
+
+
 
 INSERT INTO sys_dictionary (id, createTime, lastmodifiedTime, dicKey, parentId, dicValue) VALUES (1, '2020-11-03 10:46:11', '2020-11-03 10:46:11', 'loginLogSaveDay', 0, '-1');
 INSERT INTO sys_dictionary (id, createTime, lastmodifiedTime, dicKey, parentId, dicValue) VALUES (2, '2020-11-03 10:46:11', '2020-11-03 10:46:11', 'loginLogSaveDay', 1, '-1');

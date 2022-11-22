@@ -38,18 +38,18 @@ public class SysNotice extends BaseModelCID {
     private String cnTitle;
 
     /**
-     * 中文简介
-     * @required
-     */
-    @NotEmpty
-    private String cnDescription;
-
-    /**
      * 中文内容
      * @required
      */
     @NotEmpty
     private String cnText;
+
+    /**
+     * 中文简介
+     * @required
+     */
+    @NotEmpty
+    private String cnDescription;
 
     /**
      * 英文标题
@@ -59,18 +59,18 @@ public class SysNotice extends BaseModelCID {
     private String enTitle;
 
     /**
-     * 英文简介
-     * @required
-     */
-    @NotEmpty
-    private String enDescription;
-
-    /**
      * 英文内容
      * @required
      */
     @NotEmpty
     private String enText;
+
+    /**
+     * 英文简介
+     * @required
+     */
+    @NotEmpty
+    private String enDescription;
 
 
 }

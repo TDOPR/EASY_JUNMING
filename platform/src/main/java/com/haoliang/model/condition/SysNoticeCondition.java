@@ -3,6 +3,7 @@ package com.haoliang.model.condition;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
 import com.haoliang.model.SysNotice;
+import lombok.Data;
 import org.springframework.util.StringUtils;
 
 /**
@@ -10,6 +11,7 @@ import org.springframework.util.StringUtils;
  * @Description
  * @CreateTime 2022/11/7 11:24
  **/
+@Data
 public class SysNoticeCondition extends BaseCondition<SysNotice> {
 
     /**
@@ -24,7 +26,10 @@ public class SysNoticeCondition extends BaseCondition<SysNotice> {
 
     @Override
     public QueryWrapper buildQueryParam() {
-        this.buildBaseQueryWrapper();
+        this.init();
+        //根据序号升序然后根据日期降序
+        this.getQueryWrapper().orderByAsc("sortIndex");
+        this.getQueryWrapper().orderByDesc("createTime");
         if (StringUtils.hasText(cnTitle)) {
             cnTitle = cnTitle.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("cnTitle", cnTitle);

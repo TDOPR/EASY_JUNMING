@@ -6,8 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dominick Li
@@ -28,7 +29,7 @@ public class WalletLogsDetailVO {
     /**
      * 流水明细
      */
-    private List<WalletLogVO> walletLogList;
+    private Map<String,List<WalletLogVO>> walletLogMap;
 
     /**
      * 存入金额 (量化 + 代理  + 充值)
@@ -41,14 +42,20 @@ public class WalletLogsDetailVO {
     private String takeOut;
 
     /**
+     * 流水类型
+     */
+    private List<ViewSelectVO> typeList;
+
+    /**
      * 类型下拉
      */
-    private List<ViewSelectVO> typeList = Arrays.asList(
-            new ViewSelectVO("全部", "-1"),
-            new ViewSelectVO(FlowingTypeEnum.RECHARGE),
-            new ViewSelectVO(FlowingTypeEnum.WITHDRAWAL),
-            new ViewSelectVO("代理收益存入", "0"),
-            new ViewSelectVO("量化收益存入", FlowingTypeEnum.STATIC.getValue().toString()),
-            new ViewSelectVO(FlowingTypeEnum.ENTRUSTMENT),
-            new ViewSelectVO(FlowingTypeEnum.WITHDRAWL_WALLET));
+    public static List<ViewSelectVO> buildTypeList(List<Integer> typeList) {
+        List<ViewSelectVO> list = new ArrayList<>();
+        list.add(new ViewSelectVO("全部", "-1"));
+        for (Integer type : typeList) {
+            list.add(new ViewSelectVO(FlowingTypeEnum.getWalletDescByValue(type), type.toString()));
+        }
+        return list;
+    }
+
 }

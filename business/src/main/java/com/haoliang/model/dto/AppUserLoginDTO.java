@@ -22,5 +22,9 @@ public class AppUserLoginDTO {
      */
     private String password;
 
+    /**
+     * 系统名称
+     */
+    private String systemName;
 
 }

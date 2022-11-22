@@ -28,12 +28,12 @@ public class AppUserRebotRef {
     private Integer userId;
 
     /**
-     * 邀请的用户Id
+     * 被邀请的用户Id
      */
     private Integer inviteUserId;
 
     /**
-     * 邀请的用户是用户的第几位购买机器
+     * 被邀请的用户是用户的第几位购买机器人
      */
     private Integer level;
 

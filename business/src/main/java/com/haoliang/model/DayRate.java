@@ -1,7 +1,10 @@
 package com.haoliang.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,7 +13,10 @@ import java.time.LocalDate;
  * @author Administrator
  */
 @Data
+@Builder
 @TableName("dayrate")
+@NoArgsConstructor
+@AllArgsConstructor
 public class DayRate   {
 
     private static final long serialVersionUID = 1L;

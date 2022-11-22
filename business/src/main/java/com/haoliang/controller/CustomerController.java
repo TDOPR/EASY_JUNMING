@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 客户管理
  * @author Dominick Li
- * @Description 客户管理
  * @CreateTime 2022/11/11 18:50
  **/
 @RestController

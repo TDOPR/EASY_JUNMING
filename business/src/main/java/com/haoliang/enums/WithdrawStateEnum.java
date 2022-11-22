@@ -3,6 +3,9 @@ package com.haoliang.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * 提现以及审核状态枚举
+ */
 @AllArgsConstructor
 @Getter
 public enum WithdrawStateEnum {

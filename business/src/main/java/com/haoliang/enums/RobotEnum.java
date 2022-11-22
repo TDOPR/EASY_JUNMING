@@ -8,6 +8,9 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * 机器人等级枚举类
+ */
 @Getter
 @AllArgsConstructor
 public enum RobotEnum {
@@ -104,8 +107,11 @@ public enum RobotEnum {
         return ZERO;
     }
 
+
     /**
-     * 根据等级
+     * 根据机器人等级生成对应范围内的收益率
+     * @param level 机器人等级
+     * @return 随机收益率
      */
     public static BigDecimal getProfitRateByLevel(Integer level) {
         for (RobotEnum robotEnum : RobotEnum.values()) {

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author Dominick Li
@@ -27,11 +27,17 @@ public class SysRoleMenu {
      */
     private Integer menuId;
 
-    @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
+    /**
+     * 是否选中状态
+     */
+    private Integer checked;
 
-    public SysRoleMenu(Integer roleId, Integer menuId) {
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    public SysRoleMenu(Integer roleId, Integer menuId, Integer checked) {
         this.roleId = roleId;
         this.menuId = menuId;
+        this.checked = checked;
     }
 }

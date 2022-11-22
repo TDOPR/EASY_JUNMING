@@ -1,11 +1,13 @@
 package com.haoliang.controller;
 
+import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.IpAddrUtil;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.dto.AppUserLoginDTO;
 import com.haoliang.model.dto.AppUserRegisterDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
+import com.haoliang.model.vo.AppTokenVO;
 import com.haoliang.model.vo.HomeVO;
 import com.haoliang.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +39,9 @@ public class HomeController {
     /**
      * 注册
      */
+    @RepeatSubmit
     @PostMapping("/register")
-    public JsonResult register(@Valid @RequestBody AppUserRegisterDTO appUserRegisterDTO ) {
+    public JsonResult register(@Valid @RequestBody AppUserRegisterDTO appUserRegisterDTO) {
         return appUserService.register(appUserRegisterDTO);
     }
 
@@ -46,7 +49,7 @@ public class HomeController {
      * 登录
      */
     @PostMapping("/login")
-    public JsonResult login(@Valid @RequestBody AppUserLoginDTO appUserLogin, HttpServletRequest request) {
+    public JsonResult<AppTokenVO> login(@Valid @RequestBody AppUserLoginDTO appUserLogin, HttpServletRequest request) {
         return appUserService.login(appUserLogin, IpAddrUtil.getLocalIp(request));
     }
 

@@ -1,5 +1,6 @@
 package com.haoliang.controller;
 
+import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.utils.JwtTokenUtils;
 import com.haoliang.model.dto.RobotDTO;
@@ -9,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
+ * 机器人
  * @author Dominick Li
- * @Description 机器人
  * @CreateTime 2022/11/17 10:54
  **/
 @RestController
@@ -32,6 +33,7 @@ public class RobotController {
     /**
      * 购买机器人
      */
+    @RepeatSubmit
     @PostMapping("/buyRobot")
     public JsonResult buyRebot(@RequestBody RobotDTO robotDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
         return robotService.buyRebot(robotDTO,token);
@@ -40,6 +42,7 @@ public class RobotController {
     /**
      * 升级机器人等级
      */
+    @RepeatSubmit
     @PostMapping("/upgradeRobot")
     public JsonResult upgradeRebot(@RequestBody RobotDTO robotDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
         return robotService.upgradeRebot(robotDTO,token);

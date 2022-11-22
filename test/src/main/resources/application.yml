@@ -70,6 +70,8 @@ mybatis-plus:
 
 #########################  应用其它配置   ############################
 app:
+  #临时文件存储
+  tmpSavePath: d:/data/tmp/
   #是否加载redisson的RateLimit限流相关Bean   依赖reids
   enableRateLimit: true
   #限流模式  single=单实例限流,all=全局限流(分布式限流)

@@ -17,14 +17,20 @@ public class AppTokenVO {
      * 头像
      */
     private String headImage;
-
     /**
      * 个性签名
      */
     private String autograph;
-
     /**
      * 用户昵称
      */
     private String nickName;
+    /**
+     * 系统版本
+     */
+    private String version;
+    /**
+     * 平台说明
+     */
+    private String platformDesc;
 }

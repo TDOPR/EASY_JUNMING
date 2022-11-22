@@ -11,12 +11,13 @@ import com.haoliang.model.dto.AppUserDTO;
 import com.haoliang.model.dto.AppUserLoginDTO;
 import com.haoliang.model.dto.AppUserRegisterDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
+import com.haoliang.model.vo.AppTokenVO;
 import com.haoliang.model.vo.AppUsersVO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AppUserService extends IService<AppUsers> {
 
-    JsonResult login(AppUserLoginDTO appUserLoginDTO, String localIp);
+    JsonResult<AppTokenVO> login(AppUserLoginDTO appUserLoginDTO, String localIp);
 
     JsonResult register(AppUserRegisterDTO appUserRegisterDTO);
 
@@ -25,7 +26,6 @@ public interface AppUserService extends IService<AppUsers> {
     JsonResult home(String token);
 
     JsonResult<PageVO<AppUsersVO>> pageList(PageParam<AppUsers, AppUsersCondition> pageParam);
-
 
     JsonResult modifyUserDetail(String token, AppUserDTO appUserDTO);
 

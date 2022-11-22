@@ -176,9 +176,11 @@ app:
   #临时文件存储
   tmpSavePath: ${app.rootPath}tmp/
   #头像存储路径
-  userHeadImageSavePath: ${app.rootPath}userHeadImage\
+  imageSavePath: ${app.rootPath}userImage/
+  #系统文件存储路径
+  sysfileSavePath: ${app.rootPath}sysfile/
   #虚拟路径前缀
-  virtualPathPrefix: /userHeadImage
+  virtualPathPrefix: /virtual
   #虚拟路径URL
   virtualPathURL: http://127.0.0.1:9090${app.virtualPathPrefix}/
   #文件上传限制 MB
@@ -205,4 +207,4 @@ app:
     - /home
     - /home/*
     - /druid/**
-    - ${app.virtualPathPrefix}/*
+    - ${app.virtualPathPrefix}/**

@@ -22,49 +22,66 @@ import java.util.List;
 public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> implements DayRateService {
 
     @Override
+    public DayRate initDayRate(LocalDate localDate) {
+        DayRate dayRate = DayRate.builder()
+                .createDate(localDate)
+                .level0(RobotEnum.getProfitRateByLevel(RobotEnum.ZERO.getLevel()))
+                .level1(RobotEnum.getProfitRateByLevel(RobotEnum.ONE.getLevel()))
+                .level2(RobotEnum.getProfitRateByLevel(RobotEnum.TW0.getLevel()))
+                .level3(RobotEnum.getProfitRateByLevel(RobotEnum.THREE.getLevel()))
+                .level4(RobotEnum.getProfitRateByLevel(RobotEnum.FOUR.getLevel()))
+                .level5(RobotEnum.getProfitRateByLevel(RobotEnum.FIVE.getLevel()))
+                .build();
+        //插入一条新数据
+        this.save(dayRate);
+        return dayRate;
+    }
+
+
+    @Override
     public BigDecimal selectNewDayRate(Integer robotLevel) {
         //获取今日的利率
-        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().ge(DayRate::getCreateDate, LocalDate.now()));
+        LocalDate now = LocalDate.now();
+        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().ge(DayRate::getCreateDate, now));
         if (ObjectUtils.isEmpty(dayRate)) {
-            //插入一条新数据
-            dayRate = new DayRate();
-            dayRate.setCreateDate(LocalDate.now());
-            dayRate.setLevel0(RobotEnum.getProfitRateByLevel(RobotEnum.ZERO.getLevel()));
-            dayRate.setLevel1(RobotEnum.getProfitRateByLevel(RobotEnum.ONE.getLevel()));
-            dayRate.setLevel2(RobotEnum.getProfitRateByLevel(RobotEnum.TW0.getLevel()));
-            dayRate.setLevel3(RobotEnum.getProfitRateByLevel(RobotEnum.THREE.getLevel()));
-            dayRate.setLevel4(RobotEnum.getProfitRateByLevel(RobotEnum.FOUR.getLevel()));
-            dayRate.setLevel5(RobotEnum.getProfitRateByLevel(RobotEnum.FIVE.getLevel()));
-            this.save(dayRate);
+            dayRate = initDayRate(now);
         }
         return getDayRateByLevel(dayRate, robotLevel);
     }
+
 
     @Override
     public BigDecimal selectNewWeekRate(Integer robotLevel) {
         LocalDate date = LocalDate.now();
         date = date.minusDays(6);
         //获取最近一周收益率
-        List<DayRate> dayRateList = this.list(new LambdaQueryWrapper<DayRate>().ge(DayRate::getCreateDate, date));
+        List<DayRate> dayRateList;
         //计算周收益
         BigDecimal sum;
-        switch (robotLevel) {
-            case 1:
+        RobotEnum robotEnum = RobotEnum.levelOf(robotLevel);
+        switch (robotEnum) {
+            case ONE:
+                dayRateList = this.list(new LambdaQueryWrapper<DayRate>().select(DayRate::getLevel1).ge(DayRate::getCreateDate, date));
                 sum = dayRateList.stream().map(DayRate::getLevel1).reduce(BigDecimal.ZERO, BigDecimal::add);
                 break;
-            case 2:
+            case TW0:
+                dayRateList = this.list(new LambdaQueryWrapper<DayRate>().select(DayRate::getLevel2).ge(DayRate::getCreateDate, date));
                 sum = dayRateList.stream().map(DayRate::getLevel2).reduce(BigDecimal.ZERO, BigDecimal::add);
                 break;
-            case 3:
+            case THREE:
+                dayRateList = this.list(new LambdaQueryWrapper<DayRate>().select(DayRate::getLevel3).ge(DayRate::getCreateDate, date));
                 sum = dayRateList.stream().map(DayRate::getLevel3).reduce(BigDecimal.ZERO, BigDecimal::add);
                 break;
-            case 4:
+            case FOUR:
+                dayRateList = this.list(new LambdaQueryWrapper<DayRate>().select(DayRate::getLevel4).ge(DayRate::getCreateDate, date));
                 sum = dayRateList.stream().map(DayRate::getLevel4).reduce(BigDecimal.ZERO, BigDecimal::add);
                 break;
-            case 5:
+            case FIVE:
+                dayRateList = this.list(new LambdaQueryWrapper<DayRate>().select(DayRate::getLevel5).ge(DayRate::getCreateDate, date));
                 sum = dayRateList.stream().map(DayRate::getLevel5).reduce(BigDecimal.ZERO, BigDecimal::add);
                 break;
             default:
+                dayRateList = this.list(new LambdaQueryWrapper<DayRate>().select(DayRate::getLevel0).ge(DayRate::getCreateDate, date));
                 sum = dayRateList.stream().map(DayRate::getLevel0).reduce(BigDecimal.ZERO, BigDecimal::add);
                 break;
         }
@@ -74,34 +91,28 @@ public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> impl
     @Override
     public DayRate selectNewDayRate() {
         //获取今日的利率
-        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().ge(DayRate::getCreateDate, LocalDate.now()));
+        LocalDate now = LocalDate.now();
+        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().ge(DayRate::getCreateDate, now));
         if (ObjectUtils.isEmpty(dayRate)) {
             //插入一条新数据
-            dayRate = new DayRate();
-            dayRate.setCreateDate(LocalDate.now());
-            dayRate.setLevel0(RobotEnum.getProfitRateByLevel(RobotEnum.ZERO.getLevel()));
-            dayRate.setLevel1(RobotEnum.getProfitRateByLevel(RobotEnum.ONE.getLevel()));
-            dayRate.setLevel2(RobotEnum.getProfitRateByLevel(RobotEnum.TW0.getLevel()));
-            dayRate.setLevel3(RobotEnum.getProfitRateByLevel(RobotEnum.THREE.getLevel()));
-            dayRate.setLevel4(RobotEnum.getProfitRateByLevel(RobotEnum.FOUR.getLevel()));
-            dayRate.setLevel5(RobotEnum.getProfitRateByLevel(RobotEnum.FIVE.getLevel()));
-            this.save(dayRate);
+            dayRate = this.initDayRate(now);
         }
         return dayRate;
     }
 
     @Override
     public BigDecimal getDayRateByLevel(DayRate dayRate, Integer robotLevel) {
-        switch (robotLevel) {
-            case 1:
+        RobotEnum robotEnum = RobotEnum.levelOf(robotLevel);
+        switch (robotEnum) {
+            case ONE:
                 return dayRate.getLevel1();
-            case 2:
+            case TW0:
                 return dayRate.getLevel2();
-            case 3:
+            case THREE:
                 return dayRate.getLevel3();
-            case 4:
+            case FOUR:
                 return dayRate.getLevel4();
-            case 5:
+            case FIVE:
                 return dayRate.getLevel5();
             default:
                 return dayRate.getLevel0();

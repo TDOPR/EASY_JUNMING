@@ -1,6 +1,5 @@
 package com.haoliang.model.vo;
 
-import com.haoliang.model.SysMenu;
 import com.haoliang.model.SysRole;
 import lombok.Data;
 
@@ -20,7 +19,8 @@ public class RoleVO  extends SysRole {
     private List<Integer> menuIds;
 
     /**
-     * 用户拥有的角色信息
+     * 半选的菜单
      */
-    private List<SysMenu> sysMenus;
+    private List<Integer> semiMenuIds;
+
 }

@@ -9,11 +9,13 @@
             sys_role_menu
         WHERE
             menuId=#{menuId}
+            AND
+            checked=#{checked}
 
     </select>
 
     <select id="findAllMenuIdByRoleId" resultType="Integer">
-        SELECT menuId FROM sys_role_menu WHERE roleId=#{roleId}
+        SELECT menuId FROM sys_role_menu WHERE roleId=#{roleId} AND checked=#{checked}
     </select>
     <select id="findRoleNameByIdIn" resultType="java.lang.String">
         select roleName from sys_role where id in

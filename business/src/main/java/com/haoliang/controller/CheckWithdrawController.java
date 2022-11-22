@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 审核提现
  * @author Dominick Li
- * @Description 审核提现
  * @CreateTime 2022/11/11 11:44
  **/
 @RestController

@@ -80,7 +80,7 @@ public class MetaInfoServiceImpl extends ServiceImpl<MetaInfoMapper, MetaInfo> i
             sysMenuMapper.insert(sysMenu);
             metaInfo.setMenuId(sysMenu.getId());
             //添加角色菜单关联表
-            SysRoleMenu sysRoleMenu = new SysRoleMenu(RoleTypeEnum.ADMIN.getCode(), sysMenu.getId());
+            SysRoleMenu sysRoleMenu = new SysRoleMenu(RoleTypeEnum.ADMIN.getCode(), sysMenu.getId(),1);
             sysRoleMenuMapper.insert(sysRoleMenu);
             this.save(metaInfo);
 
@@ -164,7 +164,6 @@ public class MetaInfoServiceImpl extends ServiceImpl<MetaInfoMapper, MetaInfo> i
     public JsonResult findAll(PageParam<MetaInfo, MetaInfoCondition> pageParam) {
         LocalDateTime endDate = pageParam.getSearchParam().getEndDate();
         if (endDate != null) {
-            endDate = DateUtil.getDateStrIncrement(endDate, 1, TimeUnit.DAYS);
             pageParam.getSearchParam().setEndDate(endDate);
         }
         IPage<MetaInfo> page = metaInfoMapper.selectbyPage(pageParam.getPage(),pageParam.getSearchParam().getMetaName(),pageParam.getSearchParam().getBeginDate(),pageParam.getSearchParam().getEndDate());

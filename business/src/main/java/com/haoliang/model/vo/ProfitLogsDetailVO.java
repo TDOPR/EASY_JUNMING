@@ -15,10 +15,10 @@ import java.util.List;
 @Data
 public class ProfitLogsDetailVO {
 
-    public ProfitLogsDetailVO(String settled, String noSettled, List<ProfitLogsVO> profitLogsVOList) {
+    public ProfitLogsDetailVO(String settled, String noSettled, List<ProfitLogsVO> list) {
         this.settled = settled;
         this.noSettled = noSettled;
-        this.profitLogsVOList = profitLogsVOList;
+        this.list = list;
     }
 
     /**
@@ -31,7 +31,7 @@ public class ProfitLogsDetailVO {
      */
     private String noSettled;
 
-    private List<ProfitLogsVO> profitLogsVOList;
+    private List<ProfitLogsVO> list;
 
 
     @Data

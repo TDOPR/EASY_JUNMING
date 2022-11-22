@@ -10,7 +10,7 @@ public interface SysRoleMenuMapper extends BaseMapper<SysRoleMenu> {
 
     Integer findAllByMenuIdIn(@Param("menuId")Integer menuId);
 
-    List<Integer> findAllMenuIdByRoleId(@Param("roleId")Integer id);
+    List<Integer> findAllMenuIdByRoleId(@Param("roleId")Integer id,@Param("checked")Integer checked);
 
     List<String> findRoleNameByIdIn(@Param("idList") List<Integer> existsId);
 }
