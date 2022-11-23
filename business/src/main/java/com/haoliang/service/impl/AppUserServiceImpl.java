@@ -258,7 +258,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Override
     public JsonResult<PageVO<AppUsersVO>> pageList(PageParam<AppUsers, AppUsersCondition> pageParam) {
         IPage<AppUsersVO> iPage = appUserMapper.page(pageParam.getPage(), pageParam.getSearchParam());
-        //查询下机数量
+        //查询下级数量
         for (AppUsersVO appUsersVO : iPage.getRecords()) {
             appUsersVO.setSubordinateNumber(treePathService.countByAncestor(appUsersVO.getId()) - 1);
         }

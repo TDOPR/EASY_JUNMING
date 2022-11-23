@@ -42,7 +42,7 @@ public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> impl
     public BigDecimal selectNewDayRate(Integer robotLevel) {
         //获取今日的利率
         LocalDate now = LocalDate.now();
-        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().ge(DayRate::getCreateDate, now));
+        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().eq(DayRate::getCreateDate, now));
         if (ObjectUtils.isEmpty(dayRate)) {
             dayRate = initDayRate(now);
         }
@@ -92,7 +92,7 @@ public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> impl
     public DayRate selectNewDayRate() {
         //获取今日的利率
         LocalDate now = LocalDate.now();
-        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().ge(DayRate::getCreateDate, now));
+        DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().eq(DayRate::getCreateDate, now));
         if (ObjectUtils.isEmpty(dayRate)) {
             //插入一条新数据
             dayRate = this.initDayRate(now);
@@ -118,4 +118,6 @@ public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> impl
                 return dayRate.getLevel0();
         }
     }
+
+
 }
