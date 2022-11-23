@@ -7,12 +7,16 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.IdUtils;
-import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.common.utils.NumberUtils;
+import com.haoliang.common.util.*;
 import com.haoliang.constant.EasyTradeConfig;
-import com.haoliang.enums.*;
-import com.haoliang.mapper.*;
+import com.haoliang.enums.CoinUnitEnum;
+import com.haoliang.enums.FlowingActionEnum;
+import com.haoliang.enums.FlowingTypeEnum;
+import com.haoliang.enums.WithdrawStateEnum;
+import com.haoliang.mapper.AddressPoolMapper;
+import com.haoliang.mapper.AppUserMapper;
+import com.haoliang.mapper.AppUserRechargeMapper;
+import com.haoliang.mapper.WalletsMapper;
 import com.haoliang.model.*;
 import com.haoliang.model.dto.*;
 import com.haoliang.model.vo.MyItemVO;
@@ -66,17 +70,17 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
 
     @Override
     public JsonResult<MyWalletsVO> getMyWallet(String token) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getWalletAmount, Wallets::getBlockAddress);
 
         //获取我的团队信息
         MyItemAmountDTO myItemAmountDTO = this.getMyItemAmountByUserId(userId);
         List<BigDecimal> amountList = appUserMapper.selectUserRebotRef(userId);
         MyItemVO myItemVO = MyItemVO.builder()
-                .totalAmount(NumberUtils.downToInt(myItemAmountDTO.getMinItemAmount().add(myItemAmountDTO.getMaxItemAmount())))
-                .minAmount(NumberUtils.downToInt(myItemAmountDTO.getMinItemAmount()))
+                .totalAmount(NumberUtil.downToInt(myItemAmountDTO.getMinItemAmount().add(myItemAmountDTO.getMaxItemAmount())))
+                .minAmount(NumberUtil.downToInt(myItemAmountDTO.getMinItemAmount()))
                 .aiUserCount(amountList.size())
-                .aiAmount(NumberUtils.downToInt(myItemAmountDTO.getFirstAmount()))
+                .aiAmount(NumberUtil.downToInt(myItemAmountDTO.getFirstAmount()))
                 .validUserCount(appUserMapper.getValidUserCountByInviteId(userId))
                 .build();
 
@@ -96,10 +100,10 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
         }
 
         MyWalletsVO.Proxy proxy = MyWalletsVO.Proxy.builder()
-                .algebra(NumberUtils.toMoeny(algebra))
-                .rebot(NumberUtils.toMoeny(rebot))
-                .team(NumberUtils.toMoeny(team))
-                .special(NumberUtils.toMoeny(special))
+                .algebra(NumberUtil.toMoeny(algebra))
+                .rebot(NumberUtil.toMoeny(rebot))
+                .team(NumberUtil.toMoeny(team))
+                .special(NumberUtil.toMoeny(special))
                 .build();
 
         //获取我的量化收益 昨天,上周,上月,累计
@@ -112,7 +116,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
                 .usdtInterestRate(CoinUnitEnum.USDT.getInterestRate().multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP).intValue())
                 .lcInterestRate(CoinUnitEnum.LEGAL_CURRENCY.getInterestRate().multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP).intValue())
                 .blockAddress(wallets.getBlockAddress())
-                .balance(NumberUtils.toTwoDecimal(wallets.getWalletAmount()))
+                .balance(NumberUtil.toTwoDecimal(wallets.getWalletAmount()))
                 .build());
     }
 
@@ -120,7 +124,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Transactional
     public JsonResult recharge(WalletOrderDTO walletOrderDTO, String token) {
         //充值
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         BigDecimal usdAmount;
         BigDecimal exchangeRate;
         Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getBlockAddress);
@@ -144,7 +148,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
         AppUserRecharge appUserRecharge = AppUserRecharge.builder()
                 .exchangeRate(exchangeRate)
                 .userId(userId)
-                .txid(IdUtils.simpleUUID())
+                .txid(IdUtil.simpleUUID())
                 .coinUnit(walletOrderDTO.getCoinUnit())
                 .amount(walletOrderDTO.getAmount())
                 .usdAmount(usdAmount)
@@ -168,7 +172,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Transactional
     public JsonResult withdrawal(WalletOrderDTO walletOrderDTO, String token) {
         //提现
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
 
         Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getBlockAddress);
 
@@ -186,7 +190,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
         //生成提现记录
         AppUserWithdraw appUserWithdraw = AppUserWithdraw.builder()
                 .userId(userId)
-                .txid(IdUtils.simpleUUID())
+                .txid(IdUtil.simpleUUID())
                 .address(wallets.getBlockAddress())
                 .coinUnit(walletOrderDTO.getCoinUnit())
                 .amount(walletOrderDTO.getAmount())

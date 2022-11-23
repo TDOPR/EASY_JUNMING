@@ -2,7 +2,7 @@ package com.haoliang.scheduled;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RedisLock;
-import com.haoliang.common.utils.ErrorLogUtil;
+import com.haoliang.common.util.ErrorLogUtil;
 import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;

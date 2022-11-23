@@ -1,7 +1,7 @@
 package com.haoliang.model.vo;
 
+import com.haoliang.common.util.StringUtil;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Dominick Li
@@ -38,8 +38,8 @@ public class SysCacheVO {
     }
 
     public SysCacheVO(String cacheName, String cacheKey, String cacheValue) {
-        this.cacheName = StringUtils.replace(cacheName, ":", "");
-        this.cacheKey = StringUtils.replace(cacheKey, cacheName, "");
+        this.cacheName = StringUtil.replace(cacheName, ":", "");
+        this.cacheKey = StringUtil.replace(cacheKey, cacheName, "");
         this.cacheValue = cacheValue;
     }
 }

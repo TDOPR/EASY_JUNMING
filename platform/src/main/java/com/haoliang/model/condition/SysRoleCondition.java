@@ -2,9 +2,9 @@ package com.haoliang.model.condition;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
+import com.haoliang.common.util.StringUtil;
 import com.haoliang.enums.RoleTypeEnum;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Dominick Li
@@ -36,10 +36,10 @@ public class SysRoleCondition extends BaseCondition{
         if (enabled!=null) {
             this.getQueryWrapper().eq("enabled", enabled);
         }
-        if (StringUtils.hasText(roleName)) {
+        if (StringUtil.isNotBlank(roleName)) {
             this.getQueryWrapper().eq("roleName", roleName);
         }
-        if (StringUtils.hasText(roleCode)) {
+        if (StringUtil.isNotBlank(roleCode)) {
             this.getQueryWrapper().eq("roleCode", roleCode);
         }
         return this.getQueryWrapper();

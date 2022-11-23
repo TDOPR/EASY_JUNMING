@@ -2,8 +2,8 @@ package com.haoliang.model.condition;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
+import jodd.util.StringUtil;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Dominick Li
@@ -21,7 +21,7 @@ public class SysLoginLogCondition extends BaseCondition {
     @Override
     public QueryWrapper buildQueryParam() {
         this.buildBaseQueryWrapper();
-        if (StringUtils.hasText(username)) {
+        if (StringUtil.isNotBlank(username)) {
             username = username.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("username", username);
         }

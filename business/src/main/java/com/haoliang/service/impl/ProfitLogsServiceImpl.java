@@ -3,7 +3,7 @@ package com.haoliang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haoliang.common.utils.NumberUtils;
+import com.haoliang.common.util.NumberUtil;
 import com.haoliang.mapper.ProfitLogsMapper;
 import com.haoliang.model.ProfitLogs;
 import com.haoliang.model.vo.MyWalletsVO;
@@ -41,10 +41,10 @@ public class ProfitLogsServiceImpl extends ServiceImpl<ProfitLogsMapper, ProfitL
         BigDecimal lastMonth = profitLogsMapper.getLastMonth(userId);
         BigDecimal total = profitLogsMapper.getTotal(userId);
         return MyWalletsVO.Quantification.builder()
-                .yesterday(NumberUtils.toMoeny(yesterday))
-                .lastMonth(NumberUtils.toMoeny(lastMonth))
-                .lastWeek(NumberUtils.toMoeny(lastWeek))
-                .total(NumberUtils.toMoeny(total))
+                .yesterday(NumberUtil.toMoeny(yesterday))
+                .lastMonth(NumberUtil.toMoeny(lastMonth))
+                .lastWeek(NumberUtil.toMoeny(lastWeek))
+                .total(NumberUtil.toMoeny(total))
                 .build();
     }
 }

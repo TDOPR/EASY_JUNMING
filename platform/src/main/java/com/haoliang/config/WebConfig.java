@@ -2,7 +2,7 @@ package com.haoliang.config;
 
 
 import com.haoliang.common.config.AppParam;
-import com.haoliang.common.utils.OsUtil;
+import com.haoliang.common.util.OsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;

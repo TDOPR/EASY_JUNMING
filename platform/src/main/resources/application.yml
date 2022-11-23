@@ -10,9 +10,9 @@ spring:
     admin:
       client:
         # 启动注册到监控中心(设置true则需要启动monitor项目)
-        enabled: false
+        enabled: true
         #监控中心地址,多个以逗号隔开,并把localhost换成ip
-        url: http://localhost:9091
+        url: http://localhost:9092
         instance:
           prefer-ip: true
         register-once: true
@@ -67,7 +67,7 @@ spring:
         login-username: admin
         login-password: 123456
         #允许哪个机器登录
-        allow: 127.0.0.1
+        allow: 192.168.2.128
         #sql监控开关
         enabled: true
       #url监控

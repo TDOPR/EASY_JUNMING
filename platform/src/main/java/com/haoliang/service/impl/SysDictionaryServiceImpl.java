@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.SpringUtil;
+import com.haoliang.common.util.SpringUtil;
 import com.haoliang.mapper.SysDictionaryMapper;
 import com.haoliang.model.SysDictionary;
 import com.haoliang.service.SysDictionaryService;

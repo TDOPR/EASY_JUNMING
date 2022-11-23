@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 用户提现记录表
@@ -69,10 +69,10 @@ public class AppUserWithdraw extends BaseModel {
     /**
      * 审核时间
      */
-    private Date auditTime;
+    private LocalDateTime auditTime;
 
     /**
-     * 审核状态4=不需要审核小额提现  =待审核 2=审核通过 3=驳回
+     * 审核状态4=不需要审核小额提现  0=待审核 2=审核通过 3=驳回
      */
     private Integer auditStatus;
 

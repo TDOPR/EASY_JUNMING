@@ -92,10 +92,17 @@ export default {
       }
     },
     onSubmit() {
+
+            let words = this.password;
+            let publicKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDmDe2gkZLO1sly6uHr4tnnp/wWyCMsuRWIlyht/pB87LoIvjn3KiIK61MVmuUtHyjmIw+5QotMIuS92QNCA6XKeffVWPOn5/XmDI3sAcgcbIquqBmiHzbwWPu0TzGZMiy/I0t5mTJlHcX5DDHUBYL37YHfIgFAwFEs4d+NRy19dwIDAQAB";
+            let encrypt = new JSEncrypt();
+            encrypt.setPublicKey(publicKey);
+            let encryptPwd = encrypt.encryptLong(words);
+
       this.$ajax
         .post("/api/user/login", {
           username: this.username,
-          password: this.password,
+          password: encryptPwd,
           uuid: this.uuid,
           code: this.code,
         })

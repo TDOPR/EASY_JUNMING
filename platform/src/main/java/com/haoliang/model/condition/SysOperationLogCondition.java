@@ -2,8 +2,8 @@ package com.haoliang.model.condition;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
+import com.haoliang.common.util.StringUtil;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Dominick Li
@@ -30,14 +30,14 @@ public class SysOperationLogCondition extends BaseCondition {
     @Override
     public QueryWrapper buildQueryParam() {
         this.buildBaseQueryWrapper();
-        if (StringUtils.hasText(username)) {
+        if (StringUtil.isNotBlank(username)) {
             this.getQueryWrapper().eq("username", username);
         }
-        if (StringUtils.hasText(module)) {
+        if (StringUtil.isNotBlank(module)) {
             this.getQueryWrapper().eq("module", module);
         }
 
-        if (StringUtils.hasText(description)) {
+        if (StringUtil.isNotBlank(description)) {
             this.getQueryWrapper().eq("description", description);
         }
         return this.getQueryWrapper();

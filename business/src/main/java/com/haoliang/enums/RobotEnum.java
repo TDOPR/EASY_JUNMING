@@ -1,7 +1,7 @@
 package com.haoliang.enums;
 
-import com.haoliang.common.utils.NumberUtils;
-import com.haoliang.common.utils.RandomUtil;
+import com.haoliang.common.util.NumberUtil;
+import com.haoliang.common.util.RandomUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -75,9 +75,9 @@ public enum RobotEnum {
      */
     public String getDayRateSection() {
         if (maxProfitRate.compareTo(minProfitRate) == 0) {
-            return NumberUtils.toPercentageUP(maxProfitRate);
+            return NumberUtil.toPercentageUP(maxProfitRate);
         }
-        return NumberUtils.toPercentageUP(minProfitRate) + "-" + NumberUtils.toPercentageUP(maxProfitRate);
+        return NumberUtil.toPercentageUP(minProfitRate) + "-" + NumberUtil.toPercentageUP(maxProfitRate);
     }
 
     /**
@@ -89,7 +89,7 @@ public enum RobotEnum {
         }
         BigDecimal weekMin = minProfitRate.multiply(new BigDecimal(7));
         BigDecimal weekMax = maxProfitRate.multiply(new BigDecimal(7));
-        return NumberUtils.toPercentageUP(weekMin) + "-" + NumberUtils.toPercentageUP(weekMax);
+        return NumberUtil.toPercentageUP(weekMin) + "-" + NumberUtil.toPercentageUP(weekMax);
     }
 
     /**

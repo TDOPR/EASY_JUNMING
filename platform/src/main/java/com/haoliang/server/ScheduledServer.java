@@ -2,6 +2,7 @@ package com.haoliang.server;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RedisLock;
+import com.haoliang.common.config.AppParam;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.model.SysErrorLog;
@@ -11,11 +12,10 @@ import com.haoliang.common.model.WorkspaceHarDiskInfo;
 import com.haoliang.common.service.SysErrorLogService;
 import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.service.SysOperationLogService;
-import com.haoliang.common.utils.DateUtil;
-import com.haoliang.common.utils.FileUtils;
-import com.haoliang.common.utils.GetWorkspaceHarDiskInfoUtil;
-import com.haoliang.common.config.AppParam;
+import com.haoliang.common.util.DateUtil;
+import com.haoliang.common.util.GetWorkspaceHarDiskInfoUtil;
 import com.haoliang.model.dto.EmailTemplateDTO;
+import cn.hutool.core.io.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,7 +75,7 @@ public class ScheduledServer {
             sysOperationLogService.remove(new LambdaQueryWrapper<SysOperationLog>().le(SysOperationLog::getCreateTime, DateUtil.getDateStrIncrement(localDate, -SysSettingParam.getOperationLogSaveDay(), TimeUnit.DAYS)));
         }
         //清理临时文件
-        FileUtils.deleteFile(new File(GlobalConfig.getTmpSavePath()));
+        FileUtil.del(new File(GlobalConfig.getTmpSavePath()));
     }
 
     /**

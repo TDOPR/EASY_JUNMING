@@ -2,8 +2,8 @@ package com.haoliang.common.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.haoliang.common.enums.ReturnMessageEnum;
+import com.haoliang.common.util.StringUtil;
 import org.springframework.http.HttpStatus;
-import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 
@@ -30,11 +30,6 @@ public class JsonResult<T> implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
-//    /**
-//     * 响应时间戳
-//     */
-//    private String timestamp;
-
     private static final long serialVersionUID = -7268040542410707954L;
 
     protected static String successMessage = ReturnMessageEnum.OK.getKey();
@@ -46,7 +41,6 @@ public class JsonResult<T> implements Serializable {
 
     public JsonResult(int code) {
         this.setCode(code);
-        //this.setTimestamp(String.valueOf(System.currentTimeMillis()));
     }
 
     public JsonResult(int code, String msg) {
@@ -106,7 +100,7 @@ public class JsonResult<T> implements Serializable {
     }
 
     protected static String defautlErrorMsg(String msg) {
-        if (StringUtils.hasText(msg)) {
+        if (StringUtil.isNotEmpty(msg)) {
             return msg;
         } else {
             return errorMessage;
@@ -114,7 +108,7 @@ public class JsonResult<T> implements Serializable {
     }
 
     protected static String defaultSuccessMsg(String msg) {
-        if (StringUtils.hasText(msg)) {
+        if (StringUtil.isNotEmpty(msg)) {
             return msg;
         } else {
             return successMessage;
@@ -145,11 +139,5 @@ public class JsonResult<T> implements Serializable {
         this.data = data;
     }
 
-//    public String getTimestamp() {
-//        return timestamp;
-//    }
-//
-//    public void setTimestamp(String timestamp) {
-//        this.timestamp = timestamp;
-//    }
+
 }

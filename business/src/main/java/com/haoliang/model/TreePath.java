@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @author Administrator
@@ -41,19 +41,6 @@ public class TreePath implements Serializable {
      * @ignore
      */
     @TableField(fill = FieldFill.INSERT)
-    private Date createTime;
-//    /**
-//     * 父等级
-//     */
-//    private Integer aLevel;
-//    /**
-//     * 子等级
-//     */
-//    private Integer dLevel;
-//    /**
-//     * 子给父的返佣
-//     */
-//    private BigDecimal commission;
-
+    private LocalDateTime createTime;
 
 }

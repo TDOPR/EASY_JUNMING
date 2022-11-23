@@ -2,7 +2,7 @@ package com.haoliang.controller;
 
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.dto.RobotDTO;
 import com.haoliang.model.vo.RobotDetailVO;
 import com.haoliang.service.RobotService;
@@ -26,7 +26,7 @@ public class RobotController {
      * 获取机器人列表
      */
     @GetMapping
-    public JsonResult<RobotDetailVO> getRobotList(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
+    public JsonResult<RobotDetailVO> getRobotList(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token){
         return robotService.getRobotList(token);
     }
 
@@ -35,7 +35,7 @@ public class RobotController {
      */
     @RepeatSubmit
     @PostMapping("/buyRobot")
-    public JsonResult buyRebot(@RequestBody RobotDTO robotDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
+    public JsonResult buyRebot(@RequestBody RobotDTO robotDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME)String token){
         return robotService.buyRebot(robotDTO,token);
     }
 
@@ -44,7 +44,7 @@ public class RobotController {
      */
     @RepeatSubmit
     @PostMapping("/upgradeRobot")
-    public JsonResult upgradeRebot(@RequestBody RobotDTO robotDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
+    public JsonResult upgradeRebot(@RequestBody RobotDTO robotDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME)String token){
         return robotService.upgradeRebot(robotDTO,token);
     }
 }

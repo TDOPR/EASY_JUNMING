@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.enums.ProxyRebotEnum;
@@ -50,7 +50,7 @@ public class RobotServiceImpl implements RobotService {
 
     @Override
     public JsonResult getRobotList(String token) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getRobotLevel);
         List<RobotDetailVO.RobotVO> robotList = new ArrayList<>();
         RobotEnum hasRobotEnum = RobotEnum.levelOf(wallets.getRobotLevel());
@@ -76,7 +76,7 @@ public class RobotServiceImpl implements RobotService {
     @Transactional
     public JsonResult buyRebot(RobotDTO robotDTO, String token) {
         RobotEnum robotEnum = RobotEnum.levelOf(robotDTO.getLevel());
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getRobotLevel);
         if (wallets.getRobotLevel() > 0) {
             return JsonResult.failureResult(ReturnMessageEnum.REPEAT_PURCHASE_REBOT);
@@ -126,7 +126,7 @@ public class RobotServiceImpl implements RobotService {
     public JsonResult upgradeRebot(RobotDTO robotDTO, String token) {
         //获取需要升级的机器人
         RobotEnum robotEnum = RobotEnum.levelOf(robotDTO.getLevel());
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getRobotAmount, Wallets::getId, Wallets::getWalletAmount);
 
         //校验升级机器人等级是否比原有的等级高

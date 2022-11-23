@@ -3,15 +3,14 @@ package com.haoliang.controller;
 import cn.hutool.captcha.AbstractCaptcha;
 import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.IdUtil;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.vo.CaptchaVO;
-import com.haoliang.common.utils.IdUtils;
-import com.haoliang.common.utils.ReflectUtils;
-import com.haoliang.common.utils.SpringUtil;
-import com.haoliang.common.utils.redis.RedisUtils;
+import com.haoliang.common.util.IdUtil;
+import com.haoliang.common.util.ReflectUtil;
+import com.haoliang.common.util.SpringUtil;
+import com.haoliang.common.util.redis.RedisUtil;
 import com.haoliang.config.LoginConfig;
 import com.haoliang.enums.CaptchaCategory;
 import com.haoliang.enums.CaptchaType;
@@ -47,13 +46,13 @@ public class CaptchaController {
      */
     @GetMapping("/sendCaptchaToEmail/{email}")
     public JsonResult<UuidVO> sendCaptchaToEmail(@PathVariable String email) {
-        CodeGenerator codeGenerator = ReflectUtils.newInstance(CaptchaType.CHAR.getClazz(), loginConfig.getCaptcha().getCharLength());
+        CodeGenerator codeGenerator = ReflectUtil.newInstance(CaptchaType.CHAR.getClazz(), loginConfig.getCaptcha().getCharLength());
         String code = codeGenerator.generate();
         boolean flag = EmailServer.send(emailTemplate.getTitle(), emailTemplate.getContent().replace("{{code}}", code).replace("{{time}}", loginConfig.getCaptcha().getExpirationTime().toString()), email);
         if (flag) {
-            String uuid = IdUtils.simpleUUID();
+            String uuid = IdUtil.simpleUUID();
             String verifyKey = CacheKeyPrefixConstants.CAPTCHA_CODE + uuid;
-            RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(loginConfig.getCaptcha().getExpirationTime()));
+            RedisUtil.setCacheObject(verifyKey, code, Duration.ofMinutes(loginConfig.getCaptcha().getExpirationTime()));
             return JsonResult.successResult("ok",new UuidVO(uuid));
         }
         return JsonResult.failureResult(ReturnMessageEnum.SEND_EMAIL_ERROR);
@@ -67,7 +66,7 @@ public class CaptchaController {
     @GetMapping("/captchaImage")
     public JsonResult<CaptchaVO> getCode() {
         // 保存验证码信息
-        String uuid = IdUtil.simpleUUID();
+        String uuid = cn.hutool.core.util.IdUtil.simpleUUID();
         String verifyKey = CacheKeyPrefixConstants.CAPTCHA_CODE + uuid;
         // 获取验证码类型
         CaptchaType captchaType = loginConfig.getCaptcha().getType();
@@ -82,7 +81,7 @@ public class CaptchaController {
         boolean isMath = CaptchaType.MATH == captchaType;
         Integer length = isMath ? loginConfig.getCaptcha().getNumberLength() : loginConfig.getCaptcha().getCharLength();
 
-        CodeGenerator codeGenerator = ReflectUtils.newInstance(captchaType.getClazz(), length);
+        CodeGenerator codeGenerator = ReflectUtil.newInstance(captchaType.getClazz(), length);
 
         //获取干扰策略
         CaptchaCategory captchaCategory = loginConfig.getCaptcha().getCategory();
@@ -103,7 +102,7 @@ public class CaptchaController {
         captcha.setGenerator(codeGenerator);
         captcha.createCode();
         String code = isMath ? getCodeResult(captcha.getCode()) : captcha.getCode();
-        RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(loginConfig.getCaptcha().getExpirationTime()));
+        RedisUtil.setCacheObject(verifyKey, code, Duration.ofMinutes(loginConfig.getCaptcha().getExpirationTime()));
         return JsonResult.successResult(new CaptchaVO(uuid, captcha.getImageBase64()));
     }
 

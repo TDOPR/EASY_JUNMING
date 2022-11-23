@@ -1,7 +1,10 @@
 package com.haoliang.controller.monitor;
 
+import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.MonitorInfoUtils;
+import com.haoliang.common.model.WorkspaceHarDiskInfo;
+import com.haoliang.common.util.GetWorkspaceHarDiskInfoUtil;
+import com.haoliang.common.util.MonitorInfoUtil;
 import com.haoliang.model.vo.DataVO;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,7 @@ import java.util.List;
 
 /**
  * 监控中心
+ *
  * @author Dominick Li
  * @CreateTime 2022/11/8 14:37
  **/
@@ -25,25 +29,27 @@ public class MonitorInfoController {
      */
     @GetMapping("/getMonitorInfo")
     @PreAuthorize("hasAuthority('sys:monitor:list')")
-    public JsonResult getMonitorInfo(){
+    public JsonResult getMonitorInfo() {
         HashMap resMap = new HashMap(4);
         //获取系统性能信息
-        List list = MonitorInfoUtils.getMontiorList();
+        List list = MonitorInfoUtil.getMontiorList();
         //CPU使用率
         String cpuShare = list.get(0).toString();
         resMap.put("cpu", new DataVO(cpuShare + "%", cpuShare));
         //硬盘使用情况
-        List info = (List) list.get(1);
-        String diskInfo = info.get(0).toString();
-        String diskShare = info.get(1).toString();
-        resMap.put("disk", new DataVO(diskInfo, diskShare));
+        WorkspaceHarDiskInfo workspaceHarDiskInfo = GetWorkspaceHarDiskInfoUtil.getWorkspaceHarDiskInfo(GlobalConfig.getTmpSavePath());
+        if (workspaceHarDiskInfo == null) {
+            resMap.put("disk", new DataVO("0", "0"));
+        } else {
+            resMap.put("disk", new DataVO(workspaceHarDiskInfo.getUsed() + "/" + workspaceHarDiskInfo.getSize(), workspaceHarDiskInfo.getUse()));
+        }
         //内存使用情况
-        info = (List) list.get(2);
+        List info = (List) list.get(1);
         String memoryInfo = info.get(0).toString();
         String memoryShare = info.get(1).toString();
         resMap.put("memory", new DataVO(memoryInfo, memoryShare));
         //显存使用情况 服务器监控
-        info = (List) list.get(3);
+        info = (List) list.get(2);
         String gpuInfo = info.get(0).toString();
         String gpuShare = info.get(1).toString();
         resMap.put("gpu", new DataVO(gpuInfo, gpuShare));

@@ -2,10 +2,9 @@ package com.haoliang.model.condition;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
+import com.haoliang.common.util.StringUtil;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotBlank;
 
 /**
  * @author Dominick Li
@@ -28,10 +27,10 @@ public class MetaInfoCondition extends BaseCondition {
     @Override
     public QueryWrapper buildQueryParam() {
         this.buildBaseQueryWrapper();
-        if (StringUtils.hasText(metaName)) {
+        if (StringUtil.isNotBlank(metaName)) {
             this.getQueryWrapper().eq("metaName", metaName);
         }
-        if (StringUtils.hasText(tableCode)) {
+        if (StringUtil.isNotBlank(tableCode)) {
             this.getQueryWrapper().eq("tableCode", tableCode);
         }
         return this.getQueryWrapper();

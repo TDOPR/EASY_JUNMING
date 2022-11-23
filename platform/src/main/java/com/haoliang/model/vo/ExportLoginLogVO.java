@@ -5,7 +5,7 @@ import com.haoliang.common.model.SysLoginLog;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @Description 导出用户的模板
@@ -20,7 +20,7 @@ public class ExportLoginLogVO {
     }
 
     @ExcelProperty("登录日期")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ExcelProperty("登录的用户名")
     private String username;

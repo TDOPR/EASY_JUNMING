@@ -1,10 +1,14 @@
 package com.haoliang.service.impl;
 
-import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.MonitorInfoUtils;
 import com.haoliang.common.config.SysSettingParam;
+import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.util.MonitorInfoUtil;
+import com.haoliang.controller.monitor.server.SystemServer;
+import com.haoliang.model.vo.AdminHomeVO;
 import com.haoliang.model.vo.DataVO;
+import com.haoliang.service.AppUserService;
 import com.haoliang.service.SystemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,6 +22,9 @@ import java.util.List;
 @Service
 public class SystemServiceImpl implements SystemService {
 
+    @Autowired
+    private AppUserService appUserService;
+
     @Override
     public JsonResult getSetting() {
         HashMap result = new HashMap();
@@ -29,7 +36,7 @@ public class SystemServiceImpl implements SystemService {
     public JsonResult getMonitorInfo() {
         HashMap resMap = new HashMap(4);
         //获取系统性能信息
-        List list = MonitorInfoUtils.getMontiorList();
+        List list = MonitorInfoUtil.getMontiorList();
         //CPU使用率
         String cpuShare = list.get(0).toString();
         resMap.put("cpu", new DataVO(cpuShare + "%", cpuShare));
@@ -49,5 +56,14 @@ public class SystemServiceImpl implements SystemService {
         String gpuShare = info.get(1).toString();
         resMap.put("gpu", new DataVO(gpuInfo, gpuShare));
         return JsonResult.successResult(resMap);
+    }
+
+    @Override
+    public JsonResult<AdminHomeVO> getHomeInfo() {
+
+        AdminHomeVO adminHomeVO = new AdminHomeVO();
+        adminHomeVO.setSystem(new SystemServer());
+        adminHomeVO.setBusiness(appUserService.getBusinessVO());
+        return JsonResult.successResult(adminHomeVO);
     }
 }

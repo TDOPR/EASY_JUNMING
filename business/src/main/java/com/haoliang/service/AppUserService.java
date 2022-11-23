@@ -13,6 +13,7 @@ import com.haoliang.model.dto.AppUserRegisterDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
 import com.haoliang.model.vo.AppTokenVO;
 import com.haoliang.model.vo.AppUsersVO;
+import com.haoliang.model.vo.BusinessVO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AppUserService extends IService<AppUsers> {
@@ -32,4 +33,6 @@ public interface AppUserService extends IService<AppUsers> {
     JsonResult uploadHeadImage(String token, MultipartFile file) throws Exception;
 
     JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO);
+
+    BusinessVO getBusinessVO();
 }

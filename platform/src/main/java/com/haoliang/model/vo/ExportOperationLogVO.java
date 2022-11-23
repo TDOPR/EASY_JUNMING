@@ -5,7 +5,7 @@ import com.haoliang.common.model.SysOperationLog;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @Description
@@ -20,7 +20,7 @@ public class ExportOperationLogVO {
     }
 
     @ExcelProperty("操作日期")
-    private Date createTime;
+    private LocalDateTime createTime;
 
     @ExcelProperty("操作员")
     private String username;

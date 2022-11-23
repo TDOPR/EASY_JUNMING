@@ -19,4 +19,10 @@
         SELECT min(createTime) minDate,max(createTime) maxDate  FROM wallet_logs  WHERE userId=#{userId}
     </select>
 
+    <select id="sumTotalAmountByType" resultType="java.math.BigDecimal">
+        SELECT sum(amount) FROM wallet_logs  WHERE type=#{type}
+    </select>
+
+
+
 </mapper>

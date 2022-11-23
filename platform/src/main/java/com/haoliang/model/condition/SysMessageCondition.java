@@ -2,9 +2,9 @@ package com.haoliang.model.condition;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
+import com.haoliang.common.util.StringUtil;
 import com.haoliang.model.SysMessage;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Dominick Li
@@ -45,19 +45,19 @@ public class SysMessageCondition extends BaseCondition<SysMessage> {
         if (type != null) {
             this.getQueryWrapper().eq("type", type);
         }
-        if (StringUtils.hasText(keyName)) {
+        if (StringUtil.isNotBlank(keyName)) {
             keyName = keyName.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("keyName", keyName);
         }
-        if (StringUtils.hasText(zhCn)) {
+        if (StringUtil.isNotBlank(zhCn)) {
             zhCn = zhCn.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("zhCn", zhCn);
         }
-        if (StringUtils.hasText(zhTw)) {
+        if (StringUtil.isNotBlank(zhTw)) {
             zhTw = zhTw.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("zhTw", zhTw);
         }
-        if (StringUtils.hasText(enUs)) {
+        if (StringUtil.isNotBlank(enUs)) {
             enUs = enUs.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("errorMsg", enUs);
         }

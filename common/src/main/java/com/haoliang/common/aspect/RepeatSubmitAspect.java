@@ -3,9 +3,9 @@ package com.haoliang.common.aspect;
 import com.alibaba.fastjson.JSONObject;
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
-import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.common.utils.MD5Util;
-import com.haoliang.common.utils.redis.RedisUtils;
+import com.haoliang.common.util.JwtTokenUtil;
+import com.haoliang.common.util.encrypt.MD5Util;
+import com.haoliang.common.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -60,17 +60,17 @@ public class RepeatSubmitAspect {
         String url = request.getRequestURI();
 
         // 用户的唯一标识
-        String token = request.getHeader(JwtTokenUtils.TOKEN_NAME);
+        String token = request.getHeader(JwtTokenUtil.TOKEN_NAME);
         // 唯一标识（指定key + url + 消息头）
         String submitKey = CacheKeyPrefixConstants.REPEAT_SUBMIT+ MD5Util.toMD5(url + "_" + token + "_" + nowParams);
 
         boolean flag = false;
 
         //判断缓存中是否有此key
-        if (!RedisUtils.hasKey(submitKey)) {
+        if (!RedisUtil.hasKey(submitKey)) {
             log.info("key={},interval={},非重复提交", submitKey, interval);
             //如果没有表示不是重复提交并设置key时间
-            RedisUtils.setCacheObject(submitKey, "", Duration.ofMillis(interval));
+            RedisUtil.setCacheObject(submitKey, "", Duration.ofMillis(interval));
             flag = true;
         }
 

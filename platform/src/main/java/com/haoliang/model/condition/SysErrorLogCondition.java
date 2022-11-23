@@ -2,8 +2,8 @@ package com.haoliang.model.condition;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
+import com.haoliang.common.util.StringUtil;
 import lombok.Data;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Dominick Li
@@ -31,15 +31,15 @@ public class SysErrorLogCondition extends BaseCondition {
     @Override
     public QueryWrapper buildQueryParam() {
         this.buildBaseQueryWrapper();
-        if (StringUtils.hasText(errorMsg)) {
+        if (StringUtil.isNotBlank(errorMsg)) {
             errorMsg = errorMsg.replaceAll("%", "////%").replaceAll("_", "////_");
             this.getQueryWrapper().like("errorMsg", errorMsg);
         }
-        if (StringUtils.hasText(ipAddr)) {
+        if (StringUtil.isNotBlank(ipAddr)) {
             this.getQueryWrapper().eq("ipAddr", ipAddr);
         }
 
-        if (StringUtils.hasText(errorType)) {
+        if (StringUtil.isNotBlank(errorType)) {
             this.getQueryWrapper().eq("errorType", errorType);
         }
         return this.getQueryWrapper();

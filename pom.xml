@@ -54,6 +54,7 @@
         <druid-boot.version>1.2.14</druid-boot.version>
         <jsr310.version>2.9.2</jsr310.version>
         <google-zxing.version>3.4.1</google-zxing.version>
+        <oshi.version>6.3.0</oshi.version>
     </properties>
 
     <dependencyManagement>
@@ -106,6 +107,7 @@
                 <version>${okhttp.version}</version>
             </dependency>
 
+            <!--redis操作-->
             <dependency>
                 <groupId>de.codecentric</groupId>
                 <artifactId>spring-boot-admin-starter-server</artifactId>
@@ -119,12 +121,14 @@
                 <version>${spring-boot-admin.version}</version>
             </dependency>
 
+            <!--redis操作-->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
 
+            <!--工具包-->
             <dependency>
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-bom</artifactId>
@@ -133,6 +137,7 @@
                 <scope>import</scope>
             </dependency>
 
+            <!--excel增强-->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>easyexcel</artifactId>
@@ -170,16 +175,25 @@
                 <version>${version}</version>
             </dependency>
 
+            <!-- jdk8 LocalDateTime兼容 -->
             <dependency>
                 <groupId>com.fasterxml.jackson.datatype</groupId>
                 <artifactId>jackson-datatype-jsr310</artifactId>
                 <version>${jsr310.version}</version>
             </dependency>
 
+            <!-- 谷歌认证器二维码生成 -->
             <dependency>
                 <groupId>com.google.zxing</groupId>
                 <artifactId>core</artifactId>
                 <version>${google-zxing.version}</version>
+            </dependency>
+
+            <!-- 获取系统信息 -->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
             </dependency>
 
         </dependencies>

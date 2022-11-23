@@ -23,12 +23,12 @@ public class HomeVO {
     /**
      * 我的托管量
      */
-    private String trusteeshipAmount="268,578.89";
+    private String trusteeshipAmount;
 
     /**
      * 总托管量
      */
-    private String totalTrusteeshipAmount="1,200,000.00";
+    private String totalTrusteeshipAmount;
 
     /**
      * 周收益率

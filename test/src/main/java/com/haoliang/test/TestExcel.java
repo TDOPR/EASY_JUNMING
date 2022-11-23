@@ -1,8 +1,8 @@
 package com.haoliang.test;
 
 import com.alibaba.excel.util.ListUtils;
-import com.haoliang.common.utils.DateUtil;
-import com.haoliang.common.utils.excel.ExcelUtil;
+import com.haoliang.common.util.DateUtil;
+import com.haoliang.common.util.excel.ExcelUtil;
 
 import java.util.List;
 

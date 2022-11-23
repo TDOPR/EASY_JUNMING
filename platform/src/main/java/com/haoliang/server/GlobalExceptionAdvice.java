@@ -1,7 +1,7 @@
 package com.haoliang.server;
 
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.ErrorLogUtil;
+import com.haoliang.common.util.ErrorLogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;

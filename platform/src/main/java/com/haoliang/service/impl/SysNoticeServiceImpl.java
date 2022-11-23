@@ -3,7 +3,7 @@ package com.haoliang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.mapper.SysNoticeMapper;
 import com.haoliang.mapper.SysNoticeUserMapper;
 import com.haoliang.model.SysNotice;
@@ -40,7 +40,7 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
 
     @Override
     public JsonResult<List<SysNoticeVO>> findMyNoticeList(String token, Integer type) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         List<SysNoticeVO> list;
         if (type == 1) {
             list = sysNoticeUserMapper.findMyNoticeListByUserIdAndCN(userId);
@@ -52,7 +52,7 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
 
     @Override
     public JsonResult deleteUserNoticeById(String token, Integer id) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         sysNoticeUserMapper.delete(new LambdaQueryWrapper<SysNoticeUser>()
                 .eq(SysNoticeUser::getNoticeId, id)
                 .eq(SysNoticeUser::getUserId, userId)

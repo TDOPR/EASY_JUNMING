@@ -8,7 +8,7 @@ import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.vo.PageVO;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.SysMessage;
 import com.haoliang.model.SysNotice;
 import com.haoliang.model.condition.SysNoticeCondition;
@@ -72,7 +72,7 @@ public class SysNoticeController {
      * @param type 1=中文 0=英文
      */
     @GetMapping("/{type}")
-    public JsonResult<List<SysNoticeVO>> findMyNoticeList(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token,@PathVariable Integer type){
+    public JsonResult<List<SysNoticeVO>> findMyNoticeList(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token, @PathVariable Integer type){
         return sysNoticeService.findMyNoticeList(token,type);
     }
 
@@ -81,7 +81,7 @@ public class SysNoticeController {
      * @param id 公告Id
      */
     @DeleteMapping("/{id}")
-    public JsonResult deleteUserNoticeById(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token,@PathVariable Integer id){
+    public JsonResult deleteUserNoticeById(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token,@PathVariable Integer id){
         return sysNoticeService.deleteUserNoticeById(token,id);
     }
 

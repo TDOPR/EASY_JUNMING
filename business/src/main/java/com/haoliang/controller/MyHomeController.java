@@ -2,7 +2,7 @@ package com.haoliang.controller;
 
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.dto.AppUserDTO;
 import com.haoliang.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class MyHomeController {
      * 修改个人信息
      */
     @PostMapping("/modifyUserDetail")
-    public JsonResult modifyUserDetail(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token, @RequestBody AppUserDTO appUserDTO){
+    public JsonResult modifyUserDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token, @RequestBody AppUserDTO appUserDTO){
         return  appUserService.modifyUserDetail(token,appUserDTO);
     }
 
@@ -33,7 +33,7 @@ public class MyHomeController {
      * 上传头像
      */
     @PostMapping("/uploadHeadImage")
-    public JsonResult uploadHeadImage(@RequestParam("file")MultipartFile file, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token) throws Exception{
+    public JsonResult uploadHeadImage(@RequestParam("file")MultipartFile file, @RequestHeader(JwtTokenUtil.TOKEN_NAME)String token) throws Exception{
         return appUserService.uploadHeadImage(token,file);
     }
 
@@ -41,8 +41,8 @@ public class MyHomeController {
      * 修改密码
      */
     @PostMapping("/updatePassword")
-    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token) {
-        updatePasswordDTO.setUserId(JwtTokenUtils.getUserIdFromToken(token));
+    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME)String token) {
+        updatePasswordDTO.setUserId(JwtTokenUtil.getUserIdFromToken(token));
         return appUserService.updatePassword(updatePasswordDTO);
     }
 

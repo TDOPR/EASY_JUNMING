@@ -1,7 +1,7 @@
 package com.haoliang.controller;
 
 import com.haoliang.common.annotation.RedisLock;
-import com.haoliang.common.utils.redis.RedisUtils;
+import com.haoliang.common.util.redis.RedisUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +22,10 @@ public class TestRedisLockController {
     @GetMapping("/testRedidLock")
     @RedisLock(retry = 3)
     public String testRedidLock() {
-        Integer shopNumber = RedisUtils.getCacheObject("shop:number");
+        Integer shopNumber = RedisUtil.getCacheObject("shop:number");
         if (shopNumber > 0) {
             shopNumber--;
-            RedisUtils.setCacheObject("shop:number", shopNumber);
+            RedisUtil.setCacheObject("shop:number", shopNumber);
             return "抢购成功!";
         } else {
             return "余量不足!";

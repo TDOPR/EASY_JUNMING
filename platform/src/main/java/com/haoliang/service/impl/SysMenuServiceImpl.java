@@ -2,9 +2,10 @@ package com.haoliang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.enums.RoleTypeEnum;
 import com.haoliang.mapper.SysMenuMapper;
 import com.haoliang.mapper.SysRoleMenuMapper;
@@ -31,7 +32,7 @@ import java.util.List;
  * @date 2021-04-15 14:53
  */
 @Service
-@CacheConfig(cacheNames = "sys_menu")
+@CacheConfig(cacheNames = CacheKeyPrefixConstants.SYS_MENU)
 @Slf4j
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
 
@@ -44,7 +45,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Autowired
     private SysRoleService sysRoleService;
 
-    @Cacheable(key = "findAll")
+    @Cacheable(key = "'findAll'")
     @Override
     public JsonResult findAll() {
         return JsonResult.successResult(sysMenuMapper.findAllByParentIdOrderBySortIndexAsc());
@@ -53,6 +54,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Cacheable(key = "#roleId")
     @Override
     public JsonResult<RouterVO> findAllByRoleId(Integer roleId) {
+        log.info("缓存未命中,查询菜单权限数据并缓存");
         RouterVO routerVO = new RouterVO();
         List<MenuVO> sysMenus;
         List<String> authorityList;
@@ -86,7 +88,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
             }
         }
         this.saveOrUpdateBatch(saveSysMenuList);
-        return JsonResult.successResult(this.findAllByRoleCode(JwtTokenUtils.getRoleCodeFromToken(token)));
+        return JsonResult.successResult(this.findAllByRoleCode(JwtTokenUtil.getRoleCodeFromToken(token)));
     }
 
 
@@ -145,6 +147,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Cacheable(key = "'authority:' +#roleId")
     @Override
     public List<String> findAuthorityByRoleId(Integer roleId) {
+        log.info("缓存未命中,查询权限数据并缓存");
         List<String> authorityList;
         if (roleId.equals(RoleTypeEnum.ADMIN.getCode())) {
             authorityList = sysMenuMapper.findAllAuthority();

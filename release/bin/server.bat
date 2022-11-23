@@ -28,7 +28,7 @@ set SERVER_JAR=lib/%SERVER_NAME%-%VERSION%.jar
 
 set JAVA_OPT=-Xms2g -Xmx2g -Xmn1g -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=320m -XX:+UseG1GC
 set JAVA_OPT=%JAVA_OPT% -XX:-OmitStackTraceInFastThrow -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=logs/dump/%SERVER_NAME%_heapdump.hprof
-
+set JAVA_OPT=%JAVA_OPT% -Dloader.path=lib/common,lib/platform
 @REM Java JVM tuning settings for dev environment  print GC Log
 @REM set JAVA_OPT=%JAVA_OPT% -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps
 @REM set JAVA_OPT=%JAVA_OPT% -Xloggc:logs/gc/%SERVER_NAME%-gc.log

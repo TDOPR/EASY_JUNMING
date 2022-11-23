@@ -18,16 +18,13 @@ import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.utils.*;
-import com.haoliang.common.utils.redis.RedisUtils;
+import com.haoliang.common.util.*;
+import com.haoliang.common.util.encrypt.AESUtil;
+import com.haoliang.common.util.redis.RedisUtil;
+import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.enums.RobotEnum;
-import com.haoliang.mapper.AddressPoolMapper;
-import com.haoliang.mapper.AppUserMapper;
-import com.haoliang.mapper.AppVersionsMapper;
-import com.haoliang.model.AppUsers;
-import com.haoliang.model.AppVersions;
-import com.haoliang.model.TreePath;
-import com.haoliang.model.Wallets;
+import com.haoliang.mapper.*;
+import com.haoliang.model.*;
 import com.haoliang.model.condition.AppUsersCondition;
 import com.haoliang.model.dto.AppUserDTO;
 import com.haoliang.model.dto.AppUserLoginDTO;
@@ -35,11 +32,9 @@ import com.haoliang.model.dto.AppUserRegisterDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
 import com.haoliang.model.vo.AppTokenVO;
 import com.haoliang.model.vo.AppUsersVO;
+import com.haoliang.model.vo.BusinessVO;
 import com.haoliang.model.vo.HomeVO;
-import com.haoliang.service.AppUserService;
-import com.haoliang.service.DayRateService;
-import com.haoliang.service.TreePathService;
-import com.haoliang.service.WalletsService;
+import com.haoliang.service.*;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,22 +80,27 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Resource
     private AppVersionsMapper appVersionsMapper;
 
+    @Resource
+    private AppUserWithdrawMapper appUserWithdrawMapper;
+
+    @Resource
+    private WalletLogsMapper walletLogsMapper;
 
     @Override
     public JsonResult home(String token) {
         Integer robotLevel = 0;
         BigDecimal principalAmount = BigDecimal.ZERO;
         //判断当前用户是否登录
-        if (!JwtTokenUtils.isTokenExpired(token)) {
-            Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        if (!JwtTokenUtil.isTokenExpired(token)) {
+            Integer userId = JwtTokenUtil.getUserIdFromToken(token);
             Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
             robotLevel = wallets.getRobotLevel();
             principalAmount = wallets.getPrincipalAmount();
         }
         HomeVO homeVO = new HomeVO();
         RobotEnum robotEnum = RobotEnum.levelOf(robotLevel);
-        homeVO.setDayRate(NumberUtils.formatBigDecimalToRateStr(dayRateService.selectNewDayRate(robotLevel)));
-        homeVO.setWeekRate(NumberUtils.formatBigDecimalToRateStr(dayRateService.selectNewWeekRate(robotLevel)));
+        homeVO.setDayRate(NumberUtil.formatBigDecimalToRateStr(dayRateService.selectNewDayRate(robotLevel)));
+        homeVO.setWeekRate(NumberUtil.formatBigDecimalToRateStr(dayRateService.selectNewWeekRate(robotLevel)));
         homeVO.setDayRateSection(robotEnum.getDayRateSection());
         homeVO.setWeekRateSection(robotEnum.getWeekRateSection());
         //总地址
@@ -110,9 +110,9 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         dateTime.minusDays(1);
         homeVO.setAddress((int) this.count(new LambdaQueryWrapper<AppUsers>().ge(AppUsers::getCreateTime, dateTime)));
         //我的托管量和平台托管基恩
-        homeVO.setTrusteeshipAmount(NumberUtils.toMoeny(principalAmount));
+        homeVO.setTrusteeshipAmount(NumberUtil.toMoeny(principalAmount));
         BigDecimal totalAmount = walletsService.getPlatformTotalLockAmount();
-        homeVO.setTotalTrusteeshipAmount(NumberUtils.toMoeny(totalAmount));
+        homeVO.setTotalTrusteeshipAmount(NumberUtil.toMoeny(totalAmount));
         //获取主页显示的折线图数据 TODO
 
         return JsonResult.successResult(homeVO);
@@ -136,16 +136,16 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
                 .eq(AppUsers::getId, appUsers.getId());
         this.update(updateWrapper);
 
-        String token = JwtTokenUtils.getToken(appUsers.getId());
+        String token = JwtTokenUtil.getToken(appUsers.getId());
 
         //单点登录需要删除用户在其它地方登录的Token
         if (SysSettingParam.isEnableSso()) {
-            RedisUtils.deleteObjects(CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":*");
+            RedisUtil.deleteObjects(CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":*");
         }
         AppVersions appVersions = appVersionsMapper.selectOne(new LambdaQueryWrapper<AppVersions>().eq(AppVersions::getSystemName, appUserLoginDTO.getSystemName()));
         //把token存储到缓存中
-        String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtils.simpleUUID();
-        RedisUtils.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
+        String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtil.simpleUUID();
+        RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(appUsers.getEmail(), localIp, 2));
 
         //返回token给客户端
@@ -161,7 +161,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Transactional
     public JsonResult register(AppUserRegisterDTO appUserRegisterDTO) {
         String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + appUserRegisterDTO.getUuid();
-        String code = RedisUtils.getCacheObject(cacheKey);
+        String code = RedisUtil.getCacheObject(cacheKey);
         if (code == null) {
             return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_EXPIRE);
         }
@@ -188,7 +188,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
             //设置用户的邀请人ID
             appUsers.setInviteId(inviteUserId);
             //设置密码加密用的盐
-            appUsers.setSalt(IdUtils.simpleUUID());
+            appUsers.setSalt(IdUtil.simpleUUID());
             appUsers.setPassword(AESUtil.encrypt(appUserRegisterDTO.getPassword(), appUsers.getSalt()));
             this.save(appUsers);
 
@@ -205,7 +205,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
             TreePath treePath = TreePath.builder()
                     .ancestor(appUsers.getId())
                     .descendant(appUsers.getId())
-                    .level(1)
+                    .level(0)
                     .build();
             treePathService.save(treePath);
             if (inviteUserId != null) {
@@ -221,7 +221,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     @Override
     public JsonResult findPassword(FindPasswordDTO findPasswordDTO) {
         String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + findPasswordDTO.getUuid();
-        String code = RedisUtils.getCacheObject(cacheKey);
+        String code = RedisUtil.getCacheObject(cacheKey);
         if (code == null) {
             return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_EXPIRE);
         }
@@ -242,12 +242,12 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
      * 生成唯一邀请码
      */
     private String getInviteCode() {
-        String inviteCode = IdUtils.generateShortUUID(8);
+        String inviteCode = IdUtil.generateShortUUID(8);
         AppUsers exists;
         while (true) {
             exists = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getInviteCode, inviteCode));
             if (exists != null) {
-                inviteCode = IdUtils.generateShortUUID(8);
+                inviteCode = IdUtil.generateShortUUID(8);
             } else {
                 break;
             }
@@ -271,14 +271,14 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         updateWrapper.lambda()
                 .set(AppUsers::getNickName, appUserDTO.getNickName())
                 .set(AppUsers::getAutograph, appUserDTO.getAutograph())
-                .eq(AppUsers::getId, JwtTokenUtils.getUserIdFromToken(token));
+                .eq(AppUsers::getId, JwtTokenUtil.getUserIdFromToken(token));
         boolean flag = this.update(updateWrapper);
         return JsonResult.build(flag);
     }
 
     @Override
     public JsonResult uploadHeadImage(String token, MultipartFile file) throws Exception {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
 
         String suffix = FileUtil.getSuffix(file.getOriginalFilename());
         String fileName = userId + "." + suffix;
@@ -289,7 +289,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();
         updateWrapper.lambda()
                 .set(AppUsers::getHeadImage, url)
-                .eq(AppUsers::getId, JwtTokenUtils.getUserIdFromToken(token));
+                .eq(AppUsers::getId, JwtTokenUtil.getUserIdFromToken(token));
         boolean flag = this.update(updateWrapper);
 
         if (flag) {
@@ -313,5 +313,21 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
             return JsonResult.successResult();
         }
         return JsonResult.failureResult(ReturnMessageEnum.ORIGINAL_PASSWORD_ERROR);
+    }
+
+    @Override
+    public BusinessVO getBusinessVO() {
+        BigDecimal totalRecharge = walletLogsMapper.sumTotalAmountByType(FlowingTypeEnum.RECHARGE.getValue());
+        BigDecimal totalWithdraw = walletLogsMapper.sumTotalAmountByType(FlowingTypeEnum.WITHDRAWAL.getValue());
+
+        BusinessVO businessVO = BusinessVO.builder()
+                .onlineUserSize(sysLoginLogService.getTodayLoginCount())
+                .totalUserSize((int) this.count())
+                .totalTrusteeship(NumberUtil.toMoeny(walletsService.getPlatformTotalLockAmount()))
+                .ToBeReviewedSize(appUserWithdrawMapper.selectCount(new LambdaQueryWrapper<AppUserWithdraw>().eq(AppUserWithdraw::getAuditStatus, 0)).intValue())
+                .totalRecharge(NumberUtil.toMoeny(totalRecharge))
+                .totalWithdraw(NumberUtil.toMoeny(totalWithdraw))
+                .build();
+        return businessVO;
     }
 }

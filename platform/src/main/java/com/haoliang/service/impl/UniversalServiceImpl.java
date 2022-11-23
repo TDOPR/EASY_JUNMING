@@ -3,9 +3,9 @@ package com.haoliang.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.DateUtil;
-import com.haoliang.common.utils.IdWorkerUtil;
-import com.haoliang.common.utils.excel.ExcelUtil;
+import com.haoliang.common.util.IdUtil;
+import com.haoliang.common.util.StringUtil;
+import com.haoliang.common.util.excel.ExcelUtil;
 import com.haoliang.enums.ConditionTypeEnum;
 import com.haoliang.model.MetaColumn;
 import com.haoliang.model.MetaInfo;
@@ -20,7 +20,6 @@ import com.haoliang.service.UniversalService;
 import io.jsonwebtoken.lang.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -59,7 +58,7 @@ public class UniversalServiceImpl implements UniversalService {
         List<Object> condition = new ArrayList<>();
         //拼接查询条件
         for (ConditionFiled conditionFiled : conditionFiledList) {
-            if (StringUtils.hasText(conditionFiled.getValue())) {
+            if (StringUtil.isNotBlank(conditionFiled.getValue())) {
                 if (conditionFiled.getType() == ConditionTypeEnum.EQUALS) {
                     querySql.append(" and ").append(conditionFiled.getCode());
                     querySql.append(" =?");
@@ -75,7 +74,7 @@ public class UniversalServiceImpl implements UniversalService {
                 querySql.append(" and ").append(conditionFiled.getCode()).append(">=?");
                 condition.add(conditionFiled.getBetweenValue().get(0));
                 querySql.append(" and ").append(conditionFiled.getCode()).append("<=?");
-                condition.add(DateUtil.getDateStrIncrement(conditionFiled.getBetweenValue().get(1)));
+                //condition.add(DateUtil.getDateStrIncrement(conditionFiled.getBetweenValue().get(1)));
             }
         }
 
@@ -169,7 +168,7 @@ public class UniversalServiceImpl implements UniversalService {
             valueSb.deleteCharAt(valueSb.length() - 1);
             sql.append(") values(");
             if (!metaInfo.isIncrement()) {
-                sql.append("'").append(IdWorkerUtil.getId()).append("',");
+                sql.append("'").append(IdUtil.getSnowflakeNextId()).append("',");
             }
             sql.append(valueSb);
             sql.append(")");

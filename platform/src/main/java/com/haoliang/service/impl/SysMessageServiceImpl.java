@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.ResponseUtils;
+import com.haoliang.common.util.ResponseUtil;
 import com.haoliang.mapper.SysMessageMapper;
 import com.haoliang.model.SysMessage;
 import com.haoliang.service.SysMessageService;
@@ -53,6 +53,6 @@ public class SysMessageServiceImpl extends ServiceImpl<SysMessageMapper, SysMess
             zhTw.put(sysMessage.getKeyName(), sysMessage.getZhTw());
             enUs.put(sysMessage.getKeyName(), sysMessage.getEnUs());
         }
-        ResponseUtils.exportJson(httpServletResponse, data.toJSONString(), "msg");
+        ResponseUtil.exportJson(httpServletResponse, data.toJSONString(), "msg");
     }
 }

@@ -1,6 +1,6 @@
 package com.haoliang.listen;
 
-import com.haoliang.common.utils.redis.RedisUtils;
+import com.haoliang.common.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ public class TestInitListen implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        RedisUtils.setCacheObject("shop:number", 5);
+        RedisUtil.setCacheObject("shop:number", 5);
     }
 
 }

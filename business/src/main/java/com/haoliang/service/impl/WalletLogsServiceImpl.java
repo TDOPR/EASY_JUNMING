@@ -3,7 +3,7 @@ package com.haoliang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.*;
+import com.haoliang.common.util.*;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.mapper.WalletLogsMapper;
@@ -68,7 +68,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         for (WalletLogs walletLogs : walletLogsList) {
             walletLogVOList.add(WalletLogVO.builder()
                     .createTime(walletLogs.getCreateTime().toLocalDate().toString())
-                    .amount(NumberUtils.toMoeny(walletLogs.getAmount()))
+                    .amount(NumberUtil.toMoeny(walletLogs.getAmount()))
                     .name(FlowingTypeEnum.getDescByValue(walletLogs.getType()))
                     .status(walletLogs.getAction())
                     .build());
@@ -83,7 +83,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
 
     @Override
     public JsonResult<WalletLogsDetailVO> getMybillDetails(String token, BillDetailsDTO billDetailsDTO) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
 
         //查询钱包流水中第一笔流水的时间
         DateSection dateSection = walletLogsMapper.getDateSection(userId);
@@ -134,7 +134,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         }
 
         //需要对数据分组,合并代理收益
-        LinkedHashMap<String, List<WalletLogVO>> localDateListMap = GroupByUtils.collectionToMap(walletLogVOList, new GroupByUtils.GroupBy<String, WalletLogVO>() {
+        LinkedHashMap<String, List<WalletLogVO>> localDateListMap = GroupByUtil.collectionToMap(walletLogVOList, new GroupByUtil.GroupBy<String, WalletLogVO>() {
             @Override
             public String groupBy(WalletLogVO row) {
                 return row.getCreateTime();
@@ -170,7 +170,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
                     dynamicAmount = dynamicAmount.add(walletLogVO.getBigDecimalAmount());
                 } else {
                     walletLogVO.setName(FlowingTypeEnum.getWalletDescByValue(walletLogVO.getType()));
-                    walletLogVO.setAmount(NumberUtils.toUSD(walletLogVO.getBigDecimalAmount()));
+                    walletLogVO.setAmount(NumberUtil.toUSD(walletLogVO.getBigDecimalAmount()));
                     resultList.add(walletLogVO);
                     set.add(walletLogVO.getType());
                 }
@@ -181,7 +181,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
                 resultList.add(WalletLogVO.builder()
                         .createTime(entry.getKey())
                         .yearMonth(StringUtil.substring(entry.getKey(), 0, entry.getKey().lastIndexOf("-")))
-                        .amount(NumberUtils.toUSD(dynamicAmount))
+                        .amount(NumberUtil.toUSD(dynamicAmount))
                         .status(1)
                         .name("动态收益存入")
                         .build());
@@ -191,7 +191,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         }
 
         //根据年月对数据进行分组
-        LinkedHashMap<String, List<WalletLogVO>> resultMap = GroupByUtils.collectionToMap(resultList, new GroupByUtils.GroupBy<String, WalletLogVO>() {
+        LinkedHashMap<String, List<WalletLogVO>> resultMap = GroupByUtil.collectionToMap(resultList, new GroupByUtil.GroupBy<String, WalletLogVO>() {
             @Override
             public String groupBy(WalletLogVO row) {
                 return row.getYearMonth();
@@ -202,8 +202,8 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         viewTypeList.stream().sorted();
 
         return JsonResult.successResult(WalletLogsDetailVO.builder()
-                .deposit(NumberUtils.toMoeny(deposit))
-                .takeOut(NumberUtils.toMoeny(takeOut))
+                .deposit(NumberUtil.toMoeny(deposit))
+                .takeOut(NumberUtil.toMoeny(takeOut))
                 .walletLogMap(resultMap)
                 .typeList(WalletLogsDetailVO.buildTypeList(viewTypeList))
                 .dateSectionList(dateSelectVOList)
@@ -234,7 +234,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
 
     @Override
     public JsonResult<ProfitLogsDetailVO> quantificationDetail(String token) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         List<ProfitLogs> profitLogsList = profitLogsService.list(new LambdaQueryWrapper<ProfitLogs>()
                 .select(ProfitLogs::getPrincipal, ProfitLogs::getGeneratedAmount, ProfitLogs::getStatus, ProfitLogs::getCreateTime)
                 .orderByDesc(ProfitLogs::getCreateTime)
@@ -250,18 +250,18 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
             }
             profitLogsVOList.add(ProfitLogsDetailVO.ProfitLogsVO.builder()
                     .createTime(profitLogs.getCreateTime().toLocalDate().toString())
-                    .generatedAmount(NumberUtils.toTwoDecimal(profitLogs.getGeneratedAmount()))
-                    .principal(NumberUtils.toTwoDecimal(profitLogs.getPrincipal()))
+                    .generatedAmount(NumberUtil.toTwoDecimal(profitLogs.getGeneratedAmount()))
+                    .principal(NumberUtil.toTwoDecimal(profitLogs.getPrincipal()))
                     .status(profitLogs.getStatus())
                     .build());
         }
 
-        return JsonResult.successResult(new ProfitLogsDetailVO(NumberUtils.toTwoDecimal(settled), NumberUtils.toTwoDecimal(noSettled), profitLogsVOList));
+        return JsonResult.successResult(new ProfitLogsDetailVO(NumberUtil.toTwoDecimal(settled), NumberUtil.toTwoDecimal(noSettled), profitLogsVOList));
     }
 
     @Override
     public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(String token) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         List<WalletLogs> walletLogsList = this.list(new LambdaQueryWrapper<WalletLogs>()
                 .select(WalletLogs::getCreateTime, WalletLogs::getAmount, WalletLogs::getType)
                 .eq(WalletLogs::getUserId, userId)
@@ -276,7 +276,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
             typeName = FlowingTypeEnum.getDescByValue(walletLogs.getType());
             walletLogVOList.add(WalletLogVO.builder()
                     .createTime(walletLogs.getCreateTime().toLocalDate().toString())
-                    .amount(NumberUtils.toMoeny(walletLogs.getAmount()))
+                    .amount(NumberUtil.toMoeny(walletLogs.getAmount()))
                     .name(typeName)
                     .build());
             set.add(typeName);

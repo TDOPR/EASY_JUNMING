@@ -16,9 +16,12 @@ import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.utils.*;
-import com.haoliang.common.utils.excel.ExcelUtil;
-import com.haoliang.common.utils.redis.RedisUtils;
+import com.haoliang.common.util.*;
+import com.haoliang.common.util.encrypt.AESUtil;
+import com.haoliang.common.util.encrypt.RSAUtil;
+import com.haoliang.common.util.excel.ExcelUtil;
+import com.haoliang.common.util.google.GoogleAuthenticatorUtil;
+import com.haoliang.common.util.redis.RedisUtil;
 import com.haoliang.config.LoginConfig;
 import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysUserMapper;
@@ -45,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.haoliang.common.utils.QRCodeUtil.generateQRCodeImg;
+import static com.haoliang.common.util.google.QRCodeUtil.generateQRCodeImg;
 
 
 /**
@@ -81,13 +84,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (jsonResult.getCode() != HttpStatus.OK.value()) {
             return jsonResult;
         }
-
+        //对前端加密过的数据进行解密
+        //String password = RSAUtil.decryptString(loginDTO.getPassword());
+        String password = loginDTO.getPassword();
         SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, loginDTO.getUsername()).eq(SysUser::getDeleted, 0));
         //登录状态标识
         boolean loginFlag = true;
         if (sysUser == null) {
             return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_NOT_EXISTS);
-        } else if (!sysUser.getPassword().equals(AESUtil.encrypt(loginDTO.getPassword(), sysUser.getSalt()))) {
+        } else if (!sysUser.getPassword().equals(AESUtil.encrypt(password, sysUser.getSalt()))) {
             loginFlag = false;
         } else if (sysUser.getEnabled() == 0) {
             return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_DISABLED);
@@ -105,15 +110,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             return JsonResult.failureResult(ReturnMessageEnum.PASSWORD_ERROR);
         }
 
-        String tokenKey = CacheKeyPrefixConstants.TOKEN + sysUser.getId() + ":" + IdUtils.simpleUUID();
+        String tokenKey = CacheKeyPrefixConstants.TOKEN + sysUser.getId() + ":" + IdUtil.simpleUUID();
         SysRole sysRole = sysRoleMapper.selectById(sysUser.getRoleId());
-        String token = JwtTokenUtils.getToken(sysUser.getId(), sysUser.getUsername(), sysRole.getRoleCode(), sysRole.getId());
+        String token = JwtTokenUtil.getToken(sysUser.getId(), sysUser.getUsername(), sysRole.getRoleCode(), sysRole.getId());
 
         //单点登录需要删除用户在其它地方登录的Token
         if (SysSettingParam.isEnableSso()) {
-            RedisUtils.deleteObjects(CacheKeyPrefixConstants.TOKEN + sysUser.getId() + ":*");
+            RedisUtil.deleteObjects(CacheKeyPrefixConstants.TOKEN + sysUser.getId() + ":*");
         }
-        RedisUtils.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
+        RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp, 1));
         return JsonResult.successResult(new TokenVO(tokenKey));
     }
@@ -126,8 +131,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         if (sysUser.getId() == null) {
             //设置密码加密使用的盐
-            sysUser.setSalt(IdUtils.simpleUUID());
-            sysUser.setGoogleSecret(GoogleAuthenticatorUtils.genSecret(sysUser.getUsername(), loginConfig.getCaptcha().getGoogleHost()));
+            sysUser.setSalt(IdUtil.simpleUUID());
+            sysUser.setGoogleSecret(GoogleAuthenticatorUtil.genSecret(sysUser.getUsername(), loginConfig.getCaptcha().getGoogleHost()));
             sysUser.setPassword(AESUtil.encrypt(sysUser.getPassword(), sysUser.getSalt()));
             this.save(sysUser);
         } else {
@@ -137,7 +142,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
                     .set(SysUser::getName, sysUser.getName())
                     .set(SysUser::getMobile, sysUser.getMobile())
                     .set(SysUser::getEmail, sysUser.getEmail())
-                    .set(SysUser::getEnabled,sysUser.getEnabled())
+                    .set(SysUser::getEnabled, sysUser.getEnabled())
                     //.set(SysUser::getChannelId, sysUser.getChannelId())
                     .eq(SysUser::getId, sysUser.getId());
             update(wrapper);
@@ -179,11 +184,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO) {
         SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getSalt, SysUser::getPassword).eq(SysUser::getId, updatePasswordDTO.getUserId()));
-        String oldPwd = AESUtil.encrypt(updatePasswordDTO.getOldPassword(), sysUser.getSalt());
+        String oldPwd = RSAUtil.decryptString(updatePasswordDTO.getOldPassword());
+        oldPwd = AESUtil.encrypt(oldPwd, sysUser.getSalt());
         if (sysUser.getPassword().equals(oldPwd)) {
+            String password = RSAUtil.decryptString(updatePasswordDTO.getPassword());
             UpdateWrapper<SysUser> wrapper = Wrappers.update();
             wrapper.lambda()
-                    .set(SysUser::getPassword, AESUtil.encrypt(updatePasswordDTO.getPassword(), sysUser.getSalt()))
+                    .set(SysUser::getPassword, AESUtil.encrypt(password, sysUser.getSalt()))
                     .eq(SysUser::getId, updatePasswordDTO.getUserId());
             update(wrapper);
             return JsonResult.successResult();
@@ -211,7 +218,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (loginConfig.getCaptcha().isEnable() && !loginConfig.getCaptcha().isGoogle()) {
             //后台图片验证码
             String cacheKey = CacheKeyPrefixConstants.CAPTCHA_CODE + loginDTO.getUuid();
-            String code = RedisUtils.getCacheObject(cacheKey);
+            String code = RedisUtil.getCacheObject(cacheKey);
             if (code == null) {
                 return JsonResult.failureResult(ReturnMessageEnum.VERIFICATION_CODE_EXPIRE);
             } else if (!code.equals(loginDTO.getCode())) {
@@ -230,7 +237,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             if (StringUtil.isAnyBlank(code, googleSecret)) {
                 return false;
             }
-            return GoogleAuthenticatorUtils.authcode(code, googleSecret);
+            return GoogleAuthenticatorUtil.authcode(code, googleSecret);
         }
         return true;
     }
@@ -241,7 +248,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     private boolean isLock(String username) {
         if (loginConfig.isEnableErrorLock()) {
             String cacheKey = CacheKeyPrefixConstants.PWD_ERROR_COUNT + username;
-            Integer errorNumber = RedisUtils.getCacheObject(cacheKey);
+            Integer errorNumber = RedisUtil.getCacheObject(cacheKey);
             if (errorNumber != null && errorNumber.equals(loginConfig.getMaxErrorNumber())) {
                 return true;
             }
@@ -258,12 +265,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             String cacheKey = CacheKeyPrefixConstants.PWD_ERROR_COUNT + username;
             if (loginFlag) {
                 // 如果登录成功,清除之前的缓存
-                RedisUtils.deleteObject(cacheKey);
+                RedisUtil.deleteObject(cacheKey);
             } else {
                 // 获取用户登录错误次数,然后累加1
-                Integer errorNumber = RedisUtils.getCacheObject(cacheKey);
+                Integer errorNumber = RedisUtil.getCacheObject(cacheKey);
                 errorNumber = errorNumber == null ? 1 : errorNumber + 1;
-                RedisUtils.setCacheObject(cacheKey, errorNumber, Duration.ofSeconds(loginConfig.getLockTime()));
+                RedisUtil.setCacheObject(cacheKey, errorNumber, Duration.ofSeconds(loginConfig.getLockTime()));
             }
         }
     }
@@ -284,8 +291,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     @Override
     public void generateGoogleQRCode(Integer userId, HttpServletResponse response) throws Exception {
         SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getUsername, SysUser::getGoogleSecret).eq(SysUser::getId, userId));
-        String url = GoogleAuthenticatorUtils.getQRBarcodeURL(sysUser.getUsername(), loginConfig.getCaptcha().getGoogleHost(), sysUser.getGoogleSecret());
+        String url = GoogleAuthenticatorUtil.getQRBarcodeURL(sysUser.getUsername(), loginConfig.getCaptcha().getGoogleHost(), sysUser.getGoogleSecret());
         String filePath = generateQRCodeImg(GlobalConfig.getTmpSavePath(), url);
-        ResponseUtils.downloadFileByLocal(response, new File(filePath), ContentTypeEnum.PNG);
+        ResponseUtil.downloadFileByLocal(response, new File(filePath), ContentTypeEnum.PNG);
     }
 }

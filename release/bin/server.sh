@@ -13,6 +13,7 @@ console_out="logs/platform-console-out.log"
 JAVA_OPT="-Xms2g -Xmx2g -Xmn1g -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=256m -XX:+UseG1GC"
 JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${BASE_DIR}/logs/heapdump/${server_name}_heapdump.hprof"
 #JAVA_OPT="${JAVA_OPT} -XX:+PrintGCDetails -Xloggc:logs/gc/${server_name}-gc.log"
+JAVA_OPT="${JAVA_OPT} -Dloader.path=lib/common,lib/platform"
 
 cd $BASE_DIR
 

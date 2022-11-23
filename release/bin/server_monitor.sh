@@ -22,13 +22,6 @@ SYSTEM_IDLE=`echo ${NEXT_SYS_IDLE} ${LAST_SYS_IDLE} | awk '{print $1-$2}'`
 TOTAL_TIME=`echo ${NEXT_TOTAL_CPU_T} ${LAST_TOTAL_CPU_T} | awk '{print $1-$2}'`
 CPU_USAGE=`echo ${SYSTEM_IDLE} ${TOTAL_TIME} | awk '{printf "%.2f", 100-$1/$2*100}'`
 
-
-
-#获取磁盘使用率
-used=`df -k | grep -v "tmpfs" | egrep -A 1 "mapper|sd" | awk 'NF>1{print $(NF-3)}' | awk -v used=0 '{used+=$1}END{printf "%.2f\n",used/1048576}'`
-totald=` df -k | grep -v "tmpfs" | egrep -A 1 "mapper|sd" | awk 'NF>1{print $(NF-4)}' | awk -v used=0 '{used+=$1}END{printf "%.2f\n",used/1048576}'`
-diskUsage=`awk 'BEGIN{printf "%.2f\n",('$used'/'$totald')*100}'`
-
 #获取内存使用率
 mem_used=`free | grep Mem | awk '{print $3}'` 
 mem_total=`free | grep Mem | awk '{print $2}'` 
@@ -38,7 +31,6 @@ mem_used=`awk 'BEGIN{printf "%.2f\n",('$mem_used'/1048576)}'`
 mem_total=`awk 'BEGIN{printf "%.2f\n",('$mem_total'/1048576)}'`
 
 echo  $CPU_USAGE
-echo "user=${used} totald=${totald} diskUsage=${diskUsage}"
 echo "user=${mem_used} totald=${mem_total} memUsage=${mem_used_persent}"
 nvidia-smi
 

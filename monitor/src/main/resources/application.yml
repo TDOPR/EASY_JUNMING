@@ -21,7 +21,7 @@ spring:
         # 启动注册到监控中心
         enabled: true
         #监控中心地址,多个以逗号隔开,并把localhost换成ip
-        url: http://localhost:9091
+        url: http://localhost:${server.port}
         instance:
           prefer-ip: true
         register-once: false

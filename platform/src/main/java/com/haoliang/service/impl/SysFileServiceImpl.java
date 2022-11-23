@@ -9,7 +9,7 @@ import com.haoliang.common.config.AppParam;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.enums.ContentTypeEnum;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.*;
+import com.haoliang.common.util.*;
 import com.haoliang.mapper.SysFileMapper;
 import com.haoliang.model.SysFile;
 import com.haoliang.service.SysFileService;
@@ -35,14 +35,14 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     public void downloadFile(Integer id, HttpServletResponse httpServletResponse) throws Exception {
         SysFile sysFile = this.getById(id);
-        ResponseUtils.downloadFileByLocal(httpServletResponse, new File(sysFile.getFilePath()), ContentTypeEnum.OCTET_STREAM);
+        ResponseUtil.downloadFileByLocal(httpServletResponse, new File(sysFile.getFilePath()), ContentTypeEnum.OCTET_STREAM);
     }
 
     @Override
     public JsonResult deleteByIds(List<Integer> idList) {
         List<SysFile> sysFileList = this.list(new LambdaQueryWrapper<SysFile>().select(SysFile::getFilePath).in(SysFile::getId, idList));
         for (SysFile sysFile : sysFileList) {
-            FileUtils.deleteFile(sysFile.getFilePath());
+            FileUtil.del(sysFile.getFilePath());
         }
         this.removeByIds(idList);
         return JsonResult.successResult();
@@ -51,7 +51,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     @Override
     public JsonResult saveAndUpload(String token, MultipartFile file, String fileName, String fileType, String fileDesc) {
         try {
-            String userName = JwtTokenUtils.getUserNameFromToken(token);
+            String userName = JwtTokenUtil.getUserNameFromToken(token);
             SysFile sysFile = new SysFile();
             sysFile.setFileType(fileType);
             sysFile.setFileDesc(fileDesc);
@@ -60,7 +60,7 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
 
 
             String suffix = FileUtil.getSuffix(file.getOriginalFilename());
-            String saveFileName = IdUtils.simpleUUID() + "." + suffix;
+            String saveFileName = IdUtil.simpleUUID() + "." + suffix;
             String savePath = appParam.getSysfileSavePath();
             String url = GlobalConfig.getVirtualPathURL() + StringUtil.replace(appParam.getSysfileSavePath(), appParam.getRootPath(), "") + saveFileName;
             //复制文件流到本地文件

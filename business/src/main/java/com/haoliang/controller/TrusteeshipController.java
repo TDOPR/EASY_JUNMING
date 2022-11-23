@@ -2,7 +2,7 @@ package com.haoliang.controller;
 
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.dto.AmountDTO;
 import com.haoliang.model.vo.TrusteeshipAmountVO;
 import com.haoliang.service.TrusteeshipService;
@@ -27,7 +27,7 @@ public class TrusteeshipController {
      * 我的量化金额
      */
     @GetMapping
-    public JsonResult<TrusteeshipAmountVO> quantificationAmount(@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
+    public JsonResult<TrusteeshipAmountVO> quantificationAmount(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token){
         return trusteeshipRecharge.getTrusteeshipAmount(token);
     }
 
@@ -36,7 +36,7 @@ public class TrusteeshipController {
      */
     @RepeatSubmit
     @PostMapping("/recharge")
-    public JsonResult entrustWithdrawal(@Valid @RequestBody AmountDTO amountDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
+    public JsonResult entrustWithdrawal(@Valid @RequestBody AmountDTO amountDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME)String token){
         return trusteeshipRecharge.recharge(amountDTO,token);
     }
 
@@ -45,7 +45,7 @@ public class TrusteeshipController {
      */
     @RepeatSubmit
     @PostMapping("/withdrawal")
-    public JsonResult trusteeshipWithdrawal(@Valid @RequestBody AmountDTO amountDTO,@RequestHeader(JwtTokenUtils.TOKEN_NAME)String token){
+    public JsonResult trusteeshipWithdrawal(@Valid @RequestBody AmountDTO amountDTO,@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token){
         return trusteeshipRecharge.withdrawal(amountDTO,token);
     }
 

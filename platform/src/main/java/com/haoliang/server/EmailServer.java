@@ -1,7 +1,7 @@
 package com.haoliang.server;
 
 
-import com.haoliang.common.utils.SpringUtil;
+import com.haoliang.common.util.SpringUtil;
 import com.haoliang.config.EmailConfig;
 import com.haoliang.model.dto.EmailTemplateDTO;
 import com.sun.mail.util.MailSSLSocketFactory;

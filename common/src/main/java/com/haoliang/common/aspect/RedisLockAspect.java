@@ -2,6 +2,7 @@ package com.haoliang.common.aspect;
 
 import com.haoliang.common.annotation.RedisLock;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
+import com.haoliang.common.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +40,7 @@ public class RedisLockAspect {
         Method method = currentMethod(proceedingJoinPoint);
         RedisLock redisLock = method.getAnnotation(RedisLock.class);
         String methodName = redisLock.name();
-        if (!StringUtils.hasLength(methodName)) {
+        if (StringUtil.isNotBlank(methodName)) {
             //如果注解里没有设置锁的名称,默认使用方法的名称
             methodName = method.getName();
         }

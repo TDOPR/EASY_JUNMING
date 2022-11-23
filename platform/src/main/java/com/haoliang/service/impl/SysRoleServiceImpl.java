@@ -8,7 +8,7 @@ import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.vo.PageVO;
-import com.haoliang.common.utils.StringUtil;
+import com.haoliang.common.util.StringUtil;
 import com.haoliang.enums.RoleTypeEnum;
 import com.haoliang.mapper.SysRoleMapper;
 import com.haoliang.mapper.SysRoleMenuMapper;

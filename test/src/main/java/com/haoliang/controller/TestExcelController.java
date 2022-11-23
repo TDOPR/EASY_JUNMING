@@ -1,7 +1,7 @@
 package com.haoliang.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.haoliang.common.utils.excel.ExcelUtil;
+import com.haoliang.common.util.excel.ExcelUtil;
 import com.haoliang.model.ExcelData;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

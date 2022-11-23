@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
-import com.haoliang.common.utils.NumberUtils;
+import com.haoliang.common.util.JwtTokenUtil;
+import com.haoliang.common.util.NumberUtil;
 import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
@@ -47,7 +47,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
             return JsonResult.failureResult(ReturnMessageEnum.MIN_AMOUNT);
         }
 
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getRobotLevel, Wallets::getPrincipalAmount);
         if (amountDTO.getAmount().subtract(wallets.getWalletAmount()).doubleValue() > 0) {
             //如果提现的金额超过托管金额,则返回错误码
@@ -78,7 +78,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
     @Transactional
     public JsonResult withdrawal(AmountDTO amountDTO, String token) {
         //提现到钱包
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getPrincipalAmount);
         if (amountDTO.getAmount().subtract(wallets.getPrincipalAmount()).doubleValue() > 0) {
             //如果提现的金额超过托管金额,则返回错误码
@@ -100,7 +100,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
 
     @Override
     public JsonResult<TrusteeshipAmountVO> getTrusteeshipAmount(String token) {
-        Integer userId = JwtTokenUtils.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
 
         String robotName = "";
@@ -114,8 +114,8 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
                 .eq(WalletLogs::getUserId, userId).eq(WalletLogs::getType, FlowingTypeEnum.STATIC.getValue()));
         BigDecimal sum = walletLogsList.stream().map(WalletLogs::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         TrusteeshipAmountVO trusteeshipAmountVO = new TrusteeshipAmountVO();
-        trusteeshipAmountVO.setAmount(NumberUtils.toTwoDecimal(wallets.getPrincipalAmount()));
-        trusteeshipAmountVO.setProfit(NumberUtils.toTwoDecimal(sum));
+        trusteeshipAmountVO.setAmount(NumberUtil.toTwoDecimal(wallets.getPrincipalAmount()));
+        trusteeshipAmountVO.setProfit(NumberUtil.toTwoDecimal(sum));
         trusteeshipAmountVO.setRobotName(robotName);
         if (sum.compareTo(BigDecimal.ZERO) == 0) {
             trusteeshipAmountVO.setProfitRate("0.0%");

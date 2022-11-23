@@ -10,8 +10,8 @@ import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
-import com.haoliang.common.utils.IpAddrUtil;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.IpAddrUtil;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.SysUser;
 import com.haoliang.model.condition.SysUserCondition;
 import com.haoliang.model.dto.LoginDTO;
@@ -112,8 +112,8 @@ public class SysUserController {
      * 修改密码
      */
     @PostMapping("/updatePassword")
-    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
-        updatePasswordDTO.setUserId(JwtTokenUtils.getUserIdFromToken(token));
+    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
+        updatePasswordDTO.setUserId(JwtTokenUtil.getUserIdFromToken(token));
         return sysUserService.updatePassword(updatePasswordDTO);
     }
 
@@ -130,8 +130,8 @@ public class SysUserController {
      * 获取用户的菜单权限
      */
     @GetMapping("/getRouters")
-    public JsonResult<RouterVO> getRouters(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
-        return sysMenuService.findAllByRoleCode(JwtTokenUtils.getRoleCodeFromToken(token));
+    public JsonResult<RouterVO> getRouters(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
+        return sysMenuService.findAllByRoleCode(JwtTokenUtil.getRoleCodeFromToken(token));
     }
 
     /**

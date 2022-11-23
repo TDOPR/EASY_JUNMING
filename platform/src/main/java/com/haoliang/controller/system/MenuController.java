@@ -72,7 +72,7 @@ public class MenuController {
 //     */
 //    @OperationLog(module = OperationModel.SYS_MENU, description = OperationAction.RELOAD)
 //    @PostMapping("/reloadMenu")
-//    public JsonResult reloadMenu(@RequestBody List<SysMenu> sysMenus, @RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
+//    public JsonResult reloadMenu(@RequestBody List<SysMenu> sysMenus, @RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
 //        return sysMenuService.reloadMenu(sysMenus, token);
 //    }
 

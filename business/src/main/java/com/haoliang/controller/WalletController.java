@@ -2,7 +2,7 @@ package com.haoliang.controller;
 
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.utils.JwtTokenUtils;
+import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.dto.BillDetailsDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
 import com.haoliang.model.vo.MyWalletsVO;
@@ -35,7 +35,7 @@ public class WalletController {
      * 我的钱包
      */
     @GetMapping
-    public JsonResult<MyWalletsVO> getMyWallet(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
+    public JsonResult<MyWalletsVO> getMyWallet(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
         return walletsService.getMyWallet(token);
     }
 
@@ -44,7 +44,7 @@ public class WalletController {
      */
     @RepeatSubmit
     @PostMapping("/recharge")
-    public JsonResult recharge(@Valid @RequestBody WalletOrderDTO walletOrderDTO, @RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
+    public JsonResult recharge(@Valid @RequestBody WalletOrderDTO walletOrderDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
         return walletsService.recharge(walletOrderDTO, token);
     }
 
@@ -53,7 +53,7 @@ public class WalletController {
      */
     @RepeatSubmit
     @PostMapping("/withdrawal")
-    public JsonResult withdrawal(@Valid @RequestBody WalletOrderDTO walletOrderDTO,@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token) {
+    public JsonResult withdrawal(@Valid @RequestBody WalletOrderDTO walletOrderDTO,@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
         return walletsService.withdrawal(walletOrderDTO,token);
     }
 
@@ -61,7 +61,7 @@ public class WalletController {
      * 账单明细
      */
     @PostMapping("/billDetails")
-    public JsonResult<WalletLogsDetailVO>  billDetails(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token, @RequestBody BillDetailsDTO billDetailsDTO){
+    public JsonResult<WalletLogsDetailVO>  billDetails(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token, @RequestBody BillDetailsDTO billDetailsDTO){
         return walletLogService.getMybillDetails(token,billDetailsDTO);
     }
 
@@ -69,7 +69,7 @@ public class WalletController {
      * 量化收益明细
      */
     @PostMapping("/quantificationDetail")
-    public JsonResult<ProfitLogsDetailVO> quantificationDetail(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token){
+    public JsonResult<ProfitLogsDetailVO> quantificationDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token){
         return walletLogService.quantificationDetail(token);
     }
 
@@ -77,7 +77,7 @@ public class WalletController {
      * 代理收益明细
      */
     @PostMapping("/proxyDetail")
-    public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(@RequestHeader(JwtTokenUtils.TOKEN_NAME) String token){
+    public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token){
         return walletLogService.proxyDetail(token);
     }
 }
