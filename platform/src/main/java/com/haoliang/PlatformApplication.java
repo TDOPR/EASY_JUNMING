@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @SpringBootApplication
 @ImportResource(locations = {"classpath:emailInfo.xml"})
-@MapperScan({"com.haoliang.mapper","com.haoliang.common.mapper","com.haoliang.business.mapper"})
+@MapperScan({"com.haoliang.mapper", "com.haoliang.common.mapper", "com.haoliang.business.mapper"})
 public class PlatformApplication {
 
     public static void main(String[] args) {

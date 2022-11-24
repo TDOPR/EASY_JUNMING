@@ -3,7 +3,6 @@ package com.haoliang.controller;
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.util.JwtTokenUtil;
-import com.haoliang.model.dto.BillDetailsDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
 import com.haoliang.model.vo.MyWalletsVO;
 import com.haoliang.model.vo.ProfitLogsDetailVO;
@@ -61,8 +60,8 @@ public class WalletController {
      * 账单明细
      */
     @PostMapping("/billDetails")
-    public JsonResult<WalletLogsDetailVO>  billDetails(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token, @RequestBody BillDetailsDTO billDetailsDTO){
-        return walletLogService.getMybillDetails(token,billDetailsDTO);
+    public JsonResult<WalletLogsDetailVO>  billDetails(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token){
+        return walletLogService.getMybillDetails(token);
     }
 
     /**

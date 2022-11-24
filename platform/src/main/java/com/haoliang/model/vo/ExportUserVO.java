@@ -1,6 +1,7 @@
 package com.haoliang.model.vo;
 
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.haoliang.common.enums.BooleanEnum;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
@@ -14,7 +15,7 @@ public class ExportUserVO {
 
     public ExportUserVO(UserVO sysUser) {
         BeanUtils.copyProperties(sysUser,this);
-        this.setEnabled(sysUser.getEnabled()==1?"正常":"禁用");
+        this.setEnabled(sysUser.getEnabled().equals(BooleanEnum.TRUE.getIntValue()) ?"正常":"禁用");
     }
 
     @ExcelProperty("用户Id")

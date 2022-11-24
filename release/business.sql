@@ -11,7 +11,7 @@ CREATE TABLE `app_users`  (
   `headImage` varchar(255) NOT NULL DEFAULT '' COMMENT '头像',
   `nickName` varchar(255)  NOT NULL DEFAULT '' COMMENT '用户昵称',
   `autograph` varchar(255)  NOT NULL DEFAULT '' COMMENT '个性签名',
-  `enabled` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户状态： 1-正常 0=禁用',
+  `enabled` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '用户状态： 1-正常 0=禁用',
   `level` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户等级',
   `inviteId` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '邀请人Id',
   `loginCount` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '登录次数',

@@ -9,7 +9,6 @@ import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.mapper.WalletLogsMapper;
 import com.haoliang.model.ProfitLogs;
 import com.haoliang.model.WalletLogs;
-import com.haoliang.model.dto.BillDetailsDTO;
 import com.haoliang.model.dto.DateSection;
 import com.haoliang.model.vo.*;
 import com.haoliang.service.ProfitLogsService;
@@ -82,7 +81,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     }
 
     @Override
-    public JsonResult<WalletLogsDetailVO> getMybillDetails(String token, BillDetailsDTO billDetailsDTO) {
+    public JsonResult<WalletLogsDetailVO> getMybillDetails(String token) {
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
 
         //查询钱包流水中第一笔流水的时间
@@ -91,35 +90,10 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         List<ViewSelectVO> dateSelectVOList = getSelectListByUser(dateSection);
 
 
-        //根据类型查询
-//        List<Integer> typeList = new ArrayList<>();
-//
-//        if (billDetailsDTO.getType() == 0) {
-//            //查询代理收益
-//            typeList.addAll(dynamicTypeList);
-//        } else if (billDetailsDTO.getType() != -1) {
-//            //其它
-//            typeList.add(billDetailsDTO.getType());
-//        }
-
         LambdaQueryWrapper<WalletLogs> lambdaQueryWrapper = new LambdaQueryWrapper<WalletLogs>()
                 .select(WalletLogs::getCreateTime, WalletLogs::getAmount, WalletLogs::getType, WalletLogs::getAction)
                 .eq(WalletLogs::getUserId, userId)
                 .orderByDesc(WalletLogs::getCreateTime);
-
-//        if (!Collections.isEmpty(typeList)) {
-//            lambdaQueryWrapper.in(WalletLogs::getType, typeList);
-//        }
-
-        //判断是否查询所有还是根据指定月份查询
-//        LocalDate beginDate = null, endDate = null;
-//        if (!billDetailsDTO.getYearMonth().equals("-1")) {
-//            //分割年月
-//            String arr[] = billDetailsDTO.getYearMonth().split("-");
-//            beginDate = LocalDate.of(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), 1);
-//            endDate = beginDate.plusMonths(1);
-//            lambdaQueryWrapper.between(WalletLogs::getCreateTime, beginDate, endDate);
-//        }
 
         List<WalletLogs> walletLogsList = this.list(lambdaQueryWrapper);
         List<WalletLogVO> walletLogVOList = new ArrayList<>();

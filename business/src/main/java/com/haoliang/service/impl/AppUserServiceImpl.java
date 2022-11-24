@@ -11,6 +11,7 @@ import com.haoliang.common.config.AppParam;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
+import com.haoliang.common.enums.BooleanEnum;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
@@ -123,7 +124,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         AppUsers appUsers = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getEmail, appUserLoginDTO.getEmail()));
         if (appUsers == null) {
             return JsonResult.failureResult(ReturnMessageEnum.EMAIL_NOT_EXISTS);
-        } else if (appUsers.getEnabled() == 1) {
+        } else if (appUsers.getEnabled().equals(BooleanEnum.TRUE.getIntValue())) {
             return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_DISABLED);
         } else if (!appUsers.getPassword().equals(AESUtil.encrypt(appUserLoginDTO.getPassword(), appUsers.getSalt()))) {
             return JsonResult.failureResult(ReturnMessageEnum.PASSWORD_ERROR);
