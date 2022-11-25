@@ -3,6 +3,8 @@ package com.haoliang.controller;
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.util.JwtTokenUtil;
+import com.haoliang.model.dto.BillDetailsDTO;
+import com.haoliang.model.dto.TypeDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
 import com.haoliang.model.vo.MyWalletsVO;
 import com.haoliang.model.vo.ProfitLogsDetailVO;
@@ -60,23 +62,23 @@ public class WalletController {
      * 账单明细
      */
     @PostMapping("/billDetails")
-    public JsonResult<WalletLogsDetailVO>  billDetails(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token){
-        return walletLogService.getMybillDetails(token);
+    public JsonResult<WalletLogsDetailVO>  billDetails(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token, @RequestBody BillDetailsDTO billDetailsDTO){
+        return walletLogService.getMybillDetails(token,billDetailsDTO);
     }
 
     /**
      * 量化收益明细
      */
     @PostMapping("/quantificationDetail")
-    public JsonResult<ProfitLogsDetailVO> quantificationDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token){
-        return walletLogService.quantificationDetail(token);
+    public JsonResult<ProfitLogsDetailVO> quantificationDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token, @RequestBody TypeDTO typeDTO){
+        return walletLogService.quantificationDetail(token, typeDTO);
     }
 
     /**
      * 代理收益明细
      */
     @PostMapping("/proxyDetail")
-    public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token){
-        return walletLogService.proxyDetail(token);
+    public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token,@RequestBody TypeDTO typeDTO){
+        return walletLogService.proxyDetail(token,typeDTO);
     }
 }

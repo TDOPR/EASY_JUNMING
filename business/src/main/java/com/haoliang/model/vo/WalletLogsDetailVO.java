@@ -1,5 +1,6 @@
 package com.haoliang.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.haoliang.enums.FlowingTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Dominick Li
@@ -24,12 +24,13 @@ public class WalletLogsDetailVO {
     /**
      * 日期下拉列表
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ViewSelectVO> dateSectionList;
 
     /**
      * 流水明细
      */
-    private Map<String,List<WalletLogVO>> walletLogMap;
+    private List<WalletLogVO> tableList;
 
     /**
      * 存入金额 (量化 + 代理  + 充值)
@@ -44,16 +45,25 @@ public class WalletLogsDetailVO {
     /**
      * 流水类型
      */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ViewSelectVO> typeList;
+
+    /**
+     * 总页数
+     */
+    private Integer totalPage;
 
     /**
      * 类型下拉
      */
-    public static List<ViewSelectVO> buildTypeList(List<Integer> typeList) {
+    public static List<ViewSelectVO> buildTypeList() {
         List<ViewSelectVO> list = new ArrayList<>();
         list.add(new ViewSelectVO("全部", "-1"));
-        for (Integer type : typeList) {
-            list.add(new ViewSelectVO(FlowingTypeEnum.getWalletDescByValue(type), type.toString()));
+        list.add(new ViewSelectVO("动态收益存入", "0"));
+        for (FlowingTypeEnum flowingTypeEnum : FlowingTypeEnum.values()) {
+            if (flowingTypeEnum.getValue() > FlowingTypeEnum.SPECIAL.getValue()) {
+                list.add(new ViewSelectVO(FlowingTypeEnum.getWalletDescByValue(flowingTypeEnum.getValue()), flowingTypeEnum.getValue().toString()));
+            }
         }
         return list;
     }

@@ -40,11 +40,18 @@ public class ProfitLogsServiceImpl extends ServiceImpl<ProfitLogsMapper, ProfitL
         BigDecimal lastWeek = profitLogsMapper.getLastWeek(userId);
         BigDecimal lastMonth = profitLogsMapper.getLastMonth(userId);
         BigDecimal total = profitLogsMapper.getTotal(userId);
+
         return MyWalletsVO.Quantification.builder()
-                .yesterday(NumberUtil.toMoeny(yesterday))
-                .lastMonth(NumberUtil.toMoeny(lastMonth))
-                .lastWeek(NumberUtil.toMoeny(lastWeek))
-                .total(NumberUtil.toMoeny(total))
+                .yesterday(NumberUtil.toTwoDecimal(yesterday))
+                .lastMonth(NumberUtil.toTwoDecimal(lastMonth))
+                .lastWeek(NumberUtil.toTwoDecimal(lastWeek))
+                .total(NumberUtil.toTwoDecimal(total))
                 .build();
+    }
+
+    @Override
+    public BigDecimal getTotalAmountByUserIdAndType(Integer userId, Integer type) {
+        BigDecimal amount=profitLogsMapper.getTotalAmountByUserIdAndType(userId,type);
+        return amount;
     }
 }

@@ -1,5 +1,7 @@
 package com.haoliang.server;
 
+import cn.hutool.core.io.FileUtil;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RedisLock;
 import com.haoliang.common.config.AppParam;
@@ -15,7 +17,9 @@ import com.haoliang.common.service.SysOperationLogService;
 import com.haoliang.common.util.DateUtil;
 import com.haoliang.common.util.GetWorkspaceHarDiskInfoUtil;
 import com.haoliang.model.dto.EmailTemplateDTO;
-import cn.hutool.core.io.FileUtil;
+import com.haoliang.netty.AdminHomeWebSocketHandler;
+import com.haoliang.service.SystemService;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +55,9 @@ public class ScheduledServer {
 
     @Autowired
     private SysLoginLogService sysLoginLogService;
+
+    @Autowired
+    private SystemService systemService;
 
     @Value("${mail.enable}")
     private boolean enableMail;
@@ -105,6 +112,17 @@ public class ScheduledServer {
             EmailServer.send(monitorInfoTemplate);
         } else {
             log.info("硬盘已使用:{},未达到阔值:{}", workspaceHarDiskInfo.getUse(), SysSettingParam.getThresholdSize());
+        }
+    }
+
+    /**
+     * 每30秒推送一次系统后台主页消息
+     */
+    @Scheduled(fixedDelay =30000 )
+    public void sendSystemInfo() {
+        if(AdminHomeWebSocketHandler.getChannelGroup().size()>0){
+            log.info("推送后台主页信息到客户端");
+            AdminHomeWebSocketHandler.getChannelGroup().writeAndFlush(new TextWebSocketFrame(JSONObject.toJSONString(systemService.getHomeInfo().getData())));
         }
     }
 

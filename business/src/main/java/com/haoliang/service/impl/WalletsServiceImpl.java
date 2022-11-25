@@ -100,10 +100,11 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
         }
 
         MyWalletsVO.Proxy proxy = MyWalletsVO.Proxy.builder()
-                .algebra(NumberUtil.toMoeny(algebra))
-                .rebot(NumberUtil.toMoeny(rebot))
-                .team(NumberUtil.toMoeny(team))
-                .special(NumberUtil.toMoeny(special))
+                .algebra(NumberUtil.toTwoDecimal(algebra))
+                .rebot(NumberUtil.toTwoDecimal(rebot))
+                .team(NumberUtil.toTwoDecimal(team))
+                .special(NumberUtil.toTwoDecimal(special))
+                .totalAmount(NumberUtil.toTwoDecimal(algebra.add(rebot).add(team).add(special)))
                 .build();
 
         //获取我的量化收益 昨天,上周,上月,累计

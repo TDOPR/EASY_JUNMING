@@ -13,13 +13,15 @@ import java.util.List;
  * @CreateTime 2022/11/18 17:06
  **/
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProfitLogsDetailVO {
 
-    public ProfitLogsDetailVO(String settled, String noSettled, List<ProfitLogsVO> list) {
-        this.settled = settled;
-        this.noSettled = noSettled;
-        this.list = list;
-    }
+    /**
+     * 总收益
+     */
+    private String totalAmount;
 
     /**
      * 已结算
@@ -31,7 +33,20 @@ public class ProfitLogsDetailVO {
      */
     private String noSettled;
 
+    /**
+     * 类型列表
+     */
+    private List<ViewSelectVO> typeList;
+
+    /**
+     * 列表数据
+     */
     private List<ProfitLogsVO> list;
+
+    /**
+     * 总页数
+     */
+    private Integer totalPage;
 
 
     @Data
@@ -58,7 +73,7 @@ public class ProfitLogsDetailVO {
         /**
          * 是否交割  1=已交割 0=未交割
          */
-        private Integer status;
+        private Integer type;
 
     }
 }

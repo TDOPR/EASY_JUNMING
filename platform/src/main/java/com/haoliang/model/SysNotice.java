@@ -20,8 +20,7 @@ public class SysNotice extends BaseModelCID {
      * 排序
      * @required
      */
-    @NotNull
-    private Integer sortIndex;
+    private Integer sortIndex=0;
 
     /**
      * 显示状态 1=可见,0=隐藏

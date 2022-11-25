@@ -20,6 +20,28 @@ public class GlobalConfig {
 
     private static String tmpSavePath;
 
+    private static Integer webSocketPort;
+
+    private static String webSocketAddress;
+
+    public static Integer getWebSocketPort() {
+        return webSocketPort;
+    }
+
+    @Value("${webSocket.port}")
+    public  void setWebSocketPort(Integer webSocketPort) {
+        GlobalConfig.webSocketPort = webSocketPort;
+    }
+
+    public static String getWebSocketAddress() {
+        return webSocketAddress;
+    }
+
+    @Value("${webSocket.address}")
+    public  void setWebSocketAddress(String webSocketAddress) {
+        GlobalConfig.webSocketAddress = webSocketAddress;
+    }
+
     public static String getVirtualPathURL() {
         return virtualPathURL;
     }

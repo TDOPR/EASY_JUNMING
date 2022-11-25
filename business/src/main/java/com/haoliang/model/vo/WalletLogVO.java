@@ -31,9 +31,6 @@ public class WalletLogVO {
      */
     private String createTime;
 
-    @JsonIgnore
-    private String yearMonth;
-
     /**
      * 流水类型名称
      */
@@ -43,7 +40,7 @@ public class WalletLogVO {
      * 流水类型
      */
     @JsonIgnore
-    private Integer type;
+    private Integer logType;
 
     /**
      * 金额
@@ -54,5 +51,5 @@ public class WalletLogVO {
      * 收支 1=收入 0=支出
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer status;
+    private Integer type;
 }

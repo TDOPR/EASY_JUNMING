@@ -15,6 +15,7 @@ CREATE TABLE `app_users`  (
   `level` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户等级',
   `inviteId` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '邀请人Id',
   `loginCount` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '登录次数',
+   `level` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '代理商等级',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
   UNIQUE INDEX `UK_app_users_email`(`email`) USING BTREE,

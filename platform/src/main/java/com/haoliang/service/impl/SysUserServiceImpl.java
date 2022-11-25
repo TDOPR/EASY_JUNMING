@@ -36,6 +36,7 @@ import com.haoliang.model.vo.UserVO;
 import com.haoliang.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +71,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Resource
     private SysRoleMapper sysRoleMapper;
+
+    @Value("${webSocket.adminwsPath}")
+    private String adminwsPath;
 
     @Override
     public JsonResult login(LoginDTO loginDTO, String clientIp) {
@@ -120,7 +124,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         }
         RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp, 1));
-        return JsonResult.successResult(new TokenVO(tokenKey));
+        return JsonResult.successResult(new TokenVO(tokenKey, GlobalConfig.getWebSocketAddress() + adminwsPath));
     }
 
     @Override
@@ -294,5 +298,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         String url = GoogleAuthenticatorUtil.getQRBarcodeURL(sysUser.getUsername(), loginConfig.getCaptcha().getGoogleHost(), sysUser.getGoogleSecret());
         String filePath = generateQRCodeImg(GlobalConfig.getTmpSavePath(), url);
         ResponseUtil.downloadFileByLocal(response, new File(filePath), ContentTypeEnum.PNG);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(IdUtil.simpleUUID());
     }
 }

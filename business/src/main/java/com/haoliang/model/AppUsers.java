@@ -26,6 +26,7 @@ public class AppUsers extends BaseModelCID {
 
     /**
      * 加密用得盐
+     *
      * @ignore
      */
     private String salt;
@@ -64,5 +65,10 @@ public class AppUsers extends BaseModelCID {
      * 邀请人Id
      */
     private Integer inviteId;
+
+    /**
+     * 代理商等级
+     */
+    private Integer level;
 
 }

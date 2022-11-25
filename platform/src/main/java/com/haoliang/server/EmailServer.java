@@ -31,7 +31,6 @@ public class EmailServer {
 
     private static final EmailConfig CONFIG = SpringUtil.getBean(EmailConfig.class);
 
-
     private static class FileInfo {
 
         public FileInfo(String name, InputStream inputStream) {

@@ -43,4 +43,15 @@
     <select id="getTotal" resultType="java.math.BigDecimal">
         SELECT sum(generatedAmount) FROM profit_logs WHERE userId=#{userId}
     </select>
+
+    <select id="getTotalAmountByUserIdAndType" resultType="java.math.BigDecimal">
+        SELECT
+            sum(generatedAmount)
+        FROM
+            profit_logs
+        WHERE
+            userId=#{userId}
+            AND
+            status=#{type}
+    </select>
 </mapper>

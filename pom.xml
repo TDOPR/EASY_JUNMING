@@ -55,6 +55,7 @@
         <jsr310.version>2.9.2</jsr310.version>
         <google-zxing.version>3.4.1</google-zxing.version>
         <oshi.version>6.3.0</oshi.version>
+        <netty-all.version>4.1.36.Final</netty-all.version>
     </properties>
 
     <dependencyManagement>
@@ -194,6 +195,13 @@
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
+            </dependency>
+
+            <!--netty核心组件-->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>${netty-all.version}</version>
             </dependency>
 
         </dependencies>

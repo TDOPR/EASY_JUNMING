@@ -45,7 +45,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     @Autowired
     private SysRoleService sysRoleService;
 
-    @Cacheable(key = "'findAll'")
+    //@Cacheable(key = "'findAll'")
     @Override
     public JsonResult findAll() {
         return JsonResult.successResult(sysMenuMapper.findAllByParentIdOrderBySortIndexAsc());

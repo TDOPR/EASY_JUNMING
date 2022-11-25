@@ -5,6 +5,8 @@ import com.haoliang.common.model.JsonResult;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.model.WalletLogs;
+import com.haoliang.model.dto.BillDetailsDTO;
+import com.haoliang.model.dto.TypeDTO;
 import com.haoliang.model.vo.ProfitLogsDetailVO;
 import com.haoliang.model.vo.ProxyWalletLogsDetailVO;
 import com.haoliang.model.vo.WalletLogVO;
@@ -45,19 +47,19 @@ public interface WalletLogsService extends IService<WalletLogs> {
      * @param token
      * @return
      */
-    JsonResult<WalletLogsDetailVO> getMybillDetails(String token);
+    JsonResult<WalletLogsDetailVO> getMybillDetails(String token, BillDetailsDTO billDetailsDTO);
 
     /**
      * 获取量化奖励明细
      * @param token 身份信息
      * @return
      */
-    JsonResult<ProfitLogsDetailVO> quantificationDetail(String token);
+    JsonResult<ProfitLogsDetailVO> quantificationDetail(String token, TypeDTO typeDTO);
 
     /**
      * 获取动态奖励明细
      * @param token
      * @return
      */
-    JsonResult<ProxyWalletLogsDetailVO> proxyDetail(String token);
+    JsonResult<ProxyWalletLogsDetailVO> proxyDetail(String token,TypeDTO typeDTO);
 }

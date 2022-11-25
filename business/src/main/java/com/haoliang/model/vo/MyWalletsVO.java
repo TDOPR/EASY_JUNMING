@@ -88,6 +88,11 @@ public class MyWalletsVO {
     public static class Proxy {
 
         /**
+         * 总收益
+         */
+        private String totalAmount;
+
+        /**
          * 代数奖
          */
         private String algebra;
