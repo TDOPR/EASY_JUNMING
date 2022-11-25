@@ -32,31 +32,28 @@ import java.util.Date;
 public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> implements StrategyService {
 
     @Resource
-    private AppUserService appUsersService;
-
-    @Resource
     private WalletsService walletsService;
 
     @Resource
-    private  StrategyService strategyService;
+    private StrategyService strategyService;
 
-    public static String[] strategyTypeData = new String[] { "马丁格尔AI策略", "迈凯伦指数策略", "期现套利策略", "波段追踪策略", "频响定投策略", "集中频响策略",
+    public static String[] strategyTypeData = new String[]{"马丁格尔AI策略", "迈凯伦指数策略", "期现套利策略", "波段追踪策略", "频响定投策略", "集中频响策略",
             "逆周期跟单策略", "低阻抗追踪策略", "波段平衡策略", "阻抗均衡策略"};
 
-    public static String[] qcData = new String[] { "BTC", "LTC", "ETH", "ETC", "XRP", "EOX",
+    public static String[] qcData = new String[]{"BTC", "LTC", "ETH", "ETC", "XRP", "EOX",
             "ADA", "MANA", "TRX", "MKR", "BCH", "FTM", "SOL", "ATOM", "DOGE", "CEOL", "COMP", "DOT", "UNI",
             "DAI", "AAVE", "CHZ", "SHIB", "SOX", "KNC", "ZEN", "ZIL", "ANT", "SRM", "SUSHI", "UMA", "GRT",
-            "1INCH", "MXC", "MASK", "XCH" };
+            "1INCH", "MXC", "MASK", "XCH"};
 
-    public static String[] bcData = new String[] { "BTC", "LTC", "ETH", "ETC", "XRP", "EOX",
+    public static String[] bcData = new String[]{"BTC", "LTC", "ETH", "ETC", "XRP", "EOX",
             "ADA", "MANA", "TRX", "MKR", "BCH", "FTM", "SOL", "ATOM", "DOGE", "CEOL", "COMP", "DOT", "UNI",
             "DAI", "AAVE", "CHZ", "SHIB", "SOX", "KNC", "ZEN", "ZIL", "ANT", "SRM", "SUSHI", "UMA", "GRT",
-            "1INCH", "MXC", "MASK", "XCH" };
+            "1INCH", "MXC", "MASK", "XCH"};
 
-    public static String[] croData = new String[] { "BTC/LTC", "ETH/ETC", "XRP/EOX", "ADA/MANA", "TRX/MKR", "BCH/FTM",
+    public static String[] croData = new String[]{"BTC/LTC", "ETH/ETC", "XRP/EOX", "ADA/MANA", "TRX/MKR", "BCH/FTM",
             "SOL/BTC", "LTC/ETH", "ETC/XRP", "EOX/ADA", "MANA/TRX", "MKR/BCH", "FTM/SOL", "ATOM/DOGE", "CEOL/COMP", "DOT/UNI", "DAI/AAVE", "CHZ/SHIB", "SOX/KNC",
             "ZEN/ZIL", "ANT/SRM", "SUSHI/UMA", "GRT/1INCH", "MXC/MASK", "XCH/ATOM", "DOGE/CEOL", "COMP/DOT", "UNI/DAI", "AAVE/CHZ", "SHIB/SOX", "KNC/ZEN", "ZIL/ANT",
-            "SRM/SUSHI", "UMA/GRT", "1INCH/MXC", "MASK/XCH" };
+            "SRM/SUSHI", "UMA/GRT", "1INCH/MXC", "MASK/XCH"};
 
     public static BigDecimal generate(int min, int max, int type, int divid) {
         double num = (Math.random() * (min - max) + max) / divid;
@@ -65,7 +62,7 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
         return d;
     }
 
-    public JsonResult<Strategy> getStrategyType(String token){
+    public JsonResult<Strategy> getStrategyType(String token) {
 
         String strategyType;
         String qc;
@@ -79,10 +76,10 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
 
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
-        if(wallets.getRobotLevel()==0){
+        if (wallets.getRobotLevel() == 0) {
             return JsonResult.failureResult("未购买机器人,不参与做单");
-        }else{
-            BigDecimal d = generate(0,36, 0, 1);
+        } else {
+            BigDecimal d = generate(0, 36, 0, 1);
             strategyType = strategyTypeData[d.intValue()];
             qc = qcData[d.intValue()];
             bc = bcData[d.intValue()];
@@ -92,7 +89,7 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
             ti = generate(5, 90, 4, 100000);
             eipM = generate(2000, 8000, 0, 1);
             eipN = generate(2000, 8000, 0, 1);
-            if(eipM.compareTo(eipN)>=0){
+            if (eipM.compareTo(eipN) >= 0) {
                 t = eipN;
                 eipN = eipM;
                 eipM = t;
@@ -107,8 +104,9 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
                 .bc(bc)
                 .cro(cro)
                 .qc(qc)
-                .dern(dern)
-                .ti(ti)
+                .dern(dern + "%")
+                .ti("ln" + ti)
+                .eip("Φ:" + eipN + "->" + eipM)
                 .build();
         strategyService.save(strategy);
         return JsonResult.successResult(strategy);

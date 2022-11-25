@@ -44,12 +44,12 @@ public class Strategy {
     /**
      * 派生交易量(DERN)
      */
-    private BigDecimal dern;
+    private String dern;
 
     /**
      * 量化指标TI
      */
-    private BigDecimal ti;
+    private String ti;
 
     /**
      * 生态基数EIPM
@@ -60,6 +60,11 @@ public class Strategy {
      * 生态基数EIPN
      */
     private BigDecimal eipN;
+
+    /**
+     * 生态基数EIP
+     */
+    private String eip;
 
     /**
      * 创建时间
