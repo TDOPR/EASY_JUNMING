@@ -13,7 +13,7 @@ public interface DayRateService extends IService<DayRate> {
      * 生成今日的收益信息
      * @param localDate
      */
-    DayRate initDayRate(LocalDate localDate);
+    DayRate insertDayRate(LocalDate localDate);
 
     /**
      * 获取今日的收益率行

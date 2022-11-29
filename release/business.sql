@@ -164,7 +164,7 @@ CREATE TABLE `app_user_rebot_ref`(
 -- -------------------------------
 DROP TABLE IF EXISTS `dayrate`;
 CREATE TABLE `dayrate`  (
-  `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '邀请的用户Id',
+  `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '创建日期',
   `level0` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '未购买机器人收益率',
   `level1` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '一级机器人收益率',
   `level2` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '二级机器人收益率',
@@ -188,4 +188,25 @@ CREATE TABLE `app_versions`  (
   `downloadAddress` varchar(255)  NOT NULL DEFAULT '' COMMENT 'app下载地址',
   `use` tinyint  NOT NULL DEFAULT 0 COMMENT '是否使用的版本 1=使用 0=未使用'
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统版本表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统版本表' ROW_FORMAT = Dynamic
+
+
+-- ----------------------------------
+-- Table structure for strategy
+-- ---------------------------------
+DROP TABLE IF EXISTS `strategy`;
+CREATE TABLE `strategy`  (
+  `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '创建日期',
+  `sortIndex` tinyint   NOT NULL DEFAULT 0  COMMENT '排序下标',
+  `strategyType` varchar(255)  NOT NULL DEFAULT '' COMMENT '策略类型',
+  `qc` varchar(255)  NOT NULL DEFAULT '' COMMENT '基准货币',
+  `bc` varchar(255)  NOT NULL DEFAULT '' COMMENT '计价货币',
+  `cro` varchar(255)  NOT NULL DEFAULT '' COMMENT '交叉货币对',
+  `dern` varchar(255)  NOT NULL DEFAULT '' COMMENT '派生交易量',
+  `ti` varchar(255)  NOT NULL DEFAULT '' COMMENT '量化指标TI',
+  `eipM` varchar(255)  NOT NULL DEFAULT '' COMMENT '生态基数EIPM',
+  `eipN` varchar(255)  NOT NULL DEFAULT '' COMMENT '生态基数EIPN',
+  `eip` varchar(255)  NOT NULL DEFAULT '' COMMENT '生态基数EIP',
+   PRIMARY KEY (`createDate`, `sortIndex`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='机器人做单策略表' ROW_FORMAT = Dynamic
+

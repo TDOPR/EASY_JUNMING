@@ -22,7 +22,7 @@ import java.util.List;
 public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> implements DayRateService {
 
     @Override
-    public DayRate initDayRate(LocalDate localDate) {
+    public DayRate insertDayRate(LocalDate localDate) {
         DayRate dayRate = DayRate.builder()
                 .createDate(localDate)
                 .level0(RobotEnum.getProfitRateByLevel(RobotEnum.ZERO.getLevel()))
@@ -44,7 +44,7 @@ public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> impl
         LocalDate now = LocalDate.now();
         DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().eq(DayRate::getCreateDate, now));
         if (ObjectUtils.isEmpty(dayRate)) {
-            dayRate = initDayRate(now);
+            dayRate = insertDayRate(now);
         }
         return getDayRateByLevel(dayRate, robotLevel);
     }
@@ -95,7 +95,7 @@ public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> impl
         DayRate dayRate = this.getOne(new LambdaQueryWrapper<DayRate>().eq(DayRate::getCreateDate, now));
         if (ObjectUtils.isEmpty(dayRate)) {
             //插入一条新数据
-            dayRate = this.initDayRate(now);
+            dayRate = this.insertDayRate(now);
         }
         return dayRate;
     }

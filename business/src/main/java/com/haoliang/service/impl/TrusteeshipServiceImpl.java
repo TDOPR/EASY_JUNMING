@@ -1,6 +1,5 @@
 package com.haoliang.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.haoliang.common.enums.ReturnMessageEnum;
@@ -11,18 +10,19 @@ import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.enums.RobotEnum;
-import com.haoliang.model.WalletLogs;
+import com.haoliang.mapper.ProfitLogsMapper;
+import com.haoliang.model.Strategy;
 import com.haoliang.model.Wallets;
 import com.haoliang.model.dto.AmountDTO;
 import com.haoliang.model.vo.TrusteeshipAmountVO;
-import com.haoliang.service.TrusteeshipService;
-import com.haoliang.service.WalletLogsService;
-import com.haoliang.service.WalletsService;
+import com.haoliang.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,6 +38,12 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
 
     @Autowired
     private WalletLogsService walletLogsService;
+
+    @Autowired
+    private StrategyService strategyService;
+
+    @Resource
+    private ProfitLogsMapper profitLogsMapper;
 
     @Override
     @Transactional
@@ -104,25 +110,29 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
 
         String robotName = "";
+        List<Strategy> strategyList;
         if (wallets.getRobotLevel() > 0) {
             RobotEnum robotEnum = RobotEnum.levelOf(wallets.getRobotLevel());
             robotName = robotEnum.getName();
+            strategyList=strategyService.getStrategyListByRobotLevel(wallets.getRobotLevel());
+        }else{
+            strategyList=new ArrayList<>();
         }
 
-        List<WalletLogs> walletLogsList = walletLogsService.list(new LambdaQueryWrapper<WalletLogs>()
-                .select(WalletLogs::getAmount)
-                .eq(WalletLogs::getUserId, userId).eq(WalletLogs::getType, FlowingTypeEnum.STATIC.getValue()));
-        BigDecimal sum = walletLogsList.stream().map(WalletLogs::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-        TrusteeshipAmountVO trusteeshipAmountVO = new TrusteeshipAmountVO();
-        trusteeshipAmountVO.setAmount(NumberUtil.toTwoDecimal(wallets.getPrincipalAmount()));
-        trusteeshipAmountVO.setProfit(NumberUtil.toTwoDecimal(sum));
-        trusteeshipAmountVO.setRobotName(robotName);
-        if (sum.compareTo(BigDecimal.ZERO) == 0) {
-            trusteeshipAmountVO.setProfitRate("0.0%");
-        } else {
-            trusteeshipAmountVO.setProfitRate(sum.divide(wallets.getPrincipalAmount(), 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(1, BigDecimal.ROUND_FLOOR) + "%");
+        //获取量化总收益
+        BigDecimal sum = profitLogsMapper.getTotal(userId);
+        String profitRate="0.0%";
+        if (sum.compareTo(BigDecimal.ZERO)>0) {
+            profitRate=sum.divide(wallets.getPrincipalAmount(), 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(1, BigDecimal.ROUND_FLOOR) + "%";
         }
-        return JsonResult.successResult(trusteeshipAmountVO);
+
+        return JsonResult.successResult(TrusteeshipAmountVO.builder()
+                .amount(NumberUtil.toTwoDecimal(wallets.getPrincipalAmount()))
+                .profit(NumberUtil.toTwoDecimal(sum))
+                .profitRate(profitRate)
+                .robotName(robotName)
+                .strategyList(strategyList)
+                .build());
     }
 
 }

@@ -50,12 +50,18 @@ public class ProfitTaskScheduledJob {
     @Autowired
     private DayRateService dayRateService;
 
+    @Autowired
+    private StrategyService strategyService;
+
     /**
-     * 每天凌晨0点5分更新收益率
+     * 每天凌晨0点5分更新收益率和机器人做单策略
      */
     @Scheduled(cron = "0 5 0 * * ?")
+    //@Scheduled(fixedDelay = 10000)
     public void randowDayRate() {
-        dayRateService.initDayRate(LocalDate.now());
+        LocalDate localDate=LocalDate.now();
+        dayRateService.insertDayRate(localDate);
+        strategyService.insertStrategy(localDate);
     }
 
     /**

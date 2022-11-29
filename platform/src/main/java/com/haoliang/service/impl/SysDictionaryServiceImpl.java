@@ -23,8 +23,8 @@ import java.util.Map;
  * @CreateTime 2021/6/18 15:10
  * @description
  **/
-@Service
 @Slf4j
+@Service
 public class SysDictionaryServiceImpl extends ServiceImpl<SysDictionaryMapper, SysDictionary> implements SysDictionaryService {
 
     @Value("${spring.redis.topic}")

@@ -1,12 +1,14 @@
 package com.haoliang.model;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -20,6 +22,18 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Strategy {
+
+    /**
+     * 创建时间
+     */
+    @JsonIgnore
+    private LocalDate createDate;
+
+    /**
+     * 序号   不同机器人级别显示不同的序号(每天生成5条策略) 1级显示1条, 2级显示2条
+     */
+    @JsonIgnore
+    private Integer sortIndex;
 
     /**
      * 策略类型
@@ -54,20 +68,16 @@ public class Strategy {
     /**
      * 生态基数EIPM
      */
-    private BigDecimal eipM;
+    private String eipM;
 
     /**
      * 生态基数EIPN
      */
-    private BigDecimal eipN;
+    private String eipN;
 
     /**
      * 生态基数EIP
      */
     private String eip;
 
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
 }

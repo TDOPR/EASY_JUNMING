@@ -44,4 +44,9 @@ public interface CacheKeyPrefixConstants {
      * 菜单缓存
      */
     String SYS_MENU="sys_menu";
+
+    /**
+     * 机器人策略缓存
+     */
+    String ROBOT_STRATEGY ="robot_strategy";
 }

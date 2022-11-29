@@ -31,9 +31,9 @@ import java.util.List;
  * @Description
  * @date 2021-04-15 14:53
  */
+@Slf4j
 @Service
 @CacheConfig(cacheNames = CacheKeyPrefixConstants.SYS_MENU)
-@Slf4j
 public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> implements SysMenuService {
 
     @Resource

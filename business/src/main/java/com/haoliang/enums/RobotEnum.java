@@ -120,7 +120,7 @@ public enum RobotEnum {
                     //如果为固定利率,则不用随机生成
                     return robotEnum.getMaxProfitRate().setScale(4, RoundingMode.FLOOR);
                 }
-                return RandomUtil.generate(robotEnum.minProfitRate.multiply(new BigDecimal(10000)).intValue(), robotEnum.maxProfitRate.multiply(new BigDecimal(10000)).intValue());
+                return RandomUtil.generateRobotYieldRate(robotEnum.minProfitRate.multiply(new BigDecimal(10000)).intValue(), robotEnum.maxProfitRate.multiply(new BigDecimal(10000)).intValue());
             }
         }
         return BigDecimal.ZERO;
