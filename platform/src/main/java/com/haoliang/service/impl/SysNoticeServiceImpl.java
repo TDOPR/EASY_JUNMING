@@ -1,8 +1,12 @@
 package com.haoliang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.dto.TypeDTO;
+import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.mapper.SysNoticeMapper;
 import com.haoliang.mapper.SysNoticeUserMapper;
@@ -39,15 +43,16 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
     }
 
     @Override
-    public JsonResult<List<SysNoticeVO>> findMyNoticeList(String token, Integer type) {
+    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(String token, TypeDTO type) {
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
-        List<SysNoticeVO> list;
-        if (type == 1) {
-            list = sysNoticeUserMapper.findMyNoticeListByUserIdAndCN(userId);
+        Page page=new Page<>(type.getCurrentPage(),type.getPageSize());
+        IPage iPage;
+        if (type.getType()==1) {
+            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndCN(page,userId);
         } else {
-            list = sysNoticeUserMapper.findMyNoticeListByUserIdAndEN(userId);
+            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndEN(page,userId);
         }
-        return JsonResult.successResult(list);
+        return JsonResult.successResult(new PageVO<>(iPage));
     }
 
     @Override

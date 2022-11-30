@@ -7,6 +7,7 @@ import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.dto.IntIdListDTO;
+import com.haoliang.common.model.dto.TypeDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.SysMessage;
@@ -19,7 +20,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 /**
  * 公告管理
@@ -69,10 +69,9 @@ public class SysNoticeController {
 
     /**
      * 根据用户Id获取公告列表
-     * @param type 1=中文 0=英文
      */
-    @GetMapping("/{type}")
-    public JsonResult<List<SysNoticeVO>> findMyNoticeList(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token, @PathVariable Integer type){
+    @PostMapping("/mylist")
+    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token, @RequestBody TypeDTO type){
         return sysNoticeService.findMyNoticeList(token,type);
     }
 

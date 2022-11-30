@@ -1,5 +1,6 @@
 package com.haoliang.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,9 @@ public class SysNoticeVO {
 
     private String text;
 
+    private String description;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime createTime;
 
 }

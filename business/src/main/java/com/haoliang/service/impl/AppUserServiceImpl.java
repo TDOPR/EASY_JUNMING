@@ -124,7 +124,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         AppUsers appUsers = this.getOne(new LambdaQueryWrapper<AppUsers>().eq(AppUsers::getEmail, appUserLoginDTO.getEmail()));
         if (appUsers == null) {
             return JsonResult.failureResult(ReturnMessageEnum.EMAIL_NOT_EXISTS);
-        } else if (appUsers.getEnabled().equals(BooleanEnum.TRUE.getIntValue())) {
+        } else if (appUsers.getEnabled().equals(BooleanEnum.FALSE.getIntValue())) {
             return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_DISABLED);
         } else if (!appUsers.getPassword().equals(AESUtil.encrypt(appUserLoginDTO.getPassword(), appUsers.getSalt()))) {
             return JsonResult.failureResult(ReturnMessageEnum.PASSWORD_ERROR);

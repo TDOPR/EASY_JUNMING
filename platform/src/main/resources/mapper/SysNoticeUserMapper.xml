@@ -7,7 +7,7 @@
     </insert>
     <select id="findMyNoticeListByUserIdAndCN" resultType="com.haoliang.model.vo.SysNoticeVO">
         SELECT
-            n.id,n.cnTitle title,n.cnText text,n.createTime
+            n.id,n.cnTitle title,n.cnText text,n.createTime,n.cnDescription description
         FROM
            sys_notice n
         LEFT join
@@ -23,7 +23,7 @@
     </select>
     <select id="findMyNoticeListByUserIdAndEN" resultType="com.haoliang.model.vo.SysNoticeVO">
         SELECT
-            n.id,n.enTitle title,n.enText text,n.createTime
+            n.id,n.enTitle title,n.enText text,n.createTime,n.cnDescription description
         FROM
            sys_notice n
         LEFT join

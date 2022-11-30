@@ -4,7 +4,7 @@
 
     <select id="getMyProxyWalletLogs" resultType="com.haoliang.model.WalletLogs">
         SELECT
-            type,sum(amount)
+            type,sum(amount) amount
         FROM wallet_logs
         WHERE
             userId=#{userId}
@@ -22,7 +22,5 @@
     <select id="sumTotalAmountByType" resultType="java.math.BigDecimal">
         SELECT sum(amount) FROM wallet_logs  WHERE type=#{type}
     </select>
-
-
 
 </mapper>

@@ -4,7 +4,7 @@ import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.dto.BillDetailsDTO;
-import com.haoliang.model.dto.TypeDTO;
+import com.haoliang.common.model.dto.TypeDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
 import com.haoliang.model.vo.MyWalletsVO;
 import com.haoliang.model.vo.ProfitLogsDetailVO;

@@ -1,4 +1,4 @@
-package com.haoliang.model.dto;
+package com.haoliang.common.model.dto;
 
 import lombok.Data;
 

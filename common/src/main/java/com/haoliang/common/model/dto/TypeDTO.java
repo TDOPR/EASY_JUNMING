@@ -1,5 +1,6 @@
-package com.haoliang.model.dto;
+package com.haoliang.common.model.dto;
 
+import com.haoliang.common.model.dto.PageDTO;
 import lombok.Data;
 
 /**
@@ -10,9 +11,6 @@ import lombok.Data;
 @Data
 public class TypeDTO extends PageDTO {
 
-    /**
-     * 是否发放给用户 1=已发放, 0=未发放
-     */
     private Integer type = -1;
 
 }

@@ -15,7 +15,7 @@ import com.haoliang.model.ProfitLogs;
 import com.haoliang.model.WalletLogs;
 import com.haoliang.model.dto.BillDetailsDTO;
 import com.haoliang.model.dto.DateSection;
-import com.haoliang.model.dto.TypeDTO;
+import com.haoliang.common.model.dto.TypeDTO;
 import com.haoliang.model.vo.*;
 import com.haoliang.service.ProfitLogsService;
 import com.haoliang.service.WalletLogsService;
