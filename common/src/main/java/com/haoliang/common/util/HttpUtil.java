@@ -4,6 +4,7 @@ package com.haoliang.common.util;
 import okhttp3.*;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +42,24 @@ public class HttpUtil {
         Request.Builder builder = new Request.Builder().url(url);
         RequestBody requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), jsonData);
         builder.post(requestBody);
+        try {
+            Request request = builder.build();
+            Response response = client.newCall(request).execute();
+            String result = response.body().string();
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static String postJson(String url, String headerKey,String headerValue, String jsonData) {
+        OkHttpClient client = getInstance();
+        Request.Builder builder = new Request.Builder().url(url);
+        RequestBody requestBody = FormBody.create(MediaType.parse("application/json; charset=utf-8"), jsonData);
+        builder.post(requestBody);
+        builder.addHeader(headerKey,headerValue);
         try {
             Request request = builder.build();
             Response response = client.newCall(request).execute();
