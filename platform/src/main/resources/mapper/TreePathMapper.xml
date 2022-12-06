@@ -16,14 +16,57 @@
                1
     </insert>
 
-    <select id="getTreeAmountByUserId" resultType="com.haoliang.model.dto.TreePathAmountDTO">
+    <select id="getAllAmountByUserId" resultType="com.haoliang.model.dto.TreePathAmountDTO">
         SELECT
-         w.principalAmount,w.robotAmount,t.descendant
+            (w.principalAmount+w.robotAmount) totalAmount,t.descendant
         FROM tree_paths t
         LEFT JOIN
             wallets w
             ON t.descendant=w.userId
         WHERE t.ancestor=#{uid}
+    </select>
+
+    <select id="getProfitAmountByUserIdAndLevelList" resultType="com.haoliang.model.dto.TreePathAmountDTO">
+       SELECT
+            p.generatedAmount totalAmount,t.level
+       FROM tree_paths t
+       LEFT JOIN
+            profit_logs p ON t.descendant=p.userId
+       WHERE
+            t.ancestor=#{uid}
+            AND  p.createDate=#{localDate}
+            AND t.level in
+        <foreach collection="levelList" item="level" separator="," open="(" close=")">
+            #{level}
+        </foreach>
+    </select>
+
+    <select id="getMinTeamTotalProfitAmount" resultType="java.math.BigDecimal">
+        SELECT
+            sum(p.generatedAmount)
+        FROM tree_paths t
+        LEFT JOIN
+            profit_logs p
+            ON t.descendant=p.userId
+        WHERE
+            p.createDate=#{localDate}
+            AND t.ancestor
+            IN(
+                SELECT descendant from tree_paths where ancestor=#{uid} and level=1 and largeTeam=0
+            )
+    </select>
+
+    <select id="getTeamTotalProfitAmount" resultType="java.math.BigDecimal">
+        SELECT
+            sum(p.generatedAmount)
+        FROM tree_paths t
+        LEFT JOIN
+            profit_logs p
+            ON t.descendant=p.userId
+        WHERE
+            p.createDate=#{localDate}
+            AND t.ancestor=#{uid}
+            AND t.level>0
     </select>
 
 </mapper>

@@ -7,23 +7,24 @@ import java.math.BigDecimal;
 /**
  * @author Dominick Li
  * @Description
- * @CreateTime 2022/11/14 18:44
+ * @CreateTime 2022/12/5 18:16
  **/
 @Data
-public class TreePathAmountDTO {
+public class UserWalletsDTO {
 
     /**
-     * 托管金额
+     * 所属用户Id
      */
-    private BigDecimal totalAmount;
+    private Integer userId;
 
     /**
-     * 用户Id
+     * 钱包余额
      */
-    private Integer descendant;
+    private BigDecimal walletAmount;
 
     /**
-     * 级别
+     * 代理商等级
      */
     private Integer level;
+
 }

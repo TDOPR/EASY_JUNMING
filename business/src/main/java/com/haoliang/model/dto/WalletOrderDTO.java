@@ -10,6 +10,7 @@ public class WalletOrderDTO {
 
     /**
      * 使用的货币类型  1=法币 2=usdt
+     *
      * @required
      */
     @NotNull
@@ -17,10 +18,16 @@ public class WalletOrderDTO {
 
     /**
      * 金额
+     *
      * @required
      */
     @NotNull
     private BigDecimal amount;
 
+
+    /**
+     * 区块链地址  提现的时候需要
+     */
+    private String blockAddress;
 
 }

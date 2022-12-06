@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.haoliang.common.base.BaseModelCID;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * @author Dominick Li
  * @Description 业务用户表  客户
@@ -70,5 +72,15 @@ public class AppUsers extends BaseModelCID {
      * 代理商等级
      */
     private Integer level;
+
+    /**
+     * 小团队业绩
+     */
+    private BigDecimal minTeamAmount;
+
+    /**
+     * 团队总业绩
+     */
+    private BigDecimal teamTotalAmount;
 
 }

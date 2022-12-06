@@ -5,9 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
-import com.haoliang.common.util.*;
+import com.haoliang.common.util.IdUtil;
+import com.haoliang.common.util.JwtTokenUtil;
+import com.haoliang.common.util.NumberUtil;
 import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.enums.CoinUnitEnum;
 import com.haoliang.enums.FlowingActionEnum;
@@ -56,6 +57,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Autowired
     private ProfitLogsService profitLogsService;
 
+
     @Resource
     private AppUserRechargeMapper appUserRechargeMapper;
 
@@ -68,19 +70,20 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Resource
     private WalletsMapper walletsMapper;
 
+
     @Override
     public JsonResult<MyWalletsVO> getMyWallet(String token) {
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getWalletAmount, Wallets::getBlockAddress);
+        AppUsers appUsers = appUserMapper.selectOne(new LambdaQueryWrapper<AppUsers>().select(AppUsers::getMinTeamAmount,AppUsers::getTeamTotalAmount).eq(AppUsers::getId,userId));
 
+        AppUserRebotDTO appUserRebotDTO = appUserMapper.getRobotDetailByUserId(userId);
         //获取我的团队信息
-        MyItemAmountDTO myItemAmountDTO = this.getMyItemAmountByUserId(userId);
-        List<BigDecimal> amountList = appUserMapper.selectUserRebotRef(userId);
         MyItemVO myItemVO = MyItemVO.builder()
-                .totalAmount(NumberUtil.downToInt(myItemAmountDTO.getMinItemAmount().add(myItemAmountDTO.getMaxItemAmount())))
-                .minAmount(NumberUtil.downToInt(myItemAmountDTO.getMinItemAmount()))
-                .aiUserCount(amountList.size())
-                .aiAmount(NumberUtil.downToInt(myItemAmountDTO.getFirstAmount()))
+                .totalAmount(NumberUtil.downToInt(appUsers.getTeamTotalAmount()))
+                .minAmount(NumberUtil.downToInt(appUsers.getMinTeamAmount()))
+                .aiUserCount(appUserRebotDTO.getUserCount())
+                .aiAmount(NumberUtil.downToInt(appUserRebotDTO.getRobotAmount()))
                 .validUserCount(appUserMapper.getValidUserCountByInviteId(userId))
                 .build();
 
@@ -124,48 +127,33 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Override
     @Transactional
     public JsonResult recharge(WalletOrderDTO walletOrderDTO, String token) {
-        //充值
+        //法币充值
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
-        BigDecimal usdAmount;
-        BigDecimal exchangeRate;
-        Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getBlockAddress);
-        if (walletOrderDTO.getCoinUnit().equals(CoinUnitEnum.LEGAL_CURRENCY.getType())) {
-            usdAmount = walletOrderDTO.getAmount().divide(EasyTradeConfig.XPF_2_USD, 7, RoundingMode.FLOOR);
-            exchangeRate = EasyTradeConfig.XPF_2_USD;
-            //TODO 法币充值，走第三方支付接口
-        } else {
-            //判断是否有可用的区块链地址
-            boolean hasAddress = hasBlockAddress(wallets);
-            if (!hasAddress) {
-                return JsonResult.failureResult(ReturnMessageEnum.BLOCK_ADDRESS_EMPTY);
-            }
-            String address = wallets.getBlockAddress();
-            usdAmount = walletOrderDTO.getAmount().divide(EasyTradeConfig.USDT_2_USD, 7, RoundingMode.FLOOR);
-            exchangeRate = EasyTradeConfig.USDT_2_USD;
-            //TODO Usdt充值
-        }
+        Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getId, Wallets::getBlockAddress);
+        BigDecimal usdAmount = walletOrderDTO.getAmount().divide(EasyTradeConfig.XPF_2_USD, 7, RoundingMode.FLOOR);
+        BigDecimal exchangeRate = EasyTradeConfig.XPF_2_USD;
+        Integer status = 1;
+
+        //TODO 法币充值，走第三方支付接口
+        //把充值的金额往钱包表里余额里增加
+        this.lookUpdateWallets(userId, usdAmount, FlowingActionEnum.INCOME);
+
+        //添加钱包流水记录
+        walletLogsService.insertWalletLogs(usdAmount, userId, FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
 
         //生成充值记录
         AppUserRecharge appUserRecharge = AppUserRecharge.builder()
                 .exchangeRate(exchangeRate)
+                .status(status)
+                .address(wallets.getBlockAddress())
                 .userId(userId)
                 .txid(IdUtil.simpleUUID())
                 .coinUnit(walletOrderDTO.getCoinUnit())
                 .amount(walletOrderDTO.getAmount())
                 .usdAmount(usdAmount)
                 .build();
+
         appUserRechargeMapper.insert(appUserRecharge);
-
-        //把充值的金额往钱包表里余额里增加 TODO 区块链的需要确定充值后是否能及时到账
-        UpdateWrapper<Wallets> wrapper = Wrappers.update();
-        wrapper.lambda()
-                .set(Wallets::getWalletAmount, wallets.getWalletAmount().add(usdAmount))
-                .eq(Wallets::getId, wallets.getId());
-        update(wrapper);
-
-
-        //添加钱包流水记录
-        walletLogsService.insertWalletLogs(usdAmount, userId, FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
         return JsonResult.successResult();
     }
 
@@ -175,24 +163,13 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
         //提现
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
 
-        Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getBlockAddress);
-
-        //根据提现的货币类型计算手续费
-        CoinUnitEnum coinUnitEnum = CoinUnitEnum.valueOfByType(walletOrderDTO.getCoinUnit());
-
-        //如果是提现到区块链，获取区块链地址
-        if (coinUnitEnum == CoinUnitEnum.USDT) {
-            boolean hasAddress = hasBlockAddress(wallets);
-            if (!hasAddress) {
-                return JsonResult.failureResult(ReturnMessageEnum.BLOCK_ADDRESS_EMPTY);
-            }
-        }
+        Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getId, Wallets::getBlockAddress);
 
         //生成提现记录
         AppUserWithdraw appUserWithdraw = AppUserWithdraw.builder()
                 .userId(userId)
                 .txid(IdUtil.simpleUUID())
-                .address(wallets.getBlockAddress())
+                .address(walletOrderDTO.getBlockAddress())
                 .coinUnit(walletOrderDTO.getCoinUnit())
                 .amount(walletOrderDTO.getAmount())
                 .build();
@@ -251,7 +228,18 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateWallet(BigDecimal amount, Integer userId, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
-        Wallets wallets = this.getOne(new LambdaQueryWrapper<Wallets>().select(Wallets::getId, Wallets::getWalletAmount).eq(Wallets::getUserId, userId));
+        this.lookUpdateWallets(userId, amount, flowingActionEnum);
+        //插入流水记录
+        walletLogsService.insertWalletLogs(amount, userId, flowingActionEnum, flowingTypeEnum);
+        return true;
+    }
+
+    @Override
+    public boolean updateWallet(BigDecimal amount, String blockAddress, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
+        Wallets wallets = this.getOne(new LambdaQueryWrapper<Wallets>().select(Wallets::getId, Wallets::getUserId, Wallets::getWalletAmount).eq(Wallets::getBlockAddress, blockAddress));
+        if (wallets == null) {
+            return false;
+        }
         UpdateWrapper<Wallets> walletsUpdateWrapper = Wrappers.update();
         BigDecimal result;
         if (flowingActionEnum == FlowingActionEnum.INCOME) {
@@ -264,36 +252,32 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
                 .eq(Wallets::getId, wallets.getId());
         this.update(walletsUpdateWrapper);
         //插入流水记录
-        walletLogsService.insertWalletLogs(amount, userId, flowingActionEnum, flowingTypeEnum);
+        walletLogsService.insertWalletLogs(amount, wallets.getUserId(), flowingActionEnum, flowingTypeEnum);
         return true;
     }
 
 
     @Override
-    public MyItemAmountDTO getMyItemAmount(List<Integer> firstUserIdList) {
+    public MyTeamAmountDTO getMyItemAmount(List<Integer> firstUserIdList) {
         //团队收益,需要去除大团队
-        List<ItemAmountDTO> itemAmountList = new ArrayList<>();
+        List<TeamAmountDTO> itemAmountList = new ArrayList<>();
         List<TreePathAmountDTO> treePathAmountList;
+
+        //团队总业绩
         BigDecimal itemIncome;
 
         Integer index = 0;
         List<Integer> userIdList;
 
-        //直推一代的业绩
-        BigDecimal fistAmount = BigDecimal.ZERO, userAmount;
         for (Integer id : firstUserIdList) {
-            treePathAmountList = treePathService.getTreeAmountByUserId(id);
+            treePathAmountList = treePathService.getAllAmountByUserId(id);
             itemIncome = new BigDecimal("0");
             for (TreePathAmountDTO amountDTO : treePathAmountList) {
                 //计算总业绩(托管金额+购买机器人金额)
-                userAmount = amountDTO.getPrincipalAmount().add(amountDTO.getRobotAmount());
-                if (amountDTO.getDescendant().equals(id)) {
-                    fistAmount = fistAmount.add(userAmount);
-                }
-                itemIncome = itemIncome.add(userAmount);
+                itemIncome = itemIncome.add(amountDTO.getTotalAmount());
             }
             userIdList = treePathAmountList.stream().map(TreePathAmountDTO::getDescendant).collect(Collectors.toList());
-            itemAmountList.add(new ItemAmountDTO(itemIncome, index, userIdList));
+            itemAmountList.add(new TeamAmountDTO(itemIncome, index, userIdList));
             index++;
         }
 
@@ -301,19 +285,20 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
         List<Integer> maxUserIdList = null;
         //当团队数量大于1的时候去除业绩最高的团队
         if (itemAmountList.size() > 1) {
-            ItemAmountDTO maxItemAmountDTO = itemAmountList.stream().max(Comparator.comparing(x -> x.getItemIncome())).get();
-            itemAmountList.remove(maxItemAmountDTO);
-            maxItemAmount = maxItemAmountDTO.getItemIncome();
-            maxUserIdList = maxItemAmountDTO.getUserIdList();
+            TeamAmountDTO maxTeamAmountDTO = itemAmountList.stream().max(Comparator.comparing(x -> x.getItemIncome())).get();
+            itemAmountList.remove(maxTeamAmountDTO);
+            maxItemAmount = maxTeamAmountDTO.getItemIncome();
+            maxUserIdList = maxTeamAmountDTO.getUserIdList();
         }
+
         //计算小团队总业绩
-        BigDecimal minSum = itemAmountList.stream().map(ItemAmountDTO::getItemIncome).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal minSum = itemAmountList.stream().map(TeamAmountDTO::getItemIncome).reduce(BigDecimal.ZERO, BigDecimal::add);
         List<Integer> minUserIdList = new ArrayList<>();
-        for (ItemAmountDTO itemAmountDTO : itemAmountList) {
-            minUserIdList.addAll(itemAmountDTO.getUserIdList());
+        for (TeamAmountDTO teamAmountDTO : itemAmountList) {
+            minUserIdList.addAll(teamAmountDTO.getUserIdList());
         }
-        return MyItemAmountDTO.builder()
-                .firstAmount(fistAmount)
+
+        return MyTeamAmountDTO.builder()
                 .minItemAmount(minSum)
                 .maxItemAmount(maxItemAmount)
                 .minItemUserIdList(minUserIdList)
@@ -322,15 +307,31 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     }
 
     @Override
-    public MyItemAmountDTO getMyItemAmountByUserId(Integer userId) {
+    public MyTeamAmountDTO getMyItemAmountByUserId(Integer userId) {
         List<AppUsers> appUsersList = appUserMapper.selectList(new LambdaQueryWrapper<AppUsers>().select(AppUsers::getId).eq(AppUsers::getInviteId, userId));
         return getMyItemAmount(appUsersList.stream().map(AppUsers::getId).collect(Collectors.toList()));
     }
 
     @Override
     public BigDecimal getPlatformTotalLockAmount() {
-        PlatformTotalLockAmountDTO platformTotalLockAmount = walletsMapper.getPlatformTotalLockAmount();
-        return platformTotalLockAmount.getTotalPrincipalAmount().add(platformTotalLockAmount.getTotalRobotAmount());
+        return walletsMapper.getPlatformTotalLockAmount();
     }
 
+
+    @Override
+    public List<UserWalletsDTO> selectUserWalletsDTOListByUserLevelGtAndPrincipalAmountGe(int level, BigDecimal proxyMinMoney) {
+        return walletsMapper.selectUserWalletsDTOListByUserLevelGtAndPrincipalAmountGe(level, proxyMinMoney);
+    }
+
+    @Override
+    public boolean lookUpdateWallets(Integer userId, BigDecimal amount, FlowingActionEnum flowingActionEnum) {
+        int ret;
+        if (flowingActionEnum.equals(FlowingActionEnum.INCOME)) {
+            ret = walletsMapper.lockUpdateAddWallet(userId, amount);
+        } else {
+            //减
+            ret = walletsMapper.lockUpdateReduceWallet(userId, amount);
+        }
+        return ret == 1;
+    }
 }

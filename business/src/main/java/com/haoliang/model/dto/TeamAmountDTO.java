@@ -2,6 +2,7 @@ package com.haoliang.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -12,8 +13,9 @@ import java.util.List;
  * @CreateTime 2022/11/15 11:31
  **/
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class ItemAmountDTO {
+public class TeamAmountDTO {
 
     /**
      * 团队总业绩
@@ -29,4 +31,9 @@ public class ItemAmountDTO {
      * 用户ID
      */
     private List<Integer> userIdList;
+
+    public TeamAmountDTO(BigDecimal itemIncome, Integer index) {
+        this.itemIncome = itemIncome;
+        this.index = index;
+    }
 }

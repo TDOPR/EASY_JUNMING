@@ -1,560 +1,327 @@
-//package com.haoliang.manager;
-//
-//import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-//import com.haoliang.enums.BusinessTypeEnum;
-//import com.haoliang.enums.CoinEnum;
-//import com.haoliang.enums.CommuRewardEnum;
-//import com.haoliang.enums.RobotEnum;
-//import com.haoliang.model.*;
-//import com.haoliang.service.*;
-//import com.haoliang.utils.Help;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import javax.security.auth.login.AccountException;
-//import java.math.BigDecimal;
-//import java.util.*;
-//
-//public class TradeManager {
-//    @Autowired
-//    private UserInfoService userInfoService;
-//
-//    @Autowired
-//    private AddressPoolService addressPoolService;
-//
-//    @Autowired
-//    private RechargeService rechargeService;
-//
-//    @Autowired
-//    private AccountService accountService;
-//
-//    @Autowired
-//    private AccountDetailService accountDetailService;
-//
-//    @Autowired
-//    private UserOrderService userOrderService;
-//
-//    @Autowired
-//    private TreePathService treePathsService;
-//
-//    @Autowired
-//    private UserWithdrawService userWithdrawService;
-//
-//    @Autowired
-//    private  RateService rateService;
-//
-//    private final static BigDecimal FEE_RATE = new BigDecimal("0.01");
-//    private final static BigDecimal FA_FEE_RATE = new BigDecimal("0.03");
-//    private final static BigDecimal RECHARGE_VALUE = new BigDecimal("300");
-//    private final static BigDecimal SUPER_RATE = new BigDecimal("0.05");
-//
-//
-///*
-//* 静态收益
-//* */
-//    public void staticIncome() {
-//        //获取当日的收益比例
-//        Random r = new Random();
-//        int rR = r.nextInt(100);
-//        int rRate = 0;
-//
-//        if (rR >= 0 && rR <= 69) {
-//            rRate = 45;
-//        } else if (rR >= 70 && rR <= 79) {
-//            rRate = 50;
-//        } else if (rR >= 80 && rR <= 89) {
-//            rRate = 60;
-//        } else if (rR >= 90 && rR <= 93) {
-//            rRate = 70;
-//        } else if (rR >= 94 && rR <= 97) {
-//            rRate = 80;
-//        } else if (rR >= 98 && rR <= 99) {
-//            rRate = 90;
-//        }
-//
-//        BigDecimal staticRate = new BigDecimal(rRate).divide(new BigDecimal(10000), 4, BigDecimal.ROUND_DOWN);
-//
-//        RateEntity rateEntity = RateEntity.builder()
-//                .rate(staticRate)
-//                .createTime(new Date())
-//                .build();
-//        rateService.save(rateEntity);
-//
-//        BigDecimal superStaticRate = staticRate.multiply(SUPER_RATE);
-//
-//        List<Map> superUserList = accountService.selectSuperUserList();
-//        BigDecimal allAmount = new BigDecimal(accountService.selectAllAmount());
-//        BigDecimal value = allAmount.multiply(superStaticRate);
-//        for (Map accountMap : superUserList) {
-//            int uid = Integer.parseInt(accountMap.get("id").toString());
-//
-//            accountService.addSuperAmountByAid(uid, value, CoinEnum.SUPER_STATIC_USDT.getCoinId());
-//        }
-//
-//        List<Map> userList = accountService.selectStaticIncomeUserList();
-//        for (Map userMap : userList) {
-//            int uid = Integer.parseInt(userMap.get("uid").toString());
-//            BigDecimal amount = new BigDecimal(userMap.get("amount").toString());
-//
-//            BigDecimal staticReward = amount.multiply(staticRate);
-//
-//            QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//            userInfoEntityQueryWrapper.eq("id", uid);
-//            UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//
-//                commuTeamReward(uid, staticReward, CoinEnum.SUPER_STATIC_USDT.getCoinId());
-//                commuAlgebraPrize(uid, staticReward, CoinEnum.SUPER_STATIC_USDT.getCoinId());
-//        }
-//    }
-//
-//    /*
-//    * 金额托管
-//    * */
-//    public void tradeRecharge(String userAddress, BigDecimal amount) throws AccountException {
-//        if (!existUser(userAddress)) {
-//            return;
-//        }
-//
-//        QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//        userInfoEntityQueryWrapper.eq("address", userAddress);
-//        UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//
-//        if (!upgradeRechargeAmount(userInfoEntity, amount, 1)) {
-//            return;
-//        }
-//
-//        //生成订单
-//        UserRecharge userRecharge = UserRecharge.builder()
-//                .address(userAddress)
-//                .type(0)
-//                .uid(userInfoEntity.getId())
-//                .amount(amount)
-//                .createTime(new Date()).build();
-//        userOrderService.save(userRecharge);
-//        //生成账单
-//        accountService.addAmount(userInfoEntity.getId(), CoinEnum.RECHARGE_USDT.getCoinId(), amount, BusinessTypeEnum.RECHARGE, userRecharge.getId());
-//        updatePerformance(userInfoEntity.getId(), amount, true);
-//    }
-//
-//
-//    /*
-//    * 取出托管
-//    * */
-//    public void tradeWithdraw(String userAddress, BigDecimal amount, int type) throws AccountException {
-//        if (!existUser(userAddress)) {
-//            return;
-//        }
-//
-//        QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//        userInfoEntityQueryWrapper.eq("address", userAddress);
-//        UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//
-//        if (!upgradeRechargeAmount(userInfoEntity, amount, 2)) {
-//            return;
-//        }
-//
-//        //生成订单
-//        UserRecharge userRecharge = UserRecharge.builder()
-//                .address(userAddress)
-//                .type(type)
-//                .uid(userInfoEntity.getId())
-//                .amount(amount)
-//                .createTime(new Date()).build();
-//        userOrderService.save(userRecharge);
-//
-//        accountService.subtractAmount(userInfoEntity.getId(), CoinEnum.RECHARGE_USDT.getCoinId(), amount, BusinessTypeEnum.RECHARGE, userRecharge.getId());
-//        updatePerformance(userInfoEntity.getId(), amount, false);
-//
-//        BigDecimal fee;
-//        //收取手续费
-//        if(type==1){
-//            fee = amount.multiply(FEE_RATE);
-//        }else {
-//            fee = amount.multiply(FA_FEE_RATE);
-//        }
-//
-//        BigDecimal mum = amount.subtract(fee);
-//
-//        //生成提现记录
-//        UserWithdraw userWithdraw = UserWithdraw.builder()
-//                .address(userAddress)
-//                .id(userInfoEntity.getId())
-//                .coinName("USDT")
-//                .coinType("EVM")
-//                .coinId(1)
-//                .num(amount)
-//                .fee(fee)
-//                .mum(mum)
-//                .status(4)
-//                .lastUpdateTime(new Date())
-//                .created(new Date()).build();
-//        userWithdrawService.save(userWithdraw);
-//    }
-//
-//
-//    /*
-//    * 更新最大可托管额度
-//    * */
-//    private boolean upgradeRechargeAmount(UserInfoEntity userInfoEntity, BigDecimal amount, int type) {
-//        BigDecimal rechargeMax = userInfoEntity.getRechargeMax();
-//        QueryWrapper<AccountEntity> accountEntityQueryWrapper = new QueryWrapper<>();
-//        accountEntityQueryWrapper.eq("uid", userInfoEntity.getId());
-//        accountEntityQueryWrapper.eq("coin_id", CoinEnum.RECHARGE_USDT.getCoinId());
-//        AccountEntity accountEntity = accountService.getOne(accountEntityQueryWrapper);
-//        BigDecimal alreadyRecharge = accountEntity.getAlreadyRechargeAmount();
-//        if (type == 1) {
-//            BigDecimal newAlreadyRecharge = alreadyRecharge.add(amount);
-//            if (rechargeMax.compareTo(newAlreadyRecharge) < 0) {
-//                return false;
-//            }
-//            accountEntity.setAlreadyRechargeAmount(newAlreadyRecharge);
-//            accountService.updateById(accountEntity);
-//
-//            return true;
-//        } else {
-//            BigDecimal newAlreadyRecharge = alreadyRecharge.subtract(amount);
-//            accountEntity.setAlreadyRechargeAmount(newAlreadyRecharge);
-//            accountService.updateById(accountEntity);
-//            return true;
-//        }
-//    }
-//
-//
-//    /*
-//    * 托管机器人
-//    * */
-//    public void tradeRobot(String userAddress, BigDecimal amount) throws Exception {
-//        if (!existUser(userAddress)) {
-//            return;
-//        }
-//        //判断当前用户是否已有机器人，查看是首次购买还是补差价
-//        QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//        userInfoEntityQueryWrapper.eq("address", userAddress);
-//        UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//        int alreadyRobotLevel = userInfoEntity.getRobotLevel();
-//
-//        int type;
-//        BusinessTypeEnum businessTypeEnum;
-//        int robotLevel = 0;
-//        if (alreadyRobotLevel == 0) {
-//            //首次购买机器人
-//            type = 1;
-//            businessTypeEnum = BusinessTypeEnum.BUY_ROBOT;
-//            if (amount.compareTo(RobotEnum.ROBOT_ONE.getPrice()) == 0) {
-//                robotLevel = 1;
-//            } else if (amount.compareTo(RobotEnum.ROBOT_TW0.getPrice()) == 0) {
-//                robotLevel = 2;
-//            } else if (amount.compareTo(RobotEnum.ROBOT_THREE.getPrice()) == 0) {
-//                robotLevel = 3;
-//            } else if (amount.compareTo(RobotEnum.ROBOT_FOUR.getPrice()) == 0) {
-//                robotLevel = 4;
-//            }
-//            //更新我的上级有效直推数量
-//            QueryWrapper<UserInfoEntity> inviteEntityWrapper = new QueryWrapper<>();
-//            inviteEntityWrapper.eq("id", userInfoEntity.getDirectInviteid());
-//            UserInfoEntity inviteEntity = userInfoService.getOne(inviteEntityWrapper);
-//            inviteEntity.setDirectNum(inviteEntity.getDirectNum() + 1);
-//            userInfoService.updateById(inviteEntity);
-//        } else {
-//            //补差价升级机器人
-//            type = 2;
-//            businessTypeEnum = BusinessTypeEnum.UPGRADE_ROBOT;
-//            BigDecimal alreadyRobotAmount = BigDecimal.ZERO;
-//            if (alreadyRobotLevel == RobotEnum.ROBOT_ONE.getCode()) {
-//                alreadyRobotAmount = RobotEnum.ROBOT_ONE.getPrice();
-//            } else if (alreadyRobotLevel == RobotEnum.ROBOT_TW0.getCode()) {
-//                alreadyRobotAmount = RobotEnum.ROBOT_TW0.getPrice();
-//            } else if (alreadyRobotLevel == RobotEnum.ROBOT_THREE.getCode()) {
-//                alreadyRobotAmount = RobotEnum.ROBOT_THREE.getPrice();
-//            } else if (alreadyRobotLevel == RobotEnum.ROBOT_FOUR.getCode()) {
-//                alreadyRobotAmount = RobotEnum.ROBOT_FOUR.getPrice();
-//            }
-//            BigDecimal currentRobotAmount = alreadyRobotAmount.add(amount);
-//            if (currentRobotAmount.compareTo(RobotEnum.ROBOT_TW0.getPrice()) == 0) {
-//                robotLevel = 2;
-//            } else if (currentRobotAmount.compareTo(RobotEnum.ROBOT_THREE.getPrice()) == 0) {
-//                robotLevel = 3;
-//            } else if (currentRobotAmount.compareTo(RobotEnum.ROBOT_FOUR.getPrice()) == 0) {
-//                robotLevel = 4;
-//            }
-//        }
-//
-//        //生成订单
-//        UserRecharge userRecharge = UserRecharge.builder()
-//                .address(userAddress)
-//                .type(type)
-//                .uid(userInfoEntity.getId())
-//                .amount(amount)
-//                .createTime(new Date()).build();
-//        userOrderService.save(userRecharge);
-//        //生成账单
-//        accountDetailService.generateBill(userInfoEntity.getId(), businessTypeEnum, userRecharge.getId(), amount);
-//        //修改机器人等级，以及用户的托管上限
-//        UserInfoEntity updateUserInfoEntity = UserInfoEntity.builder()
-//                .id(userInfoEntity.getId())
-//                .rechargeMax(RobotEnum.getRechargeMaxByCode(robotLevel))
-//                .robotLevel(robotLevel).build();
-//        userInfoService.updateById(updateUserInfoEntity);
-//        updatePerformance(userInfoEntity.getId(), amount, true);
-//        //发机器人推广奖
-//        robotReward(userInfoEntity.getDirectInviteid(), robotLevel, amount, userRecharge.getId());
-//    }
-//
-//
-//
-//    /*
-//    * 从recharge表拉取  已托管未处理用户信息
-//    * */
-//    public void reUsdt(String userAddress, BigDecimal amount) {
-//        if (!existUser(userAddress)) {
-//            return;
-//        }
-//
-//        QueryWrapper<UserInfoEntity> userWrapper = new QueryWrapper<>();
-//        userWrapper.eq("address", userAddress);
-//        UserInfoEntity userInfoEntity = userInfoService.getOne(userWrapper);
-//        if (Help.isNull(userInfoEntity.getUsdtAddress())) {
-//            String usdtAddress = addressPoolService.getAddress();
-//            UserInfoEntity updateUserInfoEntity = UserInfoEntity.builder()
-//                    .address(userAddress)
-//                    .usdtAddress(usdtAddress)
-//                    .calculateAmount(amount)
-//                    .build();
-//            userInfoService.save(updateUserInfoEntity);
-//            addressPoolService.deleteByAddress(usdtAddress);
-//        } else {
-//            UserInfoEntity updateUserInfoEntity = UserInfoEntity.builder()
-//                    .address(userAddress)
-//                    .calculateAmount(amount)
-//                    .build();
-//            userInfoService.save(updateUserInfoEntity);
-//        }
-//    }
-//
-//
-//    public void rechargeEvent() {
-//
-//        List<RechargeEntity> rechargeEntitys = rechargeService.selectPatch();
-//        for (RechargeEntity rechargeEntity : rechargeEntitys) {
-//            int uid = rechargeEntity.getId();
-//            String address = rechargeEntity.getAddress();
-//            QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//            userInfoEntityQueryWrapper.eq("address", address);
-//            UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//            if (Help.isNull(userInfoEntity)) {
-//                UserInfoEntity newUserInfoEntity = UserInfoEntity.builder()
-//                        .address(address)
-//                        .id(uid)
-//                        .build();
-//                userInfoService.save(newUserInfoEntity);
-//            } else {
-//                BigDecimal amount = userInfoEntity.getCalculateAmount().add(rechargeEntity.getCalculateAmount());
-//                UserInfoEntity newUserInfoEntity = UserInfoEntity.builder()
-//                        .address(address)
-//                        .id(uid)
-//                        .calculateAmount(amount)
-//                        .build();
-//                userInfoService.save(newUserInfoEntity);
-//            }
-//            rechargeService.updateType(uid);
-//
-//        }
-//    }
-//
-//
-//    /*
-//    * 创建用户
-//    * */
-//    public void createUser(String userAddress, String inviteUserCode) throws Exception {
-//        //需要注册用户
-//        userInfoService.createUser(userAddress, inviteUserCode);
-//    }
-//
-//
-//    /*
-//    * 更新团队业绩
-//    * */
-//    private void updatePerformance(int userId, BigDecimal amount, boolean type) {
-//        QueryWrapper<TreePath> treePathsEntityQueryWrapper = new QueryWrapper<>();
-//        treePathsEntityQueryWrapper.eq("descendant", userId);
-//        List<TreePath> treePathsEntityList = treePathsService.list(treePathsEntityQueryWrapper);
-//        for (TreePath treePathsEntity : treePathsEntityList) {
-//            if (type) {
-//                userInfoService.addTeamPerformanceById(treePathsEntity.getAncestor(), amount);
-//            } else {
-//                QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//                userInfoEntityQueryWrapper.eq("id", treePathsEntity.getAncestor());
-//                UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//                if (userInfoEntity.getTeamPerformance().compareTo(amount) < 0) {
-//                    amount = userInfoEntity.getTeamPerformance();
-//                }
-//                userInfoService.subtractTeamPerformanceById(treePathsEntity.getAncestor(), amount);
-//            }
-//            levelChange(treePathsEntity.getAncestor());
-//        }
-//    }
-//
-//
-//    /*
-//    * 更新级别
-//    * */
-//    private void levelChange(int userId) {
-//        QueryWrapper<TreePath> treePathEntityQueryWrapper = new QueryWrapper<>();
-//        treePathEntityQueryWrapper.eq("ancestor", userId);
-//        treePathEntityQueryWrapper.eq("level", 1);
-//        List<TreePath> treePathsEntity = treePathsService.list(treePathEntityQueryWrapper);
-//
-//        BigDecimal smallTeamPerformance;
-//        BigDecimal bigTeamPerformance = BigDecimal.ZERO;
-//
-//        for (TreePath treePathEntity : treePathsEntity) {
-//            QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//            userInfoEntityQueryWrapper.eq("id", treePathEntity.getDescendant());
-//            UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//            if (userInfoEntity.getTeamPerformance().compareTo(bigTeamPerformance) >= 0) {
-//                bigTeamPerformance = userInfoEntity.getTeamPerformance();
-//            }
-//        }
-//
-//        QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//        userInfoEntityQueryWrapper.eq("id", userId);
-//        UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//
-//        int userLevel = userInfoEntity.getLevel();
-//
-//        smallTeamPerformance = userInfoEntity.getTeamPerformance().subtract(bigTeamPerformance);
-//
-//        if(smallTeamPerformance.compareTo(CommuRewardEnum.REWARD_RATE_FIVE.getValue())>=0){
-//            userLevel = CommuRewardEnum.REWARD_RATE_FIVE.getLevel();
-//        } else if (smallTeamPerformance.compareTo(CommuRewardEnum.REWARD_RATE_FOUR.getValue())>=0) {
-//            userLevel = CommuRewardEnum.REWARD_RATE_FOUR.getLevel();
-//        }else if (smallTeamPerformance.compareTo(CommuRewardEnum.REWARD_RATE_THREE.getValue())>=0) {
-//            userLevel = CommuRewardEnum.REWARD_RATE_THREE.getLevel();
-//        }else if (smallTeamPerformance.compareTo(CommuRewardEnum.REWARD_RATE_TW0.getValue())>=0) {
-//            userLevel = CommuRewardEnum.REWARD_RATE_TW0.getLevel();
-//        }else if (smallTeamPerformance.compareTo(CommuRewardEnum.REWARD_RATE_ONE.getValue())>=0) {
-//            userLevel = CommuRewardEnum.REWARD_RATE_ONE.getLevel();
-//        }
-//
-//        UserInfoEntity newUserInfoEntity = UserInfoEntity.builder()
-//                .id(userId)
-//                .level(userLevel)
-//                .build();
-//        userInfoService.updateById(newUserInfoEntity);
-//    }
-//
-//
-//    /*
-//    * 社区团队奖
-//    * */
-//    private void commuTeamReward(int userId, BigDecimal amount, long coinId, int orderId) throws Exception{
-//
-//        QueryWrapper<UserInfoEntity> userInfoEntityQueryWrapper = new QueryWrapper<>();
-//        userInfoEntityQueryWrapper.eq("id", userId);
-//        UserInfoEntity userInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//
-//        QueryWrapper<TreePath> treePathsEntityQueryWrapper = new QueryWrapper<>();
-//        treePathsEntityQueryWrapper.eq("descendant", userId);
-//        treePathsEntityQueryWrapper.ne("ancestor", userId);
-//        treePathsEntityQueryWrapper.orderByDesc("level");
-//        List<TreePath> treePathsEntityList = treePathsService.list(treePathsEntityQueryWrapper);
-//
-//        boolean teamRewardFlag = false;
-//        BigDecimal lastRate;
-//        int lastLevel = 0;
-//        BigDecimal rate = BigDecimal.ZERO;
-//        BusinessTypeEnum businessTypeEnum=BusinessTypeEnum.REWARD_COMMU_TEAM;
-//
-//        for (TreePath treePathsEntity : treePathsEntityList) {
-//            Map userMap = treePathsService.getUserLevelById(treePathsEntity.getAncestor());
-//            int id = Integer.parseInt(userMap.get("ID").toString());
-//            int level = Integer.parseInt(userMap.get("LEVEL").toString());
-//
-//            QueryWrapper<UserInfoEntity> inviteInfoEntityQueryWrapper = new QueryWrapper<>();
-//            inviteInfoEntityQueryWrapper.eq("id", userId);
-//            UserInfoEntity inviteInfoEntity = userInfoService.getOne(userInfoEntityQueryWrapper);
-//
-//            if (level > lastLevel) {
-//                teamRewardFlag = true;
-//                rate = CommuRewardEnum.getRateByLevel(level);
-//            }
-//            if (teamRewardFlag) {
-//                lastRate = rate;
-//                amount = amount.multiply(rate.subtract(lastRate)).divide(new BigDecimal(100), 4, BigDecimal.ROUND_DOWN);
-//                lastLevel = level;
-//                accountService.addAmount(inviteInfoEntity.getDirectInviteid(), coinId, amount, businessTypeEnum, orderId);
-//            }
-//        }
-//    }
-//
-//
-//    /*
-//    * 社区代数奖
-//    * */
-//    private void commuAlgebraPrize(int inviteId,int coinId, int userId, BigDecimal reward, BusinessTypeEnum businessTypeEnum, int orderId) throws Exception{
-//
-//        List<Map> treePathsEntityList = treePathsService.getPathById(userId);
-//
-//        BigDecimal algebraReward = BigDecimal.ZERO;
-//        BigDecimal userRechargeAmount;
-//
-//        for(Map userMap: treePathsEntityList){
-//            int uid = Integer.parseInt(userMap.get("uid").toString());
-//            int level = Integer.parseInt(userMap.get("LEVEL").toString());
-//
-//            userRechargeAmount = new BigDecimal(accountService.selectUserRechargeAmount(uid));
-//
-//            if(userRechargeAmount.compareTo(RECHARGE_VALUE)>0){
-//
-//                if(level==1){
-//                    algebraReward = reward.multiply(new BigDecimal(25)).divide(new BigDecimal(100));
-//                } else if (level==2) {
-//                    algebraReward = reward.multiply(new BigDecimal(15)).divide(new BigDecimal(100));
-//                } else if (level==3) {
-//                    algebraReward = reward.multiply(new BigDecimal(5)).divide(new BigDecimal(100));
-//                }
-//                accountService.addAmount(inviteId, coinId, algebraReward, businessTypeEnum, orderId);
-//            }
-//        }
-//    }
-//
-//
-//    /*
-//    * 购买机器人奖励
-//    * */
-//    private void robotReward(int inviteId, int userRobotLevel, BigDecimal amount, int orderId) throws
-//            AccountException {
-//        //查询我的直推信息
-//        QueryWrapper<UserInfoEntity> userInviteEntityWrapper = new QueryWrapper<>();
-//        userInviteEntityWrapper.eq("id", inviteId);
-//        UserInfoEntity userInviteEntity = userInfoService.getOne(userInviteEntityWrapper);
-//        int directNum = userInviteEntity.getDirectNum();
-//        BigDecimal inviteRechargeAmount = new BigDecimal(accountService.selectUserRechargeAmount(inviteId));
-//        int rate;
-//        switch (directNum) {
-//            case 0:
-//                rate = 0;
-//                break;
-//            case 1:
-//                rate = 15;
-//                break;
-//            case 2:
-//                rate = 20;
-//                break;
-//            case 3:
-//                rate = 25;
-//                break;
-//            case 4:
-//                rate = 30;
-//                break;
-//            default:
-//                rate = 30;
-//        }
-//        BusinessTypeEnum businessTypeEnum;
-//        long coinId;
-//        BigDecimal reward = amount.multiply(new BigDecimal(rate)).divide(new BigDecimal(100), 4, BigDecimal.ROUND_DOWN);
-//        if (inviteRechargeAmount.compareTo(RECHARGE_VALUE)>=0) {
-//            businessTypeEnum = BusinessTypeEnum.REWARD_ROBOT;
-//            coinId = CoinEnum.ROBOT_USDT.getCoinId();
-//            accountService.addAmount(inviteId, coinId, reward, businessTypeEnum, orderId);
-//        }
-//    }
-//}
+package com.haoliang.manager;
+
+import cn.hutool.core.date.TimeInterval;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.haoliang.common.enums.BooleanEnum;
+import com.haoliang.constant.EasyTradeConfig;
+import com.haoliang.enums.AlgebraEnum;
+import com.haoliang.enums.FlowingActionEnum;
+import com.haoliang.enums.FlowingTypeEnum;
+import com.haoliang.enums.ProxyLevelEnum;
+import com.haoliang.mapper.AppUserMapper;
+import com.haoliang.mapper.BusinessJobMapper;
+import com.haoliang.model.*;
+import com.haoliang.model.dto.TreePathAmountDTO;
+import com.haoliang.model.dto.UserWalletsDTO;
+import com.haoliang.service.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author Dominick Li
+ * @Description 核心业务类
+ * @CreateTime 2022/12/5 16:18
+ **/
+@Slf4j
+@Component
+public class TradeManager {
+
+    @Autowired
+    private WalletsService walletsService;
+
+    @Autowired
+    private TreePathService treePathService;
+
+    @Autowired
+    private WalletLogsService walletLogsService;
+
+    @Autowired
+    private DayRateService dayRateService;
+
+    @Resource
+    private ProfitLogsService profitLogsService;
+
+    @Resource
+    private BusinessJobMapper businessJobMapper;
+
+    @Resource
+    private AppUserMapper appUserMapper;
+
+    /**
+     * 发放当天用户的托管静态收益
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void sendStaticTask(LocalDate localDate) {
+        log.info("-------------计算日收益任务开始--------------");
+        TimeInterval timeInterval = new TimeInterval();
+        timeInterval.start();
+
+        //查询托管金额大于0的用户钱包信息
+        List<Wallets> walletsList = walletsService.list(new LambdaQueryWrapper<Wallets>()
+                .select(
+                        Wallets::getPrincipalAmount,
+                        Wallets::getUserId,
+                        Wallets::getRobotLevel
+                )
+                .gt(Wallets::getPrincipalAmount, 0));
+        long selectTime = timeInterval.intervalRestart();
+
+        List<ProfitLogs> profitLogsList = new ArrayList<>(walletsList.size());
+
+        //当天产生的静态收益
+        BigDecimal amount;
+        DayRate dayRate = dayRateService.selectNewDayRate();
+        for (Wallets wallets : walletsList) {
+            //根据托管金额和机器人对应的利率计算收益金额
+            amount = wallets.getPrincipalAmount().multiply(dayRateService.getDayRateByLevel(dayRate, wallets.getRobotLevel()));
+            profitLogsList.add(
+                    ProfitLogs.builder()
+                    .userId(wallets.getUserId())
+                    .principal(wallets.getPrincipalAmount())
+                    .generatedAmount(amount)
+                    .createDate(localDate)
+                    .build()
+            );
+        }
+        long computeTime = timeInterval.intervalRestart();
+
+        //批量插入日收益信息
+        profitLogsService.saveBatch(profitLogsList);
+        //添加当天任务处理成功标识
+        BusinessJob businessJob = new BusinessJob();
+        businessJob.setCreateDate(LocalDate.now());
+        businessJobMapper.insert(businessJob);
+        long saveTime = timeInterval.intervalRestart();
+        log.info("-------------计算日收益任务结束 select times:{} ms ,compute times:{} ms,save times:{} ms,total:{} ms--------------", selectTime, computeTime, saveTime, (selectTime + computeTime + saveTime));
+    }
+
+    /**
+     * 发放当天的代数奖
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void sendAlgebraTask(BusinessJob businessJob) {
+        log.info("-------------开始发放代数奖--------------");
+        TimeInterval timeInterval = new TimeInterval();
+        timeInterval.start();
+
+        //获取有托管金额大于300的用户
+        List<Wallets> walletsList = walletsService.list(new LambdaQueryWrapper<Wallets>()
+                .select(
+                        Wallets::getUserId,
+                        Wallets::getWalletAmount
+                )
+                .gt(Wallets::getPrincipalAmount, EasyTradeConfig.PROXY_MIN_MONEY)
+        );
+        long selectTime = timeInterval.intervalRestart();
+
+        List<WalletLogs> walletLogsList = new ArrayList<>();
+        List<TreePathAmountDTO> treePathList;
+        BigDecimal totalIncome;
+
+        for (Wallets wallets : walletsList) {
+            //获取团队指定代数静态收益
+            treePathList = treePathService.getProfitAmountByUserIdAndLevelList(wallets.getUserId(), businessJob.getCreateDate(), EasyTradeConfig.ALGEBRA_LEVEL);
+            totalIncome = new BigDecimal("0");
+            for (TreePathAmountDTO treePathAmountDTO : treePathList) {
+                totalIncome = totalIncome.add(treePathAmountDTO.getTotalAmount().multiply(AlgebraEnum.getRechargeMaxByLevel(treePathAmountDTO.getLevel())));
+            }
+
+            //金额大于零则发放给用户
+            if (totalIncome.compareTo(BigDecimal.ZERO) > 0) {
+                //更新钱包余额
+                walletsService.lookUpdateWallets(wallets.getUserId(), totalIncome, FlowingActionEnum.INCOME);
+
+                //插入流水变更记录
+                walletLogsList.add(
+                        WalletLogs.builder()
+                                .userId(wallets.getUserId())
+                                .amount(totalIncome)
+                                .action(FlowingActionEnum.INCOME.getValue())
+                                .type(FlowingTypeEnum.ALGEBRA.getValue())
+                                .build()
+                );
+                log.info("发放代数奖: userId={} ,amount={} ", wallets.getUserId(), totalIncome);
+            }
+        }
+        long computeTime = timeInterval.intervalRestart();
+
+        //插入钱包流水变更记录
+        if (walletLogsList.size() > 0) {
+            walletLogsService.saveBatch(walletLogsList);
+        }
+
+        //更新发放代数奖任务完成
+        UpdateWrapper<BusinessJob> jobUpdateWrapper = Wrappers.update();
+        jobUpdateWrapper.lambda()
+                .set(BusinessJob::getAlgebraTask, BooleanEnum.TRUE.getIntValue())
+                .eq(BusinessJob::getCreateDate, businessJob.getCreateDate());
+        businessJobMapper.update(null, jobUpdateWrapper);
+        long saveTime = timeInterval.intervalRestart();
+        log.info("-------------结束发放代数奖 select times:{} ms ,compute times:{} ms,save times:{} ms,total:{} ms--------------", selectTime, computeTime, saveTime, (selectTime + computeTime + saveTime));
+    }
+
+    /**
+     * 发放当天的团队奖
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void sendTeamTask(BusinessJob businessJob) {
+        log.info("-------------开始发放团队奖--------------");
+        TimeInterval timeInterval = new TimeInterval();
+        timeInterval.start();
+
+        //代理商等级大于0的用户才有资格发放团队奖
+        List<UserWalletsDTO> walletsList = walletsService.selectUserWalletsDTOListByUserLevelGtAndPrincipalAmountGe(0, EasyTradeConfig.PROXY_MIN_MONEY);
+        long selectTime = timeInterval.intervalRestart();
+
+        //小团队量化收益,要发放给供应商的量化收益
+        BigDecimal minTeamTotalProfitAmount, sendAmount;
+        List<WalletLogs> walletLogsList = new ArrayList<>();
+
+        for (UserWalletsDTO userWalletsDTO : walletsList) {
+            minTeamTotalProfitAmount = treePathService.getMinTeamTotalProfitAmount(userWalletsDTO.getUserId(), businessJob.getCreateDate());
+            //收益大于零的时候发放给用户
+            if (minTeamTotalProfitAmount.compareTo(BigDecimal.ZERO) > 0) {
+                sendAmount = minTeamTotalProfitAmount.multiply(ProxyLevelEnum.getByLevel(userWalletsDTO.getLevel()).getIncomeRatio());
+                //更新钱包余额
+                walletsService.lookUpdateWallets(userWalletsDTO.getUserId(), sendAmount, FlowingActionEnum.INCOME);
+
+                walletLogsList.add(
+                        WalletLogs.builder()
+                                .userId(userWalletsDTO.getUserId())
+                                .amount(sendAmount)
+                                .action(FlowingActionEnum.INCOME.getValue())
+                                .type(FlowingTypeEnum.TEAM.getValue())
+                                .build()
+                );
+                log.info("发放团队奖: userId={} ,amount={} ", userWalletsDTO.getUserId(), sendAmount);
+            }
+        }
+        long computeTime = timeInterval.intervalRestart();
+
+        //插入钱包流水变更记录
+        if (walletLogsList.size() > 0) {
+            walletLogsService.saveBatch(walletLogsList);
+        }
+
+        //更新发放团队奖任务完成
+        UpdateWrapper<BusinessJob> jobUpdateWrapper = Wrappers.update();
+        jobUpdateWrapper.lambda()
+                .set(BusinessJob::getTeamTask, BooleanEnum.TRUE.getIntValue())
+                .eq(BusinessJob::getCreateDate, businessJob.getCreateDate());
+        businessJobMapper.update(null, jobUpdateWrapper);
+        long saveTime = timeInterval.intervalRestart();
+        log.info("-------------结束发放团队奖 select times:{} ms ,compute times:{} ms,save times:{} ms,total:{} ms--------------", selectTime, computeTime, saveTime, (selectTime + computeTime + saveTime));
+    }
+
+    /**
+     * 发放今天的分红奖励
+     */
+    public void sendSpecialTask(BusinessJob businessJob) {
+        log.info("-------------开始发放分红奖--------------");
+        TimeInterval timeInterval = new TimeInterval();
+        timeInterval.start();
+
+        //供应商等级4和5级才有资格发放分红奖
+        List<UserWalletsDTO> walletsList = walletsService.selectUserWalletsDTOListByUserLevelGtAndPrincipalAmountGe(ProxyLevelEnum.THREE.getLevel(), EasyTradeConfig.PROXY_MIN_MONEY);
+        long selectTime = timeInterval.intervalRestart();
+
+        //团队总量化收益,该发放的分红奖励
+        BigDecimal teamTotalProfitAmount, sendAmount;
+        List<WalletLogs> walletLogsList = new ArrayList<>();
+
+        for (UserWalletsDTO userWalletsDTO : walletsList) {
+            teamTotalProfitAmount = treePathService.getTeamTotalProfitAmount(userWalletsDTO.getUserId(), businessJob.getCreateDate());
+            if (teamTotalProfitAmount.compareTo(BigDecimal.ZERO) > 0) {
+                sendAmount = teamTotalProfitAmount.multiply(EasyTradeConfig.SPECIAL_AWARD_RATE);
+                //更新钱包余额
+                walletsService.lookUpdateWallets(userWalletsDTO.getUserId(), sendAmount, FlowingActionEnum.INCOME);
+
+                walletLogsList.add(
+                        WalletLogs.builder()
+                                .userId(userWalletsDTO.getUserId())
+                                .amount(sendAmount)
+                                .action(FlowingActionEnum.INCOME.getValue())
+                                .type(FlowingTypeEnum.SPECIAL.getValue())
+                                .build()
+                );
+                log.info("发放分红奖: userId={} ,amount={} ", userWalletsDTO.getUserId(), sendAmount);
+            }
+        }
+        long computeTime = timeInterval.intervalRestart();
+
+        //插入钱包流水变更记录
+        if (walletLogsList.size() > 0) {
+            walletLogsService.saveBatch(walletLogsList);
+        }
+
+        //更新发放分红奖任务完成
+        UpdateWrapper<BusinessJob> jobUpdateWrapper = Wrappers.update();
+        jobUpdateWrapper.lambda()
+                .set(BusinessJob::getSpecialTask, BooleanEnum.TRUE.getIntValue())
+                .eq(BusinessJob::getCreateDate, businessJob.getCreateDate());
+        businessJobMapper.update(null, jobUpdateWrapper);
+        long saveTime = timeInterval.intervalRestart();
+        log.info("-------------结束发放分红奖 select times:{} ms ,compute times:{} ms,save times:{} ms,total:{} ms--------------", selectTime, computeTime, saveTime, (selectTime + computeTime + saveTime));
+    }
+
+    /**
+     * 结算量化收益给客户
+     */
+    public void grantToUser() {
+        log.info("-------------发放周收益给用户任务开始--------------");
+        TimeInterval timeInterval = new TimeInterval();
+        timeInterval.start();
+
+        List<AppUsers> appUsersList = appUserMapper.selectList(new LambdaQueryWrapper<AppUsers>().select(AppUsers::getId).eq(AppUsers::getEnabled, BooleanEnum.TRUE.getIntValue()));
+        long selectTime = timeInterval.intervalRestart();
+
+        List<ProfitLogs> profitLogsList;
+        List<Long> allIdList = new ArrayList<>();
+        BigDecimal total;
+        List<WalletLogs> walletLogList = new ArrayList<>();
+        WalletLogs walletLogs;
+        for (AppUsers appUsers : appUsersList) {
+            //获取用户未结算的收益信息
+            profitLogsList = profitLogsService.list(new LambdaQueryWrapper<ProfitLogs>().eq(ProfitLogs::getStatus, 0).eq(ProfitLogs::getUserId, appUsers.getId()));
+            allIdList.addAll(profitLogsList.stream().map(ProfitLogs::getId).collect(Collectors.toList()));
+            //获取周收益金额
+            total = new BigDecimal("0.0");
+            for (ProfitLogs profitLogs : profitLogsList) {
+                total = total.add(profitLogs.getGeneratedAmount());
+            }
+            //更新钱包余额
+            walletsService.lookUpdateWallets(appUsers.getId(), total, FlowingActionEnum.INCOME);
+
+            walletLogs = WalletLogs.builder()
+                    .userId(appUsers.getId())
+                    .amount(total)
+                    .action(FlowingActionEnum.INCOME.getValue())
+                    .type(FlowingTypeEnum.STATIC.getValue())
+                    .build();
+            //添加钱包交易流水
+            walletLogList.add(walletLogs);
+        }
+        long computeTime = timeInterval.intervalRestart();
+
+        if (allIdList.size() > 0) {
+            //修改未结算的流水记录为已结算
+            profitLogsService.updateUseByIdList(allIdList);
+        }
+
+        //提交钱包流水日志
+        walletLogsService.saveBatch(walletLogList);
+        long saveTime = timeInterval.intervalRestart();
+        log.info("-------------发放周收益给用户任务结束 select times:{} ms ,compute times:{} ms,save times:{} ms,total:{} ms--------------", selectTime, computeTime, saveTime, (selectTime + computeTime + saveTime));
+    }
+}

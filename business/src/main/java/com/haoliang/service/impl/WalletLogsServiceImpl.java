@@ -224,8 +224,8 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
 
         LambdaQueryWrapper<ProfitLogs> lambdaQueryWrapper = new LambdaQueryWrapper<ProfitLogs>()
-                .select(ProfitLogs::getPrincipal, ProfitLogs::getGeneratedAmount, ProfitLogs::getStatus, ProfitLogs::getCreateTime)
-                .orderByDesc(ProfitLogs::getCreateTime)
+                .select(ProfitLogs::getPrincipal, ProfitLogs::getGeneratedAmount, ProfitLogs::getStatus, ProfitLogs::getCreateDate)
+                .orderByDesc(ProfitLogs::getCreateDate)
                 .eq(ProfitLogs::getUserId, userId);
 
         //是否根据交割类型查询数据
@@ -240,7 +240,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         BigDecimal noSettled = profitLogsService.getTotalAmountByUserIdAndType(userId, 0);
         for (ProfitLogs profitLogs : page.getRecords()) {
             profitLogsVOList.add(ProfitLogsDetailVO.ProfitLogsVO.builder()
-                    .createTime(profitLogs.getCreateTime().toLocalDate().toString())
+                    .createTime(profitLogs.getCreateDate().toString())
                     .generatedAmount(NumberUtil.toTwoDecimal(profitLogs.getGeneratedAmount()))
                     .principal(NumberUtil.toTwoDecimal(profitLogs.getPrincipal()))
                     .type(profitLogs.getStatus())

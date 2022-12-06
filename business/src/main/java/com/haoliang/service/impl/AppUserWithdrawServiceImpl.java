@@ -83,6 +83,8 @@ public class AppUserWithdrawServiceImpl extends ServiceImpl<AppUserWithdrawMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void withdraw(AppUserWithdraw appUserWithdraw, Wallets wallets) {
+
+        //根据币种计算手续费
         CoinUnitEnum coinUnitEnum = CoinUnitEnum.valueOfByType(appUserWithdraw.getCoinUnit());
         BigDecimal fee = appUserWithdraw.getAmount().multiply(coinUnitEnum.getInterestRate());
 
@@ -94,17 +96,14 @@ public class AppUserWithdrawServiceImpl extends ServiceImpl<AppUserWithdrawMappe
         if (coinUnitEnum == CoinUnitEnum.LEGAL_CURRENCY) {
             actualAmount = actualAmountUSD.divide(EasyTradeConfig.XPF_2_USD, 7, RoundingMode.FLOOR);
             //法币金额提现
-            //TODO 法币充值，走第三方支付接口
+            //TODO 法币提现，走第三方提现接口
             {
 
             }
             state = WithdrawStateEnum.SUCCESS.getState();
             //把提现的金额往钱包表里余额减去
-            UpdateWrapper<Wallets> wrapper = Wrappers.update();
-            wrapper.lambda()
-                    .set(Wallets::getWalletAmount, wallets.getWalletAmount().subtract(appUserWithdraw.getAmount()))
-                    .eq(Wallets::getId, wallets.getId());
-            walletsMapper.update(null, wrapper);
+            walletsMapper.lockUpdateReduceWallet(wallets.getUserId(),appUserWithdraw.getAmount());
+
             //添加钱包流水记录
             WalletLogs walletLogs = WalletLogs.builder()
                     .userId(wallets.getUserId())
@@ -114,8 +113,8 @@ public class AppUserWithdrawServiceImpl extends ServiceImpl<AppUserWithdrawMappe
                     .build();
             walletLogsMapper.insert(walletLogs);
         } else {
-            //TODO Usdt充值 需要通过定时任务去扫描区块链打币有没有成功
-            state = WithdrawStateEnum.COIN_STRIKING.getState();
+            //Usdt提现 需要通过定时任务去扫描区块链打币有没有成功
+            state = WithdrawStateEnum.TO_BE_CONFIRMED_BY_THE_BLOCK.getState();
             actualAmount = actualAmountUSD.divide(EasyTradeConfig.USDT_2_USD, 7, RoundingMode.FLOOR);
         }
         appUserWithdraw.setFee(fee);

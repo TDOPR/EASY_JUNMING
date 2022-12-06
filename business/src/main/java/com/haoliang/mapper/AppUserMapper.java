@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haoliang.model.AppUsers;
 import com.haoliang.model.condition.AppUsersCondition;
+import com.haoliang.model.dto.AppUserRebotDTO;
 import com.haoliang.model.vo.AppUsersVO;
 import org.apache.ibatis.annotations.Param;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 public interface AppUserMapper extends BaseMapper<AppUsers> {
 
@@ -18,5 +16,5 @@ public interface AppUserMapper extends BaseMapper<AppUsers> {
 
     Integer getValidUserCountByInviteId(Integer userId);
 
-    List<BigDecimal> selectUserRebotRef(Integer userId);
+    AppUserRebotDTO getRobotDetailByUserId(Integer userId);
 }

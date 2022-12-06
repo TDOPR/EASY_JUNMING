@@ -80,14 +80,10 @@ public class IpAddrUtil {
      *
      * @return 本地IP地址
      */
-    public static String getHostIp()
-    {
-        try
-        {
+    public static String getHostIp() {
+        try {
             return InetAddress.getLocalHost().getHostAddress();
-        }
-        catch (UnknownHostException e)
-        {
+        } catch (UnknownHostException e) {
         }
         return "127.0.0.1";
     }
@@ -97,14 +93,10 @@ public class IpAddrUtil {
      *
      * @return 本地主机名
      */
-    public static String getHostName()
-    {
-        try
-        {
+    public static String getHostName() {
+        try {
             return InetAddress.getLocalHost().getHostName();
-        }
-        catch (UnknownHostException e)
-        {
+        } catch (UnknownHostException e) {
         }
         return "未知";
     }

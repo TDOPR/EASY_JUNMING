@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MyItemAmountDTO {
+public class MyTeamAmountDTO {
 
     /**
      * 小团队用户信息
@@ -39,9 +39,5 @@ public class MyItemAmountDTO {
      */
     private BigDecimal maxItemAmount;
 
-    /**
-     * 一代的业绩
-     */
-    private BigDecimal firstAmount;
 
 }

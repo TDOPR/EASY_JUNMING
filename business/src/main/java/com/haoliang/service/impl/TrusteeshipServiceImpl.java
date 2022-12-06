@@ -42,6 +42,9 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
     @Autowired
     private StrategyService strategyService;
 
+    @Autowired
+    private UpdateUserLevelTaskService updateUserLevelTaskService;
+
     @Resource
     private ProfitLogsMapper profitLogsMapper;
 
@@ -77,6 +80,8 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
 
         //添加钱包流水记录
         walletLogsService.insertWalletLogs(amountDTO.getAmount(), userId, FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.ENTRUSTMENT);
+
+        updateUserLevelTaskService.insertListByUserId(userId);
         return JsonResult.successResult();
     }
 
@@ -101,6 +106,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
 
         //添加钱包流水记录
         walletLogsService.insertWalletLogs(amountDTO.getAmount(), userId, FlowingActionEnum.INCOME, FlowingTypeEnum.WITHDRAWL_WALLET);
+        updateUserLevelTaskService.insertListByUserId(userId);
         return JsonResult.successResult();
     }
 

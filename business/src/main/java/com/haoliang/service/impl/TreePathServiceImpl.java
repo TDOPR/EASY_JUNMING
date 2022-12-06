@@ -10,6 +10,8 @@ import com.haoliang.service.TreePathService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -34,8 +36,8 @@ public class TreePathServiceImpl extends ServiceImpl<TreePathMapper, TreePath> i
     }
 
     @Override
-    public List<TreePathAmountDTO> getTreeAmountByUserId(Integer userId) {
-        return treePathMapper.getTreeAmountByUserId(userId);
+    public List<TreePathAmountDTO> getAllAmountByUserId(Integer userId) {
+        return treePathMapper.getAllAmountByUserId(userId);
     }
 
     @Override
@@ -47,4 +49,20 @@ public class TreePathServiceImpl extends ServiceImpl<TreePathMapper, TreePath> i
     public void insertTreePath(Integer id, Integer inviteUserId) {
          treePathMapper.insertTreePath(id, inviteUserId);
     }
+
+    @Override
+    public List<TreePathAmountDTO> getProfitAmountByUserIdAndLevelList(Integer userId, LocalDate localDate, List<Integer> levelList) {
+        return treePathMapper.getProfitAmountByUserIdAndLevelList(userId,localDate,levelList);
+    }
+
+    @Override
+    public BigDecimal getMinTeamTotalProfitAmount(Integer userId,LocalDate localDate) {
+        return treePathMapper.getMinTeamTotalProfitAmount(userId,localDate);
+    }
+
+    @Override
+    public BigDecimal getTeamTotalProfitAmount(Integer userId, LocalDate localDate) {
+        return treePathMapper.getTeamTotalProfitAmount(userId,localDate);
+    }
+
 }

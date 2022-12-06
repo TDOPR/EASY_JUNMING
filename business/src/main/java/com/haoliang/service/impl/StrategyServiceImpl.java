@@ -67,12 +67,12 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
         //生成5种不同的策略
         for(int i=0;i<5;i++){
             //取出一条策略并重集合中移除该数据,保证数据不重复
-            strategyType=strategyTypeDataList.remove(RandomUtil.generateInt(length));
+            strategyType=strategyTypeDataList.remove(RandomUtil.randomInt(length));
             length--;
-            index=RandomUtil.generateInt(qcData.length);
+            index=RandomUtil.randomInt(qcData.length);
             while (existsQcList.contains(index)){
               //保证不使用重复下标的数据
-              index=RandomUtil.generateInt(qcData.length);
+              index=RandomUtil.randomInt(qcData.length);
             }
             existsQcList.add(index);
             qc = qcData[index];

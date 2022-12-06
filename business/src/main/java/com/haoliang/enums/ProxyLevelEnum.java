@@ -47,6 +47,7 @@ public enum ProxyLevelEnum {
     }
 
 
+
     /**
      * 根据业绩范围获取代理商等级对象
      * @param amount 业绩

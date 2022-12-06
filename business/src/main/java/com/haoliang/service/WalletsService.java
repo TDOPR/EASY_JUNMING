@@ -6,7 +6,8 @@ import com.haoliang.common.model.JsonResult;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.model.Wallets;
-import com.haoliang.model.dto.MyItemAmountDTO;
+import com.haoliang.model.dto.MyTeamAmountDTO;
+import com.haoliang.model.dto.UserWalletsDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
 import com.haoliang.model.vo.MyWalletsVO;
 
@@ -57,15 +58,26 @@ public interface WalletsService extends IService<Wallets> {
      */
     boolean updateWallet(BigDecimal amount, Integer userId, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum);
 
+
+    /**
+     * 更新钱包余额
+     * @param amount  需要加或减的金额
+     * @param blockAddress  区块链地址
+     * @param flowingActionEnum 收入或支出
+     * @param flowingTypeEnum 流水类型
+     * @return 执行结果
+     */
+    boolean updateWallet(BigDecimal amount, String blockAddress, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum);
+
     /**
      * 根据直推用户获取我的团队业绩
      */
-    MyItemAmountDTO getMyItemAmount(List<Integer> firstUserIdList);
+    MyTeamAmountDTO getMyItemAmount(List<Integer> firstUserIdList);
 
     /**
      * 根据用户Id获取我的团队业绩
      */
-    MyItemAmountDTO getMyItemAmountByUserId(Integer userId);
+    MyTeamAmountDTO getMyItemAmountByUserId(Integer userId);
 
     /**
      * 获取平台总锁定金额   托管金额 + 机器人购买金额
@@ -73,4 +85,15 @@ public interface WalletsService extends IService<Wallets> {
      */
     BigDecimal getPlatformTotalLockAmount();
 
+
+    List<UserWalletsDTO> selectUserWalletsDTOListByUserLevelGtAndPrincipalAmountGe(int level, BigDecimal proxyMinMoney);
+
+    /**
+     * 通过加锁的方式修改钱包余额
+     * @param userId
+     * @param amount
+     * @param flowingActionEnum
+     * @return
+     */
+    boolean lookUpdateWallets(Integer userId,BigDecimal amount,FlowingActionEnum flowingActionEnum);
 }

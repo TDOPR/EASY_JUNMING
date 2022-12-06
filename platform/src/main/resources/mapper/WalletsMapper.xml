@@ -1,13 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haoliang.mapper.WalletsMapper">
+    <update id="lockUpdateAddWallet">
+        UPDATE wallets SET walletAmount=walletAmount+#{amount}   WHERE userId=#{userId}
+    </update>
+
+    <update id="lockUpdateReduceWallet">
+ UPDATE wallets SET walletAmount=walletAmount-#{amount}   WHERE userId=#{userId}
+    </update>
 
 
-    <select id="getPlatformTotalLockAmount" resultType="com.haoliang.model.dto.PlatformTotalLockAmountDTO">
+    <select id="getPlatformTotalLockAmount" resultType="java.math.BigDecimal">
+        SELECT sum(robotAmount+principalAmount)  FROM wallets
+    </select>
+
+    <select id="getMyItemAmountByUserId" resultType="java.math.BigDecimal">
         SELECT
-            sum(robotAmount) totalRobotAmount,
-            sum(principalAmount) totalPrincipalAmount
+            SUM(robotAmount+principalAmount)
         FROM
             wallets
+        WHERE userId IN(
+            SELECT id
+                FROM
+		            (SELECT id,inviteId FROM app_users) a,
+		            (SELECT @pv :=#{inviteId}) b
+                WHERE (FIND_IN_SET(inviteId,@pv)>0 And @pv := concat(@pv, ',', id)
+            )
+        )
     </select>
+
+    <select id="findAchievementByInviteId" resultType="com.haoliang.model.dto.AppUsersAmountDTO">
+        SELECT
+            (robotAmount+principalAmount) totalAmount,userId
+        FROM
+            wallets w
+        LEFT JOIN
+            app_users u
+            ON w.userId=u.id
+        WHERE
+            inviteId=#{inviteId}
+    </select>
+
+
+    <select id="selectUserWalletsDTOListByUserLevelGtAndPrincipalAmountGe"
+            resultType="com.haoliang.model.dto.UserWalletsDTO">
+        SELECT
+            w.walletAmount,w.userId,u.level
+        FROM
+            wallets w
+        LEFT JOIN
+            app_users u
+            ON w.userId=u.id
+        WHERE
+            u.level>#{level}
+            AND
+            w.principalAmount>=#{principalAmount}
+    </select>
+
+
 </mapper>

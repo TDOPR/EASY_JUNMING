@@ -368,7 +368,6 @@ public class RSAUtil {
      * 测试非对称加密
      */
     public static void main(String[] args) throws Exception {
-
         String source = "123456";
         //公钥加密
         PublicKey publicKey = RSAUtil.getDefaultPublicKey();

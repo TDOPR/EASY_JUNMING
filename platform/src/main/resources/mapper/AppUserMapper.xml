@@ -45,9 +45,10 @@
             w.principalAmount  <![CDATA[ > ]]> 0
     </select>
 
-    <select id="selectUserRebotRef" resultType="java.math.BigDecimal">
+
+    <select id="getRobotDetailByUserId" resultType="com.haoliang.model.dto.AppUserRebotDTO">
         SELECT
-            w.robotAmount
+            count(w.id) userCount,sum(robotAmount) robotAmount
         FROM
             wallets w
         LEFT JOIN
@@ -56,5 +57,6 @@
         WHERE
             u.userId=#{userId}
     </select>
+
 
 </mapper>

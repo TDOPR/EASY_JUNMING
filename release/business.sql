@@ -12,10 +12,11 @@ CREATE TABLE `app_users`  (
   `nickName` varchar(255)  NOT NULL DEFAULT '' COMMENT '用户昵称',
   `autograph` varchar(255)  NOT NULL DEFAULT '' COMMENT '个性签名',
   `enabled` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '用户状态： 1-正常 0=禁用',
-  `level` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '用户等级',
   `inviteId` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '邀请人Id',
   `loginCount` int(0) UNSIGNED NOT NULL DEFAULT 0 COMMENT '登录次数',
-   `level` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '代理商等级',
+  `level` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '代理商等级',
+  `minTeamAmount` decimal(24, 8) UNSIGNED NOT NULL DEFAULT 0.00000000 COMMENT '小团队业绩',
+  `teamTotalAmount` decimal(24, 8) UNSIGNED NOT NULL DEFAULT 0.00000000 COMMENT '团队总业绩',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
   UNIQUE INDEX `UK_app_users_email`(`email`) USING BTREE,
@@ -100,7 +101,7 @@ CREATE TABLE `app_user_recharge`  (
   `txid`varchar(64) NOT NULL DEFAULT '' COMMENT '交易id',
   `coinUnit` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '货币类型 1=法币 2=usdt',
   `amount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '充值金额',
-  `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '充值状态 1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
+  `status` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '充值状态 1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
   `address`varchar(256) NOT NULL DEFAULT '' COMMENT '区块链充值地址',
    `exchangeRate` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '多少金额等于1$',
    `usdAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '充值金额等值的美元',
@@ -144,6 +145,7 @@ CREATE TABLE `tree_paths`  (
   `descendant` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '子Id',
   `level` int(0) UNSIGNED NOT NULL DEFAULT  0 COMMENT '子是父的第几代',
   `createTime` datetime(0) NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `largeTeam`  tinyint   NOT NULL DEFAULT 0 COMMENT '只对直邀请客户有效 1=大团队 0=小团队',
   PRIMARY KEY (`ancestor`, `descendant`) USING BTREE
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '用户邀请关系表' ROW_FORMAT = Dynamic;
 
@@ -164,7 +166,7 @@ CREATE TABLE `app_user_rebot_ref`(
 -- -------------------------------
 DROP TABLE IF EXISTS `dayrate`;
 CREATE TABLE `dayrate`  (
-  `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '创建日期',
+  `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '邀请的用户Id',
   `level0` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '未购买机器人收益率',
   `level1` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '一级机器人收益率',
   `level2` decimal(5, 4) NOT NULL DEFAULT 0.0000 COMMENT '二级机器人收益率',
@@ -180,7 +182,7 @@ CREATE TABLE `dayrate`  (
 DROP TABLE IF EXISTS `app_versions`;
 CREATE TABLE `app_versions`  (
   `id` int(0) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `createTime` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `systemName` varchar(255)  NOT NULL DEFAULT '' COMMENT '系统名称 ios 、android',
   `version` varchar(255)  NOT NULL DEFAULT '' COMMENT '版本号',
   `updateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '功能更新说明',
@@ -188,7 +190,18 @@ CREATE TABLE `app_versions`  (
   `downloadAddress` varchar(255)  NOT NULL DEFAULT '' COMMENT 'app下载地址',
   `use` tinyint  NOT NULL DEFAULT 0 COMMENT '是否使用的版本 1=使用 0=未使用'
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统版本表' ROW_FORMAT = Dynamic
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统版本表' ROW_FORMAT = Dynamic;
+
+
+-- ----------------------------------
+-- Table structure for  update_user_level_job
+-- ----------------------------------
+DROP TABLE IF EXISTS `update_user_level_job`;
+CREATE TABLE `update_user_level_job`  (
+  `userId` int(0) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `delayTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '任务延迟处理时间',
+  PRIMARY KEY (`userId`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='更新用户的代理商等级' ROW_FORMAT = Dynamic;
 
 
 -- ----------------------------------
@@ -210,3 +223,15 @@ CREATE TABLE `strategy`  (
    PRIMARY KEY (`createDate`, `sortIndex`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='机器人做单策略表' ROW_FORMAT = Dynamic
 
+-- ----------------------------------
+-- Table structure for business_job
+-- ---------------------------------
+DROP TABLE IF EXISTS `business_job`;
+CREATE TABLE `business_job`  (
+  `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '创建日期',
+  `staticTask` tinyint  NOT NULL DEFAULT 1 COMMENT '发放静态收益任务是否执行 1=已执行 0=未执行',
+  `algebraTask` tinyint  NOT NULL DEFAULT 0 COMMENT '发放代数奖任务是否执行 1=已执行 0=未执行',
+  `teamTask` tinyint  NOT NULL DEFAULT 0 COMMENT '发放团队奖任务是否执行 1=已执行 0=未执行',
+  `specialTask` tinyint  NOT NULL DEFAULT 0 COMMENT '发放分红将任务是否执行 1=已执行 0=未执行',
+   UNIQUE INDEX `UK_job_createDate`(`createDate`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='收益发放任务表' ROW_FORMAT = Dynamic

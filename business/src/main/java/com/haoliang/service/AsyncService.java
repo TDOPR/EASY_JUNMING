@@ -19,5 +19,14 @@ public interface AsyncService {
      * @param wallets 用户钱包
      * @param userAmount 所有用户日收益map集合
      */
+    @Deprecated
     void grantItemPrizeToUser(Wallets wallets, HashMap<Integer, BigDecimal> userAmount, CountDownLatch countDownLatch);
+
+
+    /**
+     * 等级用户的代理商等级
+     * @param userId
+     * @param countDownLatch
+     */
+    void updateUserLevelTask(Integer userId, CountDownLatch countDownLatch);
 }

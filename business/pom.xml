@@ -23,6 +23,8 @@
         </dependency>
     </dependencies>
 
-
+    <build>
+        <finalName>easyTrade-${artifactId}-${parent.version}</finalName>
+    </build>
 
 </project>

@@ -53,7 +53,7 @@ public class PlayTest {
     }
 
     /**
-     * 巴西币账户充值到美元账户
+     * 巴西币账户转账到美元账户
      * @param
      */
     public static void BRL_2_USD(){
@@ -69,24 +69,25 @@ public class PlayTest {
                 .build();
         JSONObject data=new JSONObject();
         data.put("transaction",transaction);
-
         String result=HttpUtil.postJson(TRANSACTIONS_URL,TOKEN_KEY,TOKEN_VALUE,data.toJSONString());
         System.out.println(result);
     }
 
     /**
-     * 美元账户充值到巴西币账户
+     * 美元账户转账到巴西币账户
      * @param
      */
     public static void USD_2_BRL(){
+        // https://api.facilitapay.com/api/v1/transactions
         Transaction transaction=Transaction.builder()
                 .currency("USD")
                 .exchange_currency("BRL")
                 .value("1000.00")
                 //来自 FacilitaPay 的外国银行账户的 ID
                 .from_bank_account_id("97313a02-bbbb-4341-bb2c-3602d185d926")
-                //巴西合作伙伴银行帐户的 ID。
+                //巴西合作伙伴银行帐户的 ID
                 .to_bank_account_id("766eadfc-f020-4d2a-bed3-c9a95623ed24")
+                //请注意，所有 ID 必须相关，即：提供的 subject_id 必须有与其注册相关联的 BRL 银行帐户。
                 .subject_id("eb1a9eb-39d0-4d3d-ab30-bee5406d8e21")
                 .build();
         JSONObject data=new JSONObject();
@@ -100,8 +101,8 @@ public class PlayTest {
 
     public static void main(String[] args) {
         // signIn();
-        BRL_2_USD();
-        //USD_2_BRL();
+        //BRL_2_USD();
+        USD_2_BRL();
     }
 
 }

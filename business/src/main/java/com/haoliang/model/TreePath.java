@@ -35,6 +35,10 @@ public class TreePath implements Serializable {
      * 子是父的几级
      */
     private Integer level;
+    /**
+     * 是否为大团队 (该字段只对直推一代有效) 1=大团队 0=小团队
+     */
+    private Integer largeTeam;
 
     /**
      * 创建时间

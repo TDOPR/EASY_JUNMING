@@ -16,6 +16,7 @@ import com.haoliang.model.Wallets;
 import com.haoliang.model.dto.RobotDTO;
 import com.haoliang.model.vo.RobotDetailVO;
 import com.haoliang.service.RobotService;
+import com.haoliang.service.UpdateUserLevelTaskService;
 import com.haoliang.service.WalletLogsService;
 import com.haoliang.service.WalletsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,8 @@ public class RobotServiceImpl implements RobotService {
     @Resource
     private AppUserRebotRefMapper appUserRebotRefMapper;
 
+    @Autowired
+    private UpdateUserLevelTaskService updateUserLevelTaskService;
 
     @Override
     public JsonResult getRobotList(String token) {
@@ -114,6 +117,7 @@ public class RobotServiceImpl implements RobotService {
             //发送推广奖
             BigDecimal rewardAmount = robotEnum.getPrice().multiply(rewardRate);
             sendPromotionAward(rewardAmount, inviteId);
+            updateUserLevelTaskService.insertListByUserId(userId);
         }
 
         //添加钱包流水记录
@@ -158,6 +162,7 @@ public class RobotServiceImpl implements RobotService {
             //发放差价的推广奖
             BigDecimal rewardAmount = differencePrice.multiply(rewardRate);
             sendPromotionAward(rewardAmount, appUserRebotRef.getUserId());
+            updateUserLevelTaskService.insertListByUserId(userId);
         }
 
         //添加钱包流水记录

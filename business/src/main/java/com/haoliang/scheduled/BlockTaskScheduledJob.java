@@ -38,24 +38,25 @@ public class BlockTaskScheduledJob {
     private WalletsService walletsService;
 
     /**
-     * 每隔30秒拉取充值记录表任务状态
+     * 每隔3秒拉取充值记录表任务状态
      */
-    @Scheduled(fixedDelay = 30000)
+    @Scheduled(fixedDelay = 3000)
     @RedisLock
     public void scanRechargeData() {
         //获取充值任务状态是打币成功的
         UpdateWrapper<AppUserRecharge> updateWrapper;
         List<AppUserRecharge> list = appUserRechargeService.list(new LambdaQueryWrapper<AppUserRecharge>()
-                .select(AppUserRecharge::getId, AppUserRecharge::getUsdAmount)
+                .select(AppUserRecharge::getId, AppUserRecharge::getAddress, AppUserRecharge::getUsdAmount)
                 .eq(AppUserRecharge::getStatus, WithdrawStateEnum.BLOCK_COIN_PRINTING_SUCCESS.getState()));
 
         if (list.size() == 0) {
             return;
         }
 
+        //根据区块链地址修改用户钱包金额
         List<Long> idList = new ArrayList<>();
         for (AppUserRecharge appUserRecharge : list) {
-            walletsService.updateWallet(appUserRecharge.getUsdAmount(), appUserRecharge.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
+            walletsService.updateWallet(appUserRecharge.getUsdAmount(), appUserRecharge.getAddress(), FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
             idList.add(appUserRecharge.getId());
         }
 
@@ -69,7 +70,7 @@ public class BlockTaskScheduledJob {
 
 
     /**
-     * 每隔30秒拉取充值提现表任务状态
+     * 每隔3秒拉取提现表任务状态
      */
     @Scheduled(fixedDelay = 30000)
     @RedisLock
@@ -77,12 +78,13 @@ public class BlockTaskScheduledJob {
         //获取充值任务状态是打币成功的
         UpdateWrapper<AppUserWithdraw> updateWrapper;
         List<AppUserWithdraw> list = appUserWithdrawService.list(new LambdaQueryWrapper<AppUserWithdraw>()
-                .select(AppUserWithdraw::getId, AppUserWithdraw::getAmount)
+                .select(AppUserWithdraw::getId, AppUserWithdraw::getUserId, AppUserWithdraw::getAmount)
                 .eq(AppUserWithdraw::getStatus, WithdrawStateEnum.BLOCK_COIN_PRINTING_SUCCESS.getState()));
 
         if (list.size() == 0) {
             return;
         }
+
 
         List<Long> idList = new ArrayList<>();
         for (AppUserWithdraw appUserWithdraw : list) {

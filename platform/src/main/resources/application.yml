@@ -208,7 +208,7 @@ app:
   #是否加载表单去重提交验证  依赖reids
   enableRepeatSubmit: true
   #是否启动分布式锁  依赖reids
-  enableRedisLock: flase
+  enableRedisLock: false
   #过滤不需要security验证的接口
   securityExcludes:
     - /user/login
