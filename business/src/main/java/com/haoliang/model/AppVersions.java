@@ -38,4 +38,8 @@ public class AppVersions  extends BaseModelCIDNoModifyTime {
      */
     private String downloadAddress;
 
+    /**
+     * 激活版本  1=当前最新版本  0=旧版本
+     */
+    private Integer active;
 }

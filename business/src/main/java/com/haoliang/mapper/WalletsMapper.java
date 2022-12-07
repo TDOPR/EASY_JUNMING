@@ -48,4 +48,10 @@ public interface WalletsMapper extends BaseMapper<Wallets> {
      * @return
      */
     int lockUpdateReduceWallet(@Param("userId")Integer userId,@Param("amount") BigDecimal amount);
+
+    int frozenAmount(@Param("userId")Integer userId,@Param("amount") BigDecimal amount);
+
+    int unFrozenAmount(@Param("userId")Integer userId,@Param("amount") BigDecimal amount);
+
+    int reduceFrozenAmount(@Param("userId")Integer userId,@Param("amount") BigDecimal amount);
 }

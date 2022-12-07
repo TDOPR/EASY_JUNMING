@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * @author Dominick Li
@@ -26,7 +26,7 @@ public class Strategy {
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy.MM.dd")
-    private LocalDate createDate;
+    private Date createDate;
 
     /**
      * 序号   不同机器人级别显示不同的序号(每天生成5条策略) 1级显示1条, 2级显示2条

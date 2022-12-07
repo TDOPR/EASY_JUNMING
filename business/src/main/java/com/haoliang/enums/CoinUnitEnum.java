@@ -7,25 +7,25 @@ import java.math.BigDecimal;
 
 /**
  * @author Dominick Li
- * @Description 提现的货币类型
+ * @Description 提现的货币类型  网络来源
  * @CreateTime 2022/11/1 16:01
  **/
 @Getter
 @AllArgsConstructor
 public enum CoinUnitEnum {
 
-    LEGAL_CURRENCY(1, "法币", new BigDecimal(0.03)),
-    USDT(2, "Usdt数字货币", new BigDecimal(0.01));
+    USDT(1, "USDT", BigDecimal.ZERO),
+    FIAT(2, "FIAT", new BigDecimal("0.03"));
 
     /**
      * 类型id
      */
-    private Integer type;
+    private Integer Id;
 
     /**
      * 货币名称
      */
-    private String desc;
+    private String name;
 
     /**
      * 提现手续费
@@ -33,19 +33,19 @@ public enum CoinUnitEnum {
     private BigDecimal interestRate;
 
 
-    public static CoinUnitEnum valueOfByType(Integer type) {
+    public static CoinUnitEnum idOf(Integer id) {
         for (CoinUnitEnum coinUnitEnum : values()) {
-            if (type.equals(coinUnitEnum.getType())) {
+            if (coinUnitEnum.getId().equals(id)) {
                 return coinUnitEnum;
             }
         }
         return null;
     }
-    
-    public static String getDescByType(Integer type){
+
+    public static String getNameById(Integer id) {
         for (CoinUnitEnum coinUnitEnum : values()) {
-            if (type.equals(coinUnitEnum.getType())) {
-                return coinUnitEnum.getDesc();
+            if (coinUnitEnum.getId().equals(id)) {
+                return coinUnitEnum.getName();
             }
         }
         return "";

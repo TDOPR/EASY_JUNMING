@@ -2,13 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haoliang.mapper.WalletsMapper">
     <update id="lockUpdateAddWallet">
-        UPDATE wallets SET walletAmount=walletAmount+#{amount}   WHERE userId=#{userId}
+        UPDATE wallets
+            SET walletAmount=walletAmount+#{amount}
+        WHERE userId=#{userId}
     </update>
 
     <update id="lockUpdateReduceWallet">
- UPDATE wallets SET walletAmount=walletAmount-#{amount}   WHERE userId=#{userId}
+        UPDATE wallets
+            SET walletAmount=walletAmount-#{amount}
+        WHERE userId=#{userId}
     </update>
 
+    <update id="frozenAmount">
+        UPDATE wallets
+            SET walletAmount=walletAmount-#{amount},frozenAmount=frozenAmount+#{amount}
+        WHERE userId=#{userId}
+    </update>
+
+    <update id="unFrozenAmount">
+        UPDATE wallets
+            SET walletAmount=walletAmount+#{amount},frozenAmount=frozenAmount-#{amount}
+        WHERE userId=#{userId}
+    </update>
+
+    <update id="reduceFrozenAmount">
+        UPDATE wallets
+            SET frozenAmount=frozenAmount-#{amount}
+        WHERE userId=#{userId}
+    </update>
 
     <select id="getPlatformTotalLockAmount" resultType="java.math.BigDecimal">
         SELECT sum(robotAmount+principalAmount)  FROM wallets

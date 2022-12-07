@@ -28,9 +28,11 @@ public enum ReturnMessageEnum {
     BEYOND_ROBOT_UPPER_LIMIT("beyond_robot_upper_limit","需要托管的总金额超出机器人支持的上限！","The total amount to be managed exceeds the upper limit of robot support！"),
     AMOUNT_EXCEEDS_BALANCE("amount_exceeds_balance","余额不足！","Sorry, your credit is running low"),
     MIN_AMOUNT("min_amount","托管金额不能低于10$！","The trust amount cannot be less than 10$！"),
+    WITHDRAW_MIN_AMOUNT("withdraw_min_amount","USDT提现的金额未达到提现要求！","The amount withdrawn by USDT does not meet the withdrawal requirements！"),
     SEND_EMAIL_ERROR("send_eamil_error","发送验证码失败！","Failed to send verification code！"),
     REBOT_LEVEL_ERROR("rebot_level_error","升级的机器人等级必须比原有等级高！","The upgraded robot level must be higher than the original level！"),
-    REPEAT_PURCHASE_REBOT("repeat_purchase_rebot","不能重复购买机器人！","Cannot buy robots repeatedly！")
+    REPEAT_PURCHASE_REBOT("repeat_purchase_rebot","不能重复购买机器人！","Cannot buy robots repeatedly！"),
+    UB_SUPPORT_NETWORD("un_support_netword","不支持的网络类型","Unsupported network name！")
     ;
     private String key;
 

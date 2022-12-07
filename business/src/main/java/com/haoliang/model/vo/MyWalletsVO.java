@@ -17,9 +17,9 @@ import lombok.NoArgsConstructor;
 public class MyWalletsVO {
 
     /**
-     * 区块链地址
+     * 货币信息
      */
-    private String blockAddress;
+    private CoinInfoVo coinInfo;
 
     /**
      * 当前余额

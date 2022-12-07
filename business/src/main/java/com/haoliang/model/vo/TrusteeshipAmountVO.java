@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -25,22 +26,33 @@ public class TrusteeshipAmountVO {
     private String amount;
 
     /**
+     * 托管金额上限
+     */
+    private BigDecimal amountLimit;
+
+    /**
      * 收益
      */
     private String profit;
 
     /**
-     * 收益率
+     * 持仓收益率
      */
     private String profitRate;
 
     /**
-     * 机器人名称
+     * 机器人等级
      */
-    private String robotName;
+    private Integer robotLevel;
+
+    /**
+     * 机器人的收益率
+     */
+    private BigDecimal robotRate;
 
     /**
      * 机器人做单策略
      */
     private List<Strategy>  strategyList;
+
 }

@@ -89,11 +89,35 @@ public interface WalletsService extends IService<Wallets> {
     List<UserWalletsDTO> selectUserWalletsDTOListByUserLevelGtAndPrincipalAmountGe(int level, BigDecimal proxyMinMoney);
 
     /**
-     * 通过加锁的方式修改钱包余额
-     * @param userId
-     * @param amount
-     * @param flowingActionEnum
+     * 通过数据库字段计算的方式修改钱包余额
+     * @param userId 用户Id
+     * @param amount 修改的金额
+     * @param flowingActionEnum 增加或减少
      * @return
      */
     boolean lookUpdateWallets(Integer userId,BigDecimal amount,FlowingActionEnum flowingActionEnum);
+
+    /**
+     * 取消冻结用户金额
+     * @param userId  用户Id
+     * @param amount 需要解冻的金额
+     * @return
+     */
+    boolean unFrozenAmount(Integer userId, BigDecimal amount);
+
+
+    /**
+     * 冻结金额
+     * @param userId
+     * @param amount
+     * @return
+     */
+    boolean frozenAmount(Integer userId, BigDecimal amount);
+
+    /**
+     * 重冻结金额中扣除指定金额
+     * @param userId 用户Id
+     * @param amount 扣减的费用
+     */
+    boolean reduceFrozenAmount(Integer userId, BigDecimal amount);
 }

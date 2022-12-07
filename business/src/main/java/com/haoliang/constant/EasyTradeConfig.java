@@ -35,7 +35,7 @@ public class EasyTradeConfig {
     /**
      * 法币和美元汇率   119:1 实际需要调用接口获取最新汇率
      */
-    public static BigDecimal XPF_2_USD = new BigDecimal(119.38);
+    public static BigDecimal XPF_2_USD = new BigDecimal("119.38");
 
     /**
      * 泰达币和美元汇率   1:1

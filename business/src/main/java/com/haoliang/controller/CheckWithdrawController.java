@@ -3,11 +3,11 @@ package com.haoliang.controller;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.vo.PageVO;
-import com.haoliang.model.AppUserWithdraw;
+import com.haoliang.model.EvmWithdraw;
 import com.haoliang.model.condition.AppUserWithdrawCondition;
 import com.haoliang.model.dto.AuditCheckDTO;
-import com.haoliang.model.vo.AppUserWithdrawVO;
-import com.haoliang.service.AppUserWithdrawService;
+import com.haoliang.model.vo.EvmWithdrawVO;
+import com.haoliang.service.EvmWithdrawService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,15 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class CheckWithdrawController {
 
     @Autowired
-    private AppUserWithdrawService appUserWithdrawService;
+    private EvmWithdrawService evmWithdrawService;
 
     /**
      * 分页查询
      */
     @PostMapping("/pagelist")
     @PreAuthorize("hasAuthority('sys:examine:list')")
-    public JsonResult<PageVO<AppUserWithdrawVO>> pageList(@RequestBody PageParam<AppUserWithdraw, AppUserWithdrawCondition> pageParam) {
-        return appUserWithdrawService.pageList(pageParam);
+    public JsonResult<PageVO<EvmWithdrawVO>> pageList(@RequestBody PageParam<EvmWithdraw, AppUserWithdrawCondition> pageParam) {
+        return evmWithdrawService.pageList(pageParam);
     }
 
     /**
@@ -42,6 +42,6 @@ public class CheckWithdrawController {
     @PostMapping("/check")
     @PreAuthorize("hasAuthority('sys:examine:list')")
     public JsonResult check(@RequestBody AuditCheckDTO auditCheckDTO){
-        return appUserWithdrawService.check(auditCheckDTO);
+        return evmWithdrawService.check(auditCheckDTO);
     }
 }

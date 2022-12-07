@@ -2,14 +2,16 @@ package com.haoliang.controller;
 
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.dto.TypeDTO;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.dto.BillDetailsDTO;
-import com.haoliang.common.model.dto.TypeDTO;
+import com.haoliang.model.dto.UsdtWithdrawalDTO;
 import com.haoliang.model.dto.WalletOrderDTO;
 import com.haoliang.model.vo.MyWalletsVO;
 import com.haoliang.model.vo.ProfitLogsDetailVO;
 import com.haoliang.model.vo.ProxyWalletLogsDetailVO;
 import com.haoliang.model.vo.WalletLogsDetailVO;
+import com.haoliang.service.EvmWithdrawService;
 import com.haoliang.service.WalletLogsService;
 import com.haoliang.service.WalletsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class WalletController {
     @Autowired
     private WalletLogsService walletLogService;
 
+    @Autowired
+    private EvmWithdrawService evmWithdrawService;
+
     /**
      * 我的钱包
      */
@@ -50,13 +55,22 @@ public class WalletController {
     }
 
     /**
-     * 提现
+     * usdt提现
      */
     @RepeatSubmit
-    @PostMapping("/withdrawal")
-    public JsonResult withdrawal(@Valid @RequestBody WalletOrderDTO walletOrderDTO,@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
-        return walletsService.withdrawal(walletOrderDTO,token);
+    @PostMapping("/withdrawal/usdt")
+    public JsonResult withdrawal(@Valid @RequestBody UsdtWithdrawalDTO userWalletsDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
+        return evmWithdrawService.usdtWithdrawal(userWalletsDTO,token);
     }
+
+    /**
+     * 提现
+     */
+//    @RepeatSubmit
+//    @PostMapping("/withdrawal/fiat")
+//    public JsonResult withdrawal(@Valid @RequestBody UsdtWithdrawalDTO userWalletsDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
+//        return walletsService.usdtWithdrawal(userWalletsDTO,token);
+//    }
 
     /**
      * 账单明细

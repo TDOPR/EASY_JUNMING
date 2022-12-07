@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @CreateTime 2022/11/11 16:42
  **/
 @Data
-public class AppUserWithdrawVO {
+public class EvmWithdrawVO {
 
     /**
      * 任务Id
@@ -25,12 +25,6 @@ public class AppUserWithdrawVO {
      * 用户账号
      */
     private String email;
-
-    /**
-     * 提现币种类型
-     */
-    @JsonIgnore
-    private Integer coinUnit;
 
     /**
      * 提现币种类型

@@ -37,15 +37,15 @@ public class WalletLogVO {
     private String name;
 
     /**
-     * 流水类型
-     */
-    @JsonIgnore
-    private Integer logType;
-
-    /**
      * 金额
      */
     private String amount;
+
+    /**
+     * 流水类型
+     */
+    @JsonIgnore
+    private Integer flowingType;
 
     /**
      * 收支 1=收入 0=支出

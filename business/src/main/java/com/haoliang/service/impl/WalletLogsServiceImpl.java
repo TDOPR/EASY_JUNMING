@@ -128,10 +128,10 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         List<WalletLogVO> walletLogVOList = new ArrayList<>();
         for (WalletLogs walletLogs : pageData.getRecords()) {
             walletLogVOList.add(WalletLogVO.builder()
-                    .type(walletLogs.getType())
+                    .flowingType(walletLogs.getType())
+                    .type(walletLogs.getAction())
                     .createTime(walletLogs.getCreateTime().toLocalDate().toString())
                     .bigDecimalAmount(walletLogs.getAmount())
-                    .type(walletLogs.getAction())
                     .build());
         }
 
@@ -160,16 +160,18 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
             dynamicAmount = BigDecimal.ZERO;
             entry = iterator.next();
             for (WalletLogVO walletLogVO : entry.getValue()) {
-                if (walletLogVO.getType().equals(FlowingTypeEnum.WITHDRAWAL.getValue())) {
+                if (walletLogVO.getFlowingType().equals(FlowingTypeEnum.WITHDRAWAL.getValue())) {
+                    //计算存入金额
                     takeOut = takeOut.add(walletLogVO.getBigDecimalAmount());
-                } else if (depositTypeList.contains(walletLogVO.getType())) {
+                } else if (depositTypeList.contains(walletLogVO.getFlowingType())) {
+                    //计算取出金额
                     deposit = deposit.add(walletLogVO.getBigDecimalAmount());
                 }
 
-                if (dynamicTypeList.contains(walletLogVO.getType())) {
+                if (dynamicTypeList.contains(walletLogVO.getFlowingType())) {
                     dynamicAmount = dynamicAmount.add(walletLogVO.getBigDecimalAmount());
                 } else {
-                    walletLogVO.setName(FlowingTypeEnum.getWalletDescByValue(walletLogVO.getType()));
+                    walletLogVO.setName(FlowingTypeEnum.getWalletDescByValue(walletLogVO.getFlowingType()));
                     walletLogVO.setAmount(NumberUtil.toUSD(walletLogVO.getBigDecimalAmount()));
                     resultList.add(walletLogVO);
                 }

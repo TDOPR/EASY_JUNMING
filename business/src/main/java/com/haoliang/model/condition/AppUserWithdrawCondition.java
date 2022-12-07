@@ -2,7 +2,7 @@ package com.haoliang.model.condition;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haoliang.common.base.BaseCondition;
-import com.haoliang.model.AppUserWithdraw;
+import com.haoliang.model.EvmWithdraw;
 import lombok.Data;
 
 /**
@@ -11,7 +11,7 @@ import lombok.Data;
  * @CreateTime 2022/11/11 12:06
  **/
 @Data
-public class AppUserWithdrawCondition extends BaseCondition<AppUserWithdraw> {
+public class AppUserWithdrawCondition extends BaseCondition<EvmWithdraw> {
 
     /**
      * 用户邮箱号
@@ -25,12 +25,6 @@ public class AppUserWithdrawCondition extends BaseCondition<AppUserWithdraw> {
 
     @Override
     public QueryWrapper buildQueryParam() {
-        this.buildBaseQueryWrapper();
-        if (auditStatus > -1) {
-            this.getQueryWrapper().eq("auditStatus", auditStatus);
-        } else {
-            this.getQueryWrapper().gt("auditStatus", -1);
-        }
-        return this.getQueryWrapper();
+        return null;
     }
 }

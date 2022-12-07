@@ -1,11 +1,11 @@
 package com.haoliang.common.util;
 
 import java.lang.management.ManagementFactory;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -44,6 +44,15 @@ public class DateUtil {
     public static String formatDate(Date date, String format) {
         SimpleDateFormat myFormat = new SimpleDateFormat(format);
         return myFormat.format(date);
+    }
+
+    /**
+     * 把LocalDate转成
+     */
+    public static Date getNowDate() {
+        ZoneId zone = ZoneId.systemDefault();
+        Instant instant = LocalDate.now().atStartOfDay().atZone(zone).toInstant();
+        return Date.from(instant);
     }
 
     /**
@@ -183,9 +192,7 @@ public class DateUtil {
     }
 
     public static void main(String[] args) {
-        BigDecimal bigDecimal = new BigDecimal("1.1234561");
-        bigDecimal = bigDecimal.setScale(6, RoundingMode.UP);
-        System.out.println(bigDecimal);
+        System.out.println(getNowDate());
     }
 
 
@@ -232,4 +239,6 @@ public class DateUtil {
                 return "";
         }
     }
+
+
 }

@@ -48,6 +48,9 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
     @Resource
     private ProfitLogsMapper profitLogsMapper;
 
+    @Autowired
+    private DayRateService dayRateService;
+
     @Override
     @Transactional
     public JsonResult recharge(AmountDTO amountDTO, String token) {
@@ -115,28 +118,31 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
         Integer userId = JwtTokenUtil.getUserIdFromToken(token);
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
 
-        String robotName = "";
         List<Strategy> strategyList;
+        RobotEnum robotEnuml;
         if (wallets.getRobotLevel() > 0) {
-            RobotEnum robotEnum = RobotEnum.levelOf(wallets.getRobotLevel());
-            robotName = robotEnum.getName();
-            strategyList=strategyService.getStrategyListByRobotLevel(wallets.getRobotLevel());
-        }else{
-            strategyList=new ArrayList<>();
+            robotEnuml = RobotEnum.levelOf(wallets.getRobotLevel());
+            strategyList = strategyService.getStrategyListByRobotLevel(wallets.getRobotLevel());
+        } else {
+            strategyList = new ArrayList<>();
+            robotEnuml = RobotEnum.ZERO;
         }
+
 
         //获取量化总收益
         BigDecimal sum = profitLogsMapper.getTotal(userId);
-        String profitRate="0.0%";
-        if (sum.compareTo(BigDecimal.ZERO)>0) {
-            profitRate=sum.divide(wallets.getPrincipalAmount(), 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(1, BigDecimal.ROUND_FLOOR) + "%";
+        String profitRate = "0.0%";
+        if (sum != null && sum.compareTo(BigDecimal.ZERO) > 0) {
+            profitRate = sum.divide(wallets.getPrincipalAmount(), 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(1, BigDecimal.ROUND_FLOOR) + "%";
         }
 
         return JsonResult.successResult(TrusteeshipAmountVO.builder()
+                .amountLimit(robotEnuml.getRechargeMax())
+                .robotRate(dayRateService.selectNewDayRate(robotEnuml.getLevel()))
                 .amount(NumberUtil.toTwoDecimal(wallets.getPrincipalAmount()))
                 .profit(NumberUtil.toTwoDecimal(sum))
                 .profitRate(profitRate)
-                .robotName(robotName)
+                .robotLevel(wallets.getRobotLevel())
                 .strategyList(strategyList)
                 .build());
     }

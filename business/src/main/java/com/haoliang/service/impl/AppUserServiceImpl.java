@@ -19,9 +19,13 @@ import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.util.*;
+import com.haoliang.common.util.IdUtil;
+import com.haoliang.common.util.JwtTokenUtil;
+import com.haoliang.common.util.NumberUtil;
+import com.haoliang.common.util.StringUtil;
 import com.haoliang.common.util.encrypt.AESUtil;
 import com.haoliang.common.util.redis.RedisUtil;
+import com.haoliang.enums.CoinNetworkSourceEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.enums.RobotEnum;
 import com.haoliang.mapper.*;
@@ -48,6 +52,8 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Dominick Li
@@ -73,7 +79,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     private AppParam appParam;
 
     @Resource
-    private AddressPoolMapper addressPoolMapper;
+    private EvmAddressPoolMapper evmAddressPoolMapper;
 
     @Resource
     private AppUserMapper appUserMapper;
@@ -82,10 +88,13 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     private AppVersionsMapper appVersionsMapper;
 
     @Resource
-    private AppUserWithdrawMapper appUserWithdrawMapper;
+    private EvmWithdrawMapper evmWithdrawMapper;
 
     @Resource
     private WalletLogsMapper walletLogsMapper;
+
+    @Resource
+    private EvmUserWalletService evmUserWalletService;
 
     @Override
     public JsonResult home(String token) {
@@ -143,7 +152,11 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         if (SysSettingParam.isEnableSso()) {
             RedisUtil.deleteObjects(CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":*");
         }
-        AppVersions appVersions = appVersionsMapper.selectOne(new LambdaQueryWrapper<AppVersions>().eq(AppVersions::getSystemName, appUserLoginDTO.getSystemName()));
+        AppVersions appVersions = appVersionsMapper.selectOne(
+                new LambdaQueryWrapper<AppVersions>()
+                .eq(AppVersions::getSystemName, appUserLoginDTO.getSystemName())
+                .eq(AppVersions::getActive,BooleanEnum.TRUE.getIntValue())
+        );
         //把token存储到缓存中
         String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtil.simpleUUID();
         RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
@@ -193,14 +206,40 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
             appUsers.setPassword(AESUtil.encrypt(appUserRegisterDTO.getPassword(), appUsers.getSalt()));
             this.save(appUsers);
 
+            //为用户分配区块链钱包
+            {
+                List<EvmAddressPool> evmAddressPoolList = new ArrayList<>();
+                EvmAddressPool evmAddressPool;
+                for (CoinNetworkSourceEnum coinNetworkSourceEnum : CoinNetworkSourceEnum.values()) {
+                    evmAddressPool = evmAddressPoolMapper.randomGetAddress(coinNetworkSourceEnum.getName());
+                    if (evmAddressPool != null) {
+                        evmAddressPoolMapper.deleteByAddress(evmAddressPool.getAddress());
+                        evmAddressPoolList.add(evmAddressPool);
+                    }
+                }
+
+                List<EvmUserWallet> evmUserWalletList = new ArrayList<>();
+                //添加到区块链用户钱包表
+                for (EvmAddressPool address : evmAddressPoolList) {
+                    evmUserWalletList.add(EvmUserWallet.builder()
+                            .address(address.getAddress())
+                            .coinId(address.getCoinId())
+                            .keystore(address.getKeystore())
+                            .valid("E")
+                            .lowerAddress(address.getAddress().toLowerCase())
+                            .coinType(address.getCoinType())
+                            .password(address.getPwd())
+                            .userId(appUsers.getId())
+                            .build());
+                }
+                if (evmUserWalletList.size() > 0) {
+                    evmUserWalletService.saveBatch(evmUserWalletList);
+                }
+            }
+
             //创建一条钱包记录
             Wallets wallets = new Wallets();
             wallets.setUserId(appUsers.getId());
-            String address = addressPoolMapper.getAddress();
-            if (address != null) {
-                wallets.setBlockAddress(address);
-                addressPoolMapper.deleteByAddress(address);
-            }
             walletsService.save(wallets);
             //添加一条默认的treepath记录
             TreePath treePath = TreePath.builder()
@@ -321,14 +360,15 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         BigDecimal totalRecharge = walletLogsMapper.sumTotalAmountByType(FlowingTypeEnum.RECHARGE.getValue());
         BigDecimal totalWithdraw = walletLogsMapper.sumTotalAmountByType(FlowingTypeEnum.WITHDRAWAL.getValue());
 
-        BusinessVO businessVO = BusinessVO.builder()
-                .onlineUserSize(sysLoginLogService.getTodayLoginCount())
-                .totalUserSize((int) this.count())
-                .totalTrusteeship(NumberUtil.toMoeny(walletsService.getPlatformTotalLockAmount()))
-                .ToBeReviewedSize(appUserWithdrawMapper.selectCount(new LambdaQueryWrapper<AppUserWithdraw>().eq(AppUserWithdraw::getAuditStatus, 0)).intValue())
-                .totalRecharge(NumberUtil.toMoeny(totalRecharge))
-                .totalWithdraw(NumberUtil.toMoeny(totalWithdraw))
-                .build();
-        return businessVO;
+//        BusinessVO businessVO = BusinessVO.builder()
+//                .onlineUserSize(sysLoginLogService.getTodayLoginCount())
+//                .totalUserSize((int) this.count())
+//                .totalTrusteeship(NumberUtil.toMoeny(walletsService.getPlatformTotalLockAmount()))
+//                .ToBeReviewedSize(appUserWithdrawMapper.selectCount(new LambdaQueryWrapper<AppUserWithdraw>().eq(AppUserWithdraw::getAuditStatus, 0)).intValue())
+//                .totalRecharge(NumberUtil.toMoeny(totalRecharge))
+//                .totalWithdraw(NumberUtil.toMoeny(totalWithdraw))
+//                .build();
+        //return businessVO;
+        return null;
     }
 }

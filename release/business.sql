@@ -37,8 +37,7 @@ CREATE TABLE `wallets`  (
   `legalCurrencyAccount` varchar(255)  NOT NULL DEFAULT '' COMMENT '提现用的法币账号',
   `walletAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '钱包余额',
   `principalAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '托管本金',
-  `totalRechargeAmount` decimal(24, 8) UNSIGNED NOT NULL DEFAULT 0.00000000 COMMENT '累计充值金额',
-  `totalWithdrawAmount` decimal(24, 8) UNSIGNED NOT NULL DEFAULT 0.00000000 COMMENT '累计提现金额',
+  `frozenAmount` decimal(24, 8) UNSIGNED NOT NULL DEFAULT 0.00000000 COMMENT '冻结金额',
   `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
@@ -188,7 +187,7 @@ CREATE TABLE `app_versions`  (
   `updateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '功能更新说明',
   `platformDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '平台描述',
   `downloadAddress` varchar(255)  NOT NULL DEFAULT '' COMMENT 'app下载地址',
-  `use` tinyint  NOT NULL DEFAULT 0 COMMENT '是否使用的版本 1=使用 0=未使用'
+  `use` tinyint  NOT NULL DEFAULT 0 COMMENT '最新发布版本 1=最新版本 0=旧版本'
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统版本表' ROW_FORMAT = Dynamic;
 

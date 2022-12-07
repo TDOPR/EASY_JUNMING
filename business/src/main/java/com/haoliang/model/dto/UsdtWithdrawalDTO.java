@@ -5,21 +5,16 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
+/**
+ * @author Dominick Li
+ * @Description
+ * @CreateTime 2022/12/7 14:59
+ **/
 @Data
-public class WalletOrderDTO {
-
-    /**
-     * 使用的货币类型   1=usdt 2=法币
-     *
-     * @required
-     */
-    @NotNull
-    private Integer coinId;
+public class UsdtWithdrawalDTO {
 
     /**
      * 金额
-     *
-     * @required
      */
     @NotNull
     private BigDecimal amount;
@@ -27,11 +22,12 @@ public class WalletOrderDTO {
     /**
      * 区块链地址  USDT提现的时候需要
      */
+    @NotNull
     private String address;
 
     /**
      * 提现网络类型
      */
+    @NotNull
     private String networdName;
-
 }

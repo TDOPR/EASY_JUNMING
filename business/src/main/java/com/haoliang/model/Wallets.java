@@ -31,11 +31,6 @@ public class Wallets extends BaseModel {
     private Integer robotLevel;
 
     /**
-     * 区块链充值地址
-     */
-    private String blockAddress;
-
-    /**
      * 法币账号
      */
     private String legalCurrencyAccount;
@@ -59,5 +54,10 @@ public class Wallets extends BaseModel {
      * 累计提现金额
      */
     private BigDecimal totalWithdrawAmount;
+
+    /**
+     * 提现冻结的金额
+     */
+    private BigDecimal frozenAmount;
 
 }

@@ -26,6 +26,10 @@ public class AppTokenVO {
      */
     private String nickName;
     /**
+     * 用户邀请码
+     */
+    private String inviteCode;
+    /**
      * 系统版本
      */
     private String version;

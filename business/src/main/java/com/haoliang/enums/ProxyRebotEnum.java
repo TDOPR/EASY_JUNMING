@@ -14,11 +14,11 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public enum ProxyRebotEnum {
 
-    FIRST(1, new BigDecimal(0.10)),
-    SECOND(2, new BigDecimal(0.15)),
-    THIRD(3, new BigDecimal(0.20)),
-    FOURTH(4, new BigDecimal(0.25)),
-    FIFTH(5, new BigDecimal(0.30)),
+    FIRST(1, new BigDecimal("0.10")),
+    SECOND(2, new BigDecimal("0.15")),
+    THIRD(3, new BigDecimal("0.20")),
+    FOURTH(4, new BigDecimal("0.25")),
+    FIFTH(5, new BigDecimal("0.30")),
     ;
 
     /**
