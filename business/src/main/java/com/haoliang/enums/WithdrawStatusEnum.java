@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 提现以及审核状态枚举
+ * 提现状态枚举
  */
 @AllArgsConstructor
 @Getter
-public enum WithdrawStateEnum {
+public enum WithdrawStatusEnum {
 
     UNDER_REVIEW(0,"待审核"),
     SUCCESS(1,"成功"),
@@ -21,13 +21,13 @@ public enum WithdrawStateEnum {
     TO_AMOUNT_SUCCESS(8,"已结算"),
     ;
 
-    private Integer state;
+    private Integer status;
     private String desc;
 
-    public static String getDescByState(Integer state){
-        for(WithdrawStateEnum withdrawStateEnum:values()){
-            if(withdrawStateEnum.getState().equals(state)){
-                return withdrawStateEnum.getDesc();
+    public static String getDescByStatus(Integer status){
+        for(WithdrawStatusEnum withdrawStatusEnum :values()){
+            if(withdrawStatusEnum.getStatus().equals(status)){
+                return withdrawStatusEnum.getDesc();
             }
         }
         return "";

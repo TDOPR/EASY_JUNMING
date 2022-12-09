@@ -5,14 +5,15 @@ import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.enums.BooleanEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.util.IpAddrUtil;
-import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.mapper.AppVersionsMapper;
 import com.haoliang.model.AppVersions;
 import com.haoliang.model.dto.AppUserLoginDTO;
 import com.haoliang.model.dto.AppUserRegisterDTO;
+import com.haoliang.model.dto.CheckVersionDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
 import com.haoliang.model.vo.AppDownloadAddressVO;
 import com.haoliang.model.vo.AppTokenVO;
+import com.haoliang.model.vo.CheckVersionVO;
 import com.haoliang.model.vo.HomeVO;
 import com.haoliang.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,8 @@ public class HomeController {
      * 主页信息
      */
     @GetMapping
-    public JsonResult<HomeVO> home(@RequestHeader(value = JwtTokenUtil.TOKEN_NAME, required = false) String token) {
-        return appUserService.home(token);
+    public JsonResult<HomeVO> home() {
+        return appUserService.home();
     }
 
     /**
@@ -85,6 +86,36 @@ public class HomeController {
             return JsonResult.successResult(new AppDownloadAddressVO(appVersions.getDownloadAddress()));
         }
         return JsonResult.failureResult();
+    }
+
+    /**
+     * 检测版本更新信息
+     */
+    @PostMapping("/checkVersion")
+    public JsonResult checkVersion(@RequestBody CheckVersionDTO checkVersionDTO) {
+        AppVersions appVersions = appVersionsMapper.selectOne(
+                new LambdaQueryWrapper<AppVersions>()
+                        .eq(AppVersions::getSystemName, checkVersionDTO.getSystemName())
+                        .eq(AppVersions::getActive, BooleanEnum.TRUE.getIntValue())
+        );
+
+        if (appVersions.getVersion().equals(checkVersionDTO.getVersion())) {
+            return JsonResult.successResult(
+                    CheckVersionVO.builder()
+                            .flag(false)
+                            .build()
+            );
+        }
+
+        return JsonResult.successResult(
+                CheckVersionVO.builder()
+                        .flag(true)
+                        .version(appVersions.getVersion())
+                        .updateDesc(appVersions.getUpdateDesc())
+                        .downloadAddress(appVersions.getDownloadAddress())
+                        .force(BooleanEnum.TRUE.getIntValue().equals(appVersions.getForceUpdate()))
+                        .build()
+        );
     }
 
 }

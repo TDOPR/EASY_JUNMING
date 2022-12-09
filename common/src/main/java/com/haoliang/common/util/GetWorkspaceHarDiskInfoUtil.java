@@ -1,7 +1,7 @@
 package com.haoliang.common.util;
 
 
-import com.haoliang.common.model.WorkspaceHarDiskInfo;
+import com.haoliang.common.model.dto.WorkspaceHarDiskInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;

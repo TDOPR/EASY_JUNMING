@@ -4,13 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.haoliang.common.annotation.RedisLock;
-import com.haoliang.enums.CoinUnitEnum;
-import com.haoliang.enums.FlowingActionEnum;
-import com.haoliang.enums.FlowingTypeEnum;
-import com.haoliang.enums.WithdrawStateEnum;
-import com.haoliang.model.AppUserRecharge;
+import com.haoliang.enums.*;
+import com.haoliang.model.EvmRecharge;
 import com.haoliang.model.EvmWithdraw;
-import com.haoliang.service.AppUserRechargeService;
+import com.haoliang.service.EvmRechargeService;
 import com.haoliang.service.EvmWithdrawService;
 import com.haoliang.service.WalletsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +31,7 @@ public class BlockTaskScheduledJob {
     private EvmWithdrawService evmWithdrawService;
 
     @Autowired
-    private AppUserRechargeService appUserRechargeService;
+    private EvmRechargeService evmRechargeService;
 
     @Autowired
     private WalletsService walletsService;
@@ -46,10 +43,10 @@ public class BlockTaskScheduledJob {
     @RedisLock
     public void scanRechargeData() {
         //获取充值任务状态是打币成功的
-        UpdateWrapper<AppUserRecharge> updateWrapper;
-        List<AppUserRecharge> list = appUserRechargeService.list(new LambdaQueryWrapper<AppUserRecharge>()
-                .select(AppUserRecharge::getId, AppUserRecharge::getAddress, AppUserRecharge::getUsdAmount));
-                //.eq(AppUserRecharge::getStatus, WithdrawStateEnum.BLOCK_COIN_PRINTING_FAILED.getState()));
+        UpdateWrapper<EvmRecharge> updateWrapper;
+        List<EvmRecharge> list = evmRechargeService.list(new LambdaQueryWrapper<EvmRecharge>()
+                .select(EvmRecharge::getId, EvmRecharge::getAddress, EvmRecharge::getAmount)
+                .eq(EvmRecharge::getStatus, RechargeStatusEnum.RECHARGE_SUCCESS.getStatus()));
 
         if (list.size() == 0) {
             return;
@@ -57,17 +54,17 @@ public class BlockTaskScheduledJob {
 
         //根据区块链地址修改用户钱包金额
         List<Long> idList = new ArrayList<>();
-        for (AppUserRecharge appUserRecharge : list) {
-            walletsService.updateWallet(appUserRecharge.getUsdAmount(), appUserRecharge.getAddress(), FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
-            idList.add(appUserRecharge.getId());
+        for (EvmRecharge evmRecharge : list) {
+            walletsService.updateWallet(evmRecharge.getAddress(), evmRecharge.getAmount(), FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
+            idList.add(evmRecharge.getId());
         }
 
         //修改任务状态
         updateWrapper = Wrappers.update();
         updateWrapper.lambda()
-                .set(AppUserRecharge::getStatus, WithdrawStateEnum.SUCCESS.getState())
-                .in(AppUserRecharge::getId, idList);
-        appUserRechargeService.update(updateWrapper);
+                .set(EvmRecharge::getStatus, RechargeStatusEnum.TO_RECORDED_SUCCESS.getStatus())
+                .in(EvmRecharge::getId, idList);
+        evmRechargeService.update(updateWrapper);
     }
 
 
@@ -83,7 +80,7 @@ public class BlockTaskScheduledJob {
                 new LambdaQueryWrapper<EvmWithdraw>()
                         .select(EvmWithdraw::getId, EvmWithdraw::getUserId, EvmWithdraw::getAmount, EvmWithdraw::getStatus)
                         .eq(EvmWithdraw::getCoinId, CoinUnitEnum.USDT.getId())
-                        .in(EvmWithdraw::getStatus, Arrays.asList(WithdrawStateEnum.SUCCESS.getState(), WithdrawStateEnum.BLOCK_COIN_PRINTING_FAILED.getState()))
+                        .in(EvmWithdraw::getStatus, Arrays.asList(WithdrawStatusEnum.SUCCESS.getStatus(), WithdrawStatusEnum.BLOCK_COIN_PRINTING_FAILED.getStatus()))
         );
 
         if (list.size() == 0) {
@@ -92,7 +89,7 @@ public class BlockTaskScheduledJob {
 
         List<Long> idList = new ArrayList<>();
         for (EvmWithdraw evmWithdraw : list) {
-            if (evmWithdraw.getStatus().equals(WithdrawStateEnum.SUCCESS.getState())) {
+            if (evmWithdraw.getStatus().equals(WithdrawStatusEnum.SUCCESS.getStatus())) {
                 walletsService.reduceFrozenAmount(evmWithdraw.getUserId(), evmWithdraw.getAmount());
             } else {
                 //如果区块链打币失败 则把冻结的金额返还给客户
@@ -104,7 +101,7 @@ public class BlockTaskScheduledJob {
         //修改任务状态为已结算
         updateWrapper = Wrappers.update();
         updateWrapper.lambda()
-                .set(EvmWithdraw::getStatus, WithdrawStateEnum.TO_AMOUNT_SUCCESS.getState())
+                .set(EvmWithdraw::getStatus, WithdrawStatusEnum.TO_AMOUNT_SUCCESS.getStatus())
                 .in(EvmWithdraw::getId, idList);
         evmWithdrawService.update(updateWrapper);
     }

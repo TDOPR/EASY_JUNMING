@@ -8,7 +8,7 @@ import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.model.Wallets;
 import com.haoliang.model.dto.MyTeamAmountDTO;
 import com.haoliang.model.dto.UserWalletsDTO;
-import com.haoliang.model.dto.WalletOrderDTO;
+import com.haoliang.model.dto.WalletDTO;
 import com.haoliang.model.vo.MyWalletsVO;
 
 import java.math.BigDecimal;
@@ -18,27 +18,16 @@ public interface WalletsService extends IService<Wallets> {
 
     /**
      * 获取我的钱包信息
-     * @param token 身份凭证
      * @return
      */
-    JsonResult<MyWalletsVO> getMyWallet(String token);
+    JsonResult<MyWalletsVO> getMyWallet();
 
     /**
      * 充值
-     * @param walletOrderDTO 充值信息
-     * @param token 身份凭证
+     * @param walletDTO 充值信息
      * @return
      */
-    JsonResult recharge(WalletOrderDTO walletOrderDTO, String token);
-
-    /**
-     * 提现
-     * @param walletOrderDTO 提现信息
-     * @param token 身份凭证
-     * @return
-     */
-    JsonResult withdrawal(WalletOrderDTO walletOrderDTO, String token);
-
+    JsonResult recharge(WalletDTO walletDTO);
 
     /**
      * 查询钱包对象
@@ -61,13 +50,13 @@ public interface WalletsService extends IService<Wallets> {
 
     /**
      * 更新钱包余额
-     * @param amount  需要加或减的金额
      * @param blockAddress  区块链地址
+     * @param amount  需要加或减的金额
      * @param flowingActionEnum 收入或支出
      * @param flowingTypeEnum 流水类型
      * @return 执行结果
      */
-    boolean updateWallet(BigDecimal amount, String blockAddress, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum);
+    boolean updateWallet(String blockAddress,BigDecimal amount, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum);
 
     /**
      * 根据直推用户获取我的团队业绩
@@ -120,4 +109,11 @@ public interface WalletsService extends IService<Wallets> {
      * @param amount 扣减的费用
      */
     boolean reduceFrozenAmount(Integer userId, BigDecimal amount);
+
+    /**
+     * 为用户绑定一条区块链地址
+     * @param networdName 需要分配的网络名称
+     * @return
+     */
+    JsonResult getBlockAddress(String networdName);
 }

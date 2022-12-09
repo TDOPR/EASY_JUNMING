@@ -6,23 +6,23 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.config.AppParam;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
+import com.haoliang.common.constant.LanguageKeyConstants;
 import com.haoliang.common.enums.BooleanEnum;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.SysLoginLog;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
-import com.haoliang.common.util.IdUtil;
-import com.haoliang.common.util.JwtTokenUtil;
-import com.haoliang.common.util.NumberUtil;
-import com.haoliang.common.util.StringUtil;
+import com.haoliang.common.util.*;
 import com.haoliang.common.util.encrypt.AESUtil;
 import com.haoliang.common.util.redis.RedisUtil;
 import com.haoliang.enums.CoinNetworkSourceEnum;
@@ -35,10 +35,7 @@ import com.haoliang.model.dto.AppUserDTO;
 import com.haoliang.model.dto.AppUserLoginDTO;
 import com.haoliang.model.dto.AppUserRegisterDTO;
 import com.haoliang.model.dto.FindPasswordDTO;
-import com.haoliang.model.vo.AppTokenVO;
-import com.haoliang.model.vo.AppUsersVO;
-import com.haoliang.model.vo.BusinessVO;
-import com.haoliang.model.vo.HomeVO;
+import com.haoliang.model.vo.*;
 import com.haoliang.service.*;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.BeanUtils;
@@ -52,8 +49,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Dominick Li
@@ -97,8 +92,19 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     private EvmUserWalletService evmUserWalletService;
 
     @Override
-    public JsonResult home(String token) {
+    public JsonResult<MyDetailVO> getMyDetail() {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        AppUsers appUsers = this.selectColumnsByUserId(userId, AppUsers::getLevel, AppUsers::getAutograph, AppUsers::getAutograph, AppUsers::getNickName, AppUsers::getInviteCode, AppUsers::getHeadImage);
+        MyDetailVO myDetailVO = new MyDetailVO();
+        BeanUtils.copyProperties(appUsers, myDetailVO);
+        myDetailVO.setPlatformDesc(MessageUtil.get(LanguageKeyConstants.PLATFORM_DESC, ThreadLocalManager.getLanguage()));
+        return JsonResult.successResult(myDetailVO);
+    }
+
+    @Override
+    public JsonResult home() {
         Integer robotLevel = 0;
+        String token = ThreadLocalManager.getToken();
         BigDecimal principalAmount = BigDecimal.ZERO;
         //判断当前用户是否登录
         if (!JwtTokenUtil.isTokenExpired(token)) {
@@ -123,7 +129,6 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         homeVO.setTrusteeshipAmount(NumberUtil.toMoeny(principalAmount));
         BigDecimal totalAmount = walletsService.getPlatformTotalLockAmount();
         homeVO.setTotalTrusteeshipAmount(NumberUtil.toMoeny(totalAmount));
-        //获取主页显示的折线图数据 TODO
 
         return JsonResult.successResult(homeVO);
     }
@@ -152,11 +157,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         if (SysSettingParam.isEnableSso()) {
             RedisUtil.deleteObjects(CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":*");
         }
-        AppVersions appVersions = appVersionsMapper.selectOne(
-                new LambdaQueryWrapper<AppVersions>()
-                .eq(AppVersions::getSystemName, appUserLoginDTO.getSystemName())
-                .eq(AppVersions::getActive,BooleanEnum.TRUE.getIntValue())
-        );
+
         //把token存储到缓存中
         String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtil.simpleUUID();
         RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
@@ -164,10 +165,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
 
         //返回token给客户端
         AppTokenVO appTokenVO = new AppTokenVO();
-        BeanUtils.copyProperties(appUsers, appTokenVO);
         appTokenVO.setToken(tokenKey);
-        appTokenVO.setVersion(appVersions.getVersion());
-        appTokenVO.setPlatformDesc(appVersions.getPlatformDesc());
         return JsonResult.successResult(appTokenVO);
     }
 
@@ -206,34 +204,22 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
             appUsers.setPassword(AESUtil.encrypt(appUserRegisterDTO.getPassword(), appUsers.getSalt()));
             this.save(appUsers);
 
-            //为用户分配区块链钱包
+            //默认为用户分配一个BSC的区块链钱包
             {
-                List<EvmAddressPool> evmAddressPoolList = new ArrayList<>();
-                EvmAddressPool evmAddressPool;
-                for (CoinNetworkSourceEnum coinNetworkSourceEnum : CoinNetworkSourceEnum.values()) {
-                    evmAddressPool = evmAddressPoolMapper.randomGetAddress(coinNetworkSourceEnum.getName());
-                    if (evmAddressPool != null) {
-                        evmAddressPoolMapper.deleteByAddress(evmAddressPool.getAddress());
-                        evmAddressPoolList.add(evmAddressPool);
-                    }
-                }
-
-                List<EvmUserWallet> evmUserWalletList = new ArrayList<>();
-                //添加到区块链用户钱包表
-                for (EvmAddressPool address : evmAddressPoolList) {
-                    evmUserWalletList.add(EvmUserWallet.builder()
-                            .address(address.getAddress())
-                            .coinId(address.getCoinId())
-                            .keystore(address.getKeystore())
+                EvmAddressPool evmAddressPool = evmAddressPoolMapper.randomGetAddress(CoinNetworkSourceEnum.BSC.getName());
+                if (evmAddressPool != null) {
+                    evmAddressPoolMapper.deleteByAddress(evmAddressPool.getAddress());
+                    //添加到区块链用户钱包表
+                    evmUserWalletService.save(EvmUserWallet.builder()
+                            .address(evmAddressPool.getAddress())
+                            .coinId(evmAddressPool.getCoinId())
+                            .keystore(evmAddressPool.getKeystore())
                             .valid("E")
-                            .lowerAddress(address.getAddress().toLowerCase())
-                            .coinType(address.getCoinType())
-                            .password(address.getPwd())
+                            .lowerAddress(evmAddressPool.getAddress().toLowerCase())
+                            .coinType(evmAddressPool.getCoinType())
+                            .password(evmAddressPool.getPwd())
                             .userId(appUsers.getId())
                             .build());
-                }
-                if (evmUserWalletList.size() > 0) {
-                    evmUserWalletService.saveBatch(evmUserWalletList);
                 }
             }
 
@@ -306,19 +292,19 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     }
 
     @Override
-    public JsonResult modifyUserDetail(String token, AppUserDTO appUserDTO) {
+    public JsonResult modifyUserDetail(AppUserDTO appUserDTO) {
         UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();
         updateWrapper.lambda()
                 .set(AppUsers::getNickName, appUserDTO.getNickName())
                 .set(AppUsers::getAutograph, appUserDTO.getAutograph())
-                .eq(AppUsers::getId, JwtTokenUtil.getUserIdFromToken(token));
+                .eq(AppUsers::getId, JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken()));
         boolean flag = this.update(updateWrapper);
         return JsonResult.build(flag);
     }
 
     @Override
-    public JsonResult uploadHeadImage(String token, MultipartFile file) throws Exception {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult uploadHeadImage(MultipartFile file) throws Exception {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
 
         String suffix = FileUtil.getSuffix(file.getOriginalFilename());
         String fileName = userId + "." + suffix;
@@ -329,7 +315,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();
         updateWrapper.lambda()
                 .set(AppUsers::getHeadImage, url)
-                .eq(AppUsers::getId, JwtTokenUtil.getUserIdFromToken(token));
+                .eq(AppUsers::getId, userId);
         boolean flag = this.update(updateWrapper);
 
         if (flag) {
@@ -342,14 +328,16 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
 
     @Override
     public JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO) {
-        AppUsers sysUser = this.getOne(new LambdaQueryWrapper<AppUsers>().select(AppUsers::getSalt, AppUsers::getPassword).eq(AppUsers::getId, updatePasswordDTO.getUserId()));
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        AppUsers sysUser = this.selectColumnsByUserId(userId, AppUsers::getSalt, AppUsers::getPassword);
+
         String oldPwd = AESUtil.encrypt(updatePasswordDTO.getOldPassword(), sysUser.getSalt());
         if (sysUser.getPassword().equals(oldPwd)) {
             UpdateWrapper<AppUsers> wrapper = Wrappers.update();
             wrapper.lambda()
                     .set(AppUsers::getPassword, AESUtil.encrypt(updatePasswordDTO.getPassword(), sysUser.getSalt()))
-                    .eq(AppUsers::getId, updatePasswordDTO.getUserId());
-            update(null, wrapper);
+                    .eq(AppUsers::getId, userId);
+            update(wrapper);
             return JsonResult.successResult();
         }
         return JsonResult.failureResult(ReturnMessageEnum.ORIGINAL_PASSWORD_ERROR);
@@ -360,15 +348,23 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         BigDecimal totalRecharge = walletLogsMapper.sumTotalAmountByType(FlowingTypeEnum.RECHARGE.getValue());
         BigDecimal totalWithdraw = walletLogsMapper.sumTotalAmountByType(FlowingTypeEnum.WITHDRAWAL.getValue());
 
-//        BusinessVO businessVO = BusinessVO.builder()
-//                .onlineUserSize(sysLoginLogService.getTodayLoginCount())
-//                .totalUserSize((int) this.count())
-//                .totalTrusteeship(NumberUtil.toMoeny(walletsService.getPlatformTotalLockAmount()))
-//                .ToBeReviewedSize(appUserWithdrawMapper.selectCount(new LambdaQueryWrapper<AppUserWithdraw>().eq(AppUserWithdraw::getAuditStatus, 0)).intValue())
-//                .totalRecharge(NumberUtil.toMoeny(totalRecharge))
-//                .totalWithdraw(NumberUtil.toMoeny(totalWithdraw))
-//                .build();
-        //return businessVO;
-        return null;
+        BusinessVO businessVO = BusinessVO.builder()
+                .onlineUserSize(sysLoginLogService.getTodayLoginCount())
+                .totalUserSize((int) this.count())
+                .totalTrusteeship(NumberUtil.toMoeny(walletsService.getPlatformTotalLockAmount()))
+                .ToBeReviewedSize(evmWithdrawMapper.selectCount(new LambdaQueryWrapper<EvmWithdraw>().eq(EvmWithdraw::getAuditStatus, 0)).intValue())
+                .totalRecharge(NumberUtil.toMoeny(totalRecharge))
+                .totalWithdraw(NumberUtil.toMoeny(totalWithdraw))
+                .build();
+        return businessVO;
+    }
+
+    @Override
+    public AppUsers selectColumnsByUserId(Integer userId, SFunction<AppUsers, ?>... columns) {
+        return this.getOne(
+                new LambdaQueryWrapper<AppUsers>()
+                        .select(columns)
+                        .eq(AppUsers::getId, userId)
+        );
     }
 }

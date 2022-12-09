@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.common.util.NumberUtil;
 import com.haoliang.constant.EasyTradeConfig;
@@ -53,13 +54,13 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
 
     @Override
     @Transactional
-    public JsonResult recharge(AmountDTO amountDTO, String token) {
+    public JsonResult recharge(AmountDTO amountDTO) {
         //充值到托管金额不能低于10$
         if (amountDTO.getAmount().intValue() < EasyTradeConfig.MIN_AMOUNT) {
             return JsonResult.failureResult(ReturnMessageEnum.MIN_AMOUNT);
         }
 
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getRobotLevel, Wallets::getPrincipalAmount);
         if (amountDTO.getAmount().subtract(wallets.getWalletAmount()).doubleValue() > 0) {
             //如果提现的金额超过托管金额,则返回错误码
@@ -82,7 +83,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
         walletsService.update(wrapper);
 
         //添加钱包流水记录
-        walletLogsService.insertWalletLogs(amountDTO.getAmount(), userId, FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.ENTRUSTMENT);
+        walletLogsService.insertWalletLogs(userId,amountDTO.getAmount(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.ENTRUSTMENT);
 
         updateUserLevelTaskService.insertListByUserId(userId);
         return JsonResult.successResult();
@@ -90,9 +91,9 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
 
     @Override
     @Transactional
-    public JsonResult withdrawal(AmountDTO amountDTO, String token) {
+    public JsonResult withdrawal(AmountDTO amountDTO) {
         //提现到钱包
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getPrincipalAmount);
         if (amountDTO.getAmount().subtract(wallets.getPrincipalAmount()).doubleValue() > 0) {
             //如果提现的金额超过托管金额,则返回错误码
@@ -108,14 +109,14 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
         walletsService.update(wrapper);
 
         //添加钱包流水记录
-        walletLogsService.insertWalletLogs(amountDTO.getAmount(), userId, FlowingActionEnum.INCOME, FlowingTypeEnum.WITHDRAWL_WALLET);
+        walletLogsService.insertWalletLogs(userId,amountDTO.getAmount(), FlowingActionEnum.INCOME, FlowingTypeEnum.WITHDRAWL_WALLET);
         updateUserLevelTaskService.insertListByUserId(userId);
         return JsonResult.successResult();
     }
 
     @Override
-    public JsonResult<TrusteeshipAmountVO> getTrusteeshipAmount(String token) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult<TrusteeshipAmountVO> getTrusteeshipAmount() {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getPrincipalAmount, Wallets::getRobotLevel);
 
         List<Strategy> strategyList;

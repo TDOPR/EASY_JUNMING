@@ -2,7 +2,7 @@
 //
 //import com.haoliang.common.config.GlobalConfig;
 //import com.haoliang.common.model.JsonResult;
-//import com.haoliang.common.model.WorkspaceHarDiskInfo;
+//import com.haoliang.common.model.dto.WorkspaceHarDiskInfo;
 //import com.haoliang.common.util.GetWorkspaceHarDiskInfoUtil;
 //import com.haoliang.common.util.MonitorInfoUtil;
 //import com.haoliang.model.vo.DataVO;

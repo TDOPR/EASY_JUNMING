@@ -25,18 +25,6 @@ import java.time.LocalDate;
 public class ProfitTaskScheduledJob {
 
     @Autowired
-    private WalletsService walletsService;
-
-    @Autowired
-    private WalletLogsService walletLogsService;
-
-    @Autowired
-    private AsyncService asyncService;
-
-    @Resource
-    private ProfitLogsService profitLogsService;
-
-    @Autowired
     private DayRateService dayRateService;
 
     @Autowired
@@ -90,8 +78,8 @@ public class ProfitTaskScheduledJob {
     /**
      * 每天晚上22点发放团队奖
      */
-    //@Scheduled(cron = "* 0 22 * * ?")
-    @Scheduled(fixedDelay = 10000)//测试每10秒执行一次
+    @Scheduled(cron = "* 0 22 * * ?")
+    //@Scheduled(fixedDelay = 10000)//测试每10秒执行一次
     @RedisLock
     public void sendTeamTask() {
         //查询今天的静态收益是否发放完成

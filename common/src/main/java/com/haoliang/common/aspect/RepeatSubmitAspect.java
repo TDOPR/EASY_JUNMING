@@ -3,7 +3,7 @@ package com.haoliang.common.aspect;
 import com.alibaba.fastjson.JSONObject;
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
-import com.haoliang.common.util.JwtTokenUtil;
+import com.haoliang.common.constant.SystemConstants;
 import com.haoliang.common.util.encrypt.MD5Util;
 import com.haoliang.common.util.redis.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +60,7 @@ public class RepeatSubmitAspect {
         String url = request.getRequestURI();
 
         // 用户的唯一标识
-        String token = request.getHeader(JwtTokenUtil.TOKEN_NAME);
+        String token = request.getHeader(SystemConstants.TOKEN_NAME);
         // 唯一标识（指定key + url + 消息头）
         String submitKey = CacheKeyPrefixConstants.REPEAT_SUBMIT+ MD5Util.toMD5(url + "_" + token + "_" + nowParams);
 

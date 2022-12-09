@@ -79,63 +79,8 @@ CREATE TABLE `profit_logs`  (
    CONSTRAINT `FK_profit_logs_userId` FOREIGN KEY (`userId`) REFERENCES `app_users` (`id`)
 ) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '收益日结记录表' ROW_FORMAT = Dynamic;
 
--- -------------------------------
--- Table structure for address_pool
--- -------------------------------
-DROP TABLE IF EXISTS `address_pool`;
-CREATE TABLE `address_pool`  (
-  `id` int(0) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `address` varchar(255)  NOT NULL DEFAULT ''  COMMENT '区块链交易地址',
-  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '区块链地址池' ROW_FORMAT = Dynamic;
 
--- -------------------------------
--- Table structure for app_user_recharge
--- -------------------------------
-DROP TABLE IF EXISTS `app_user_recharge`;
-CREATE TABLE `app_user_recharge`  (
-  `id` bigint UNSIGNED NOT NULL,
-  `userId` int(0) UNSIGNED NOT NULL COMMENT '关联的用户ID',
-  `txid`varchar(64) NOT NULL DEFAULT '' COMMENT '交易id',
-  `coinUnit` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '货币类型 1=法币 2=usdt',
-  `amount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '充值金额',
-  `status` tinyint UNSIGNED NOT NULL DEFAULT 1 COMMENT '充值状态 1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
-  `address`varchar(256) NOT NULL DEFAULT '' COMMENT '区块链充值地址',
-   `exchangeRate` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '多少金额等于1$',
-   `usdAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '充值金额等值的美元',
-  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
-   PRIMARY KEY (`id`) USING BTREE,
-   CONSTRAINT `FK_app_user_recharge_userId` FOREIGN KEY (`userId`) REFERENCES `app_users` (`id`)
-) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '充值记录表' ROW_FORMAT = Dynamic;
-
-
--- -------------------------------
--- Table structure for app_user_withdraw
--- -------------------------------
-DROP TABLE IF EXISTS `app_user_withdraw`;
-CREATE TABLE `app_user_withdraw`  (
-  `id` bigint UNSIGNED NOT NULL,
-  `userId` int(0) UNSIGNED NOT NULL COMMENT '关联的用户ID',
-  `txid`varchar(64) NOT NULL DEFAULT '' COMMENT '交易id',
-  `coinUnit` tinyint UNSIGNED NOT NULL DEFAULT 0  COMMENT '货币类型 1=法币 2=usdt',
-  `amount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '提现金额',
-  `fee` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '手续费',
-  `actualAmount` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '实际提现金额',
-  `status` tinyint UNSIGNED NOT NULL DEFAULT 0 COMMENT '提现状态0=未审核  1=成功 5-打币中;6;-待区块确认;7-区块打币失败',
-  `address`varchar(256) NOT NULL DEFAULT '' COMMENT '区块链提现地址',
-  `chainFee` decimal(24, 8) NOT NULL DEFAULT 0.00000000 COMMENT '链上手续费花费',
-  `auditTime`  datetime(0) NULL DEFAULT NULL  COMMENT '审批时间',
-  `auditStatus`  tinyint   NOT NULL DEFAULT -1  COMMENT '-1=不需要审核小额提现  0待审核 2=审核通过 3=驳回',
-  `createTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `lastmodifiedTime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP COMMENT '修改时间',
-   PRIMARY KEY (`id`) USING BTREE,
-   CONSTRAINT `FK_app_user_withdraw_userId` FOREIGN KEY (`userId`) REFERENCES `app_users` (`id`)
-) ENGINE = InnoDB  CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '提现记录表' ROW_FORMAT = Dynamic;
-
-
--- -------------------------------
+-- ------------------------------
 -- Table structure for tree_paths
 -- -------------------------------
 DROP TABLE IF EXISTS `tree_paths`;
@@ -185,9 +130,9 @@ CREATE TABLE `app_versions`  (
   `systemName` varchar(255)  NOT NULL DEFAULT '' COMMENT '系统名称 ios 、android',
   `version` varchar(255)  NOT NULL DEFAULT '' COMMENT '版本号',
   `updateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '功能更新说明',
-  `platformDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '平台描述',
   `downloadAddress` varchar(255)  NOT NULL DEFAULT '' COMMENT 'app下载地址',
-  `use` tinyint  NOT NULL DEFAULT 0 COMMENT '最新发布版本 1=最新版本 0=旧版本'
+  `active` tinyint  NOT NULL DEFAULT 0 COMMENT '最新版本标识 1=是 0=否',
+  `forceUpdate` tinyint  NOT NULL DEFAULT 0 COMMENT '强制更新标识 1=是 0=否',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统版本表' ROW_FORMAT = Dynamic;
 
@@ -234,3 +179,98 @@ CREATE TABLE `business_job`  (
   `specialTask` tinyint  NOT NULL DEFAULT 0 COMMENT '发放分红将任务是否执行 1=已执行 0=未执行',
    UNIQUE INDEX `UK_job_createDate`(`createDate`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='收益发放任务表' ROW_FORMAT = Dynamic
+
+
+-- ----------------------------
+-- Table structure for evm_token_address_pool
+-- ----------------------------
+DROP TABLE IF EXISTS `evm_token_address_pool`;
+CREATE TABLE `evm_token_address_pool`  (
+  `id` bigint(18) NOT NULL AUTO_INCREMENT,
+  `coin_id` bigint(18) NOT NULL COMMENT '币种ID',
+  `address` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '地址',
+  `keystore` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT 'keystore',
+  `pwd` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '' COMMENT '密码',
+  `coin_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '地址类型',
+  `status` int(10) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `unq_address`(`address`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 3036 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户的地址池' ROW_FORMAT = Dynamic;
+-- ----------------------------
+-- Table structure for evm_token_recharge
+-- ----------------------------
+DROP TABLE IF EXISTS `evm_token_recharge`;
+CREATE TABLE `evm_token_recharge`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `uid` bigint(18) NULL DEFAULT NULL COMMENT '用户UID',
+  `coin_id` bigint(18) NOT NULL DEFAULT 0 COMMENT '币种id',
+  `coin_name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '币种名称',
+  `coin_type` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '币种类型',
+  `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '钱包地址',
+  `confirm` int(1) NULL DEFAULT NULL COMMENT '充值确认数',
+  `status` int(4) NULL DEFAULT 0 COMMENT '状态：0-待入帐；1-充值成功，2到账失败，3到账成功；',
+  `txid` varchar(80) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '交易id',
+  `num` decimal(20, 8) NULL DEFAULT NULL COMMENT '充值量',
+  `fee` decimal(20, 8) NULL DEFAULT NULL COMMENT '手续费',
+  `mum` decimal(20, 8) NULL DEFAULT NULL COMMENT '实际到账',
+  `block_number` int(10) NULL DEFAULT NULL COMMENT '交易的区块高度',
+  `last_update_time` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
+  `created` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `type` tinyint(1) NULL DEFAULT 0 COMMENT '充值',
+  `remark` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '备注',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `idx_txid`(`txid`) USING BTREE,
+  INDEX `uid_coinId_status`(`uid`, `coin_id`, `status`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 35 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户充值,当前用户充值成功之后添加数据到这个表,充值一般无手续费.当status为0和confirm=1的时候表示充值成功' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for evm_token_withdraw
+-- ----------------------------
+DROP TABLE IF EXISTS `evm_token_withdraw`;
+CREATE TABLE `evm_token_withdraw`  (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '自增id',
+  `uid` bigint(18) UNSIGNED NOT NULL COMMENT '用户id',
+  `coin_id` bigint(18) NOT NULL COMMENT '币种id',
+  `coin_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '币种名称',
+  `coin_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '币种类型',
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '钱包地址',
+  `txid` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '交易id',
+  `num` decimal(22, 8) NOT NULL COMMENT '提现量(包含手续费)',
+  `fee` decimal(20, 8) NOT NULL COMMENT '手续费',
+  `mum` decimal(22, 8) NOT NULL COMMENT '实际提现量',
+  `chain_fee` decimal(20, 8) NULL DEFAULT NULL COMMENT '链上手续费花费',
+  `block_num` int(11) UNSIGNED NULL DEFAULT 0 COMMENT '区块高度',
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
+  `step` tinyint(4) NULL DEFAULT NULL COMMENT '当前审核级数',
+  `status` tinyint(1) NOT NULL COMMENT '状态：0-审核中;1-成功;2-拒绝;3-撤销;4-审核通过;5-打币中;6;-待区块确认;7-区块打币失败',
+  `audit_time` datetime(0) NULL DEFAULT NULL COMMENT '审核时间',
+  `last_update_time` datetime(0) NOT NULL COMMENT '修改时间',
+  `create_time` datetime(0) NOT NULL COMMENT '创建时间',
+  `out_id` bigint(18) NULL DEFAULT NULL,
+  `auditStatus` tinyint(255) NULL DEFAULT NULL COMMENT '审核状态: 1=不需要审核的任务  0=待审核 4=审核通过   2=拒绝',
+  `monet_log_id` int(11) NOT NULL DEFAULT 0 COMMENT '日志id',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `uid`(`uid`) USING BTREE,
+  INDEX `idx_create_time`(`create_time`) USING BTREE,
+  INDEX `idx_status`(`status`) USING BTREE,
+  INDEX `coinid`(`coin_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1600407200940695566 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '当用户发起提币的时候,把数据插入到该表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for evm_user_wallet
+-- ----------------------------
+DROP TABLE IF EXISTS `evm_user_wallet`;
+CREATE TABLE `evm_user_wallet`  (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'ID[钱包名]',
+  `uid` bigint(18) NOT NULL COMMENT '用户ID',
+  `coin_id` bigint(20) NOT NULL COMMENT '币种ID',
+  `address` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '钱包地址',
+  `lower_address` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '小写地址',
+  `password` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '钱包密码',
+  `keystore` varchar(1024) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '秘钥文件',
+  `valid` char(1) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '是否可用：E可用，D不可用',
+  `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
+  `coin_type` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '网络类型名称',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1600700293720780802 CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '用户数字货币钱包' ROW_FORMAT = Dynamic;

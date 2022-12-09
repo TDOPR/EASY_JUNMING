@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.constant.EasyTradeConfig;
@@ -18,16 +19,15 @@ import com.haoliang.model.Wallets;
 import com.haoliang.model.condition.AppUserWithdrawCondition;
 import com.haoliang.model.dto.AuditCheckDTO;
 import com.haoliang.model.dto.UsdtWithdrawalDTO;
+import com.haoliang.model.dto.WalletDTO;
 import com.haoliang.model.vo.EvmWithdrawVO;
 import com.haoliang.service.EvmWithdrawService;
-import com.haoliang.service.WalletLogsService;
 import com.haoliang.service.WalletsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 /**
@@ -42,9 +42,6 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
     private WalletsService walletsService;
 
     @Resource
-    private WalletLogsService walletLogsService;
-
-    @Resource
     private EvmWithdrawMapper evmWithdrawMapper;
 
 
@@ -55,7 +52,7 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
         }
         IPage<EvmWithdrawVO> iPage = evmWithdrawMapper.page(pageParam.getPage(), pageParam.getSearchParam());
         for (EvmWithdrawVO evmWithdrawVO : iPage.getRecords()) {
-            evmWithdrawVO.setAuditStatusName(WithdrawStateEnum.getDescByState(evmWithdrawVO.getAuditStatus()));
+            evmWithdrawVO.setAuditStatusName(WithdrawStatusEnum.getDescByStatus(evmWithdrawVO.getAuditStatus()));
         }
         return JsonResult.successResult(new PageVO<>(iPage.getTotal(), iPage.getPages(), iPage.getRecords()));
     }
@@ -68,13 +65,20 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
                 .set(EvmWithdraw::getAuditTime, LocalDateTime.now())
                 .eq(EvmWithdraw::getId, auditCheckDTO.getId());
         EvmWithdraw evmWithdraw = this.getById(auditCheckDTO.getId());
-        if (auditCheckDTO.getState().equals(WithdrawStateEnum.CHECK_SUCCESS.getState())) {
+        if (auditCheckDTO.getState().equals(WithdrawStatusEnum.CHECK_SUCCESS.getStatus())) {
             //审核通过 触发提现逻辑
             if (evmWithdraw.getCoinId().equals(CoinUnitEnum.USDT.getId())) {
                 //区块链提现需要等链上打币成功再
-                wrapper.lambda().set(EvmWithdraw::getStatus, WithdrawStateEnum.CHECK_SUCCESS.getState());
+                wrapper.lambda().set(EvmWithdraw::getStatus, WithdrawStatusEnum.CHECK_SUCCESS.getStatus());
             } else {
-                //调用法币 TODO
+                boolean flag = this.playFiat(evmWithdraw);
+                if (flag) {
+                    //扣除冻结的金额
+                    walletsService.reduceFrozenAmount(evmWithdraw.getUserId(), evmWithdraw.getAmount());
+                } else {
+                    //如果调用提现接口异常则返回冻结金额给用户
+                    walletsService.unFrozenAmount(evmWithdraw.getUserId(), evmWithdraw.getAmount());
+                }
             }
         } else {
             //取消冻结的金额
@@ -84,44 +88,12 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
         return JsonResult.successResult();
     }
 
+
+
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void withdraw(EvmWithdraw evmWithdraw) {
-        //TODO
-        //根据币种计算手续费
-        CoinUnitEnum coinUnitEnum = CoinUnitEnum.idOf(evmWithdraw.getCoinId());
-        BigDecimal fee = evmWithdraw.getAmount().multiply(coinUnitEnum.getInterestRate());
-
-        //实际提现美元
-        BigDecimal actualAmountUSD = evmWithdraw.getAmount().subtract(fee);
-        //换算成提现币种的金额
-        BigDecimal actualAmount;
-        Integer state;
-        if (coinUnitEnum == CoinUnitEnum.FIAT) {
-            actualAmount = actualAmountUSD.divide(EasyTradeConfig.XPF_2_USD, 7, RoundingMode.FLOOR);
-            //法币金额提现
-            //TODO 法币提现，走第三方提现接口
-            {
-
-            }
-            state = WithdrawStateEnum.SUCCESS.getState();
-            //把提现的金额往钱包表里余额减去
-            walletsService.lookUpdateWallets(evmWithdraw.getUserId(), evmWithdraw.getAmount(), FlowingActionEnum.EXPENDITURE);
-
-        } else {
-            //Usdt提现 需要通过定时任务去扫描区块链打币有没有成功
-            state = WithdrawStateEnum.TO_BE_CONFIRMED_BY_THE_BLOCK.getState();
-            actualAmount = actualAmountUSD.divide(EasyTradeConfig.USDT_2_USD, 7, RoundingMode.FLOOR);
-        }
-        evmWithdraw.setFee(fee);
-        evmWithdraw.setActualAmount(actualAmount);
-        evmWithdraw.setStatus(state);
-        this.saveOrUpdate(evmWithdraw);
-    }
-
-    @Override
-    public JsonResult usdtWithdrawal(UsdtWithdrawalDTO usdtWithdrawalDTO, String token) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult usdtWithdrawal(UsdtWithdrawalDTO usdtWithdrawalDTO) {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getWalletAmount);
 
         if (usdtWithdrawalDTO.getAmount().compareTo(wallets.getWalletAmount()) > 0) {
@@ -131,7 +103,7 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
 
         CoinNetworkSourceEnum coinNetworkSourceEnum = CoinNetworkSourceEnum.nameOf(usdtWithdrawalDTO.getNetwordName());
 
-        if(coinNetworkSourceEnum==null){
+        if (coinNetworkSourceEnum == null) {
             return JsonResult.failureResult(ReturnMessageEnum.UB_SUPPORT_NETWORD);
         }
 
@@ -150,8 +122,6 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
                 .coinId(CoinUnitEnum.USDT.getId())
                 .build();
 
-        //添加钱包流水记录
-        walletLogsService.insertWalletLogs(evmWithdraw.getAmount(), evmWithdraw.getUserId(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.WITHDRAWAL);
 
         //计算费率
         BigDecimal fee = evmWithdraw.getAmount().multiply(coinNetworkSourceEnum.getFree());
@@ -163,14 +133,71 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
         walletsService.frozenAmount(userId, usdtWithdrawalDTO.getAmount());
         if (usdtWithdrawalDTO.getAmount().subtract(EasyTradeConfig.AMOUNT_CHECK).doubleValue() > 0) {
             //大额提现需要审核,设置提现任务状态为待审核
-            evmWithdraw.setStatus(WithdrawStateEnum.UNDER_REVIEW.getState());
-            evmWithdraw.setAuditStatus(WithdrawStateEnum.UNDER_REVIEW.getState());
+            evmWithdraw.setStatus(WithdrawStatusEnum.UNDER_REVIEW.getStatus());
+            evmWithdraw.setAuditStatus(WithdrawStatusEnum.UNDER_REVIEW.getStatus());
         } else {
             //Usdt提现 需要通过定时任务去扫描区块链打币有没有成功
-            evmWithdraw.setStatus(WithdrawStateEnum.CHECK_SUCCESS.getState());
-            evmWithdraw.setAuditStatus(-1);
+            evmWithdraw.setStatus(WithdrawStatusEnum.CHECK_SUCCESS.getStatus());
         }
         this.save(evmWithdraw);
         return JsonResult.successResult();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public JsonResult fiatWithdrawal(WalletDTO walletDTO) {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getWalletAmount);
+
+        if (walletDTO.getAmount().compareTo(wallets.getWalletAmount()) > 0) {
+            //提现金额不能大于钱包余额
+            return JsonResult.failureResult(ReturnMessageEnum.AMOUNT_EXCEEDS_BALANCE);
+        }
+
+        //生成提现记录
+        EvmWithdraw evmWithdraw = EvmWithdraw.builder()
+                .userId(userId)
+                .coinName(CoinUnitEnum.FIAT.getName())
+                .amount(walletDTO.getAmount())
+                .coinId(CoinUnitEnum.FIAT.getId())
+                .build();
+
+        //计算费率
+        BigDecimal fee = evmWithdraw.getAmount().multiply(CoinUnitEnum.FIAT.getInterestRate());
+        //实际提现美元
+        BigDecimal actualAmountUSD = evmWithdraw.getAmount().subtract(fee);
+        evmWithdraw.setFee(fee);
+        evmWithdraw.setActualAmount(actualAmountUSD);
+        if (evmWithdraw.getAmount().subtract(EasyTradeConfig.AMOUNT_CHECK).doubleValue() > 0) {
+            //需要冻结提现金额
+            walletsService.frozenAmount(userId, evmWithdraw.getAmount());
+            evmWithdraw.setStatus(WithdrawStatusEnum.UNDER_REVIEW.getStatus());
+            evmWithdraw.setAuditStatus(WithdrawStatusEnum.UNDER_REVIEW.getStatus());
+        } else {
+            //小额直接调用支付接口
+            evmWithdraw.setStatus(WithdrawStatusEnum.TO_AMOUNT_SUCCESS.getStatus());
+            boolean flag = this.playFiat(evmWithdraw);
+            if (!flag) {
+                return JsonResult.failureResult();
+            }
+            //扣减钱包余额
+            walletsService.updateWallet(evmWithdraw.getAmount(), userId, FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.WITHDRAWAL);
+        }
+        this.save(evmWithdraw);
+        return JsonResult.successResult();
+    }
+
+    /**
+     * 调用法币充值API
+     *
+     * @param evmWithdraw 充值信息
+     * @return
+     */
+    private boolean playFiat(EvmWithdraw evmWithdraw) {
+        //调用法币充值接口 TODO
+        {
+
+        }
+        return true;
     }
 }

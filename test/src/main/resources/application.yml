@@ -84,3 +84,11 @@ app:
   virtualPathPrefix: /userHeadImage
   #虚拟路径URL
   virtualPathURL: http://127.0.0.1:9090${app.virtualPathPrefix}/
+
+#########################  websocket配置 ##################################
+webSocket:
+  #监听websocket连接的端口
+  port: 9093
+  address: ws://192.168.2.128:${webSocket.port}
+  #此处要用电脑的ip,不然手机访问会出现问题
+  adminwsPath: /adminws

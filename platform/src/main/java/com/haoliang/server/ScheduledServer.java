@@ -10,7 +10,7 @@ import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.model.SysErrorLog;
 import com.haoliang.common.model.SysLoginLog;
 import com.haoliang.common.model.SysOperationLog;
-import com.haoliang.common.model.WorkspaceHarDiskInfo;
+import com.haoliang.common.model.dto.WorkspaceHarDiskInfo;
 import com.haoliang.common.service.SysErrorLogService;
 import com.haoliang.common.service.SysLoginLogService;
 import com.haoliang.common.service.SysOperationLogService;

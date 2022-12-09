@@ -86,7 +86,7 @@ public class AsyncServiceImpl implements AsyncService {
                     //如果代数奖收益大于0,则发放代数奖奖励给用户
                     wallets.setWalletAmount(wallets.getWalletAmount().add(totalIncome));
                     //插入流水变更记录
-                    walletLogsService.insertWalletLogs(totalIncome, wallets.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.ALGEBRA);
+                    walletLogsService.insertWalletLogs(wallets.getUserId(), totalIncome, FlowingActionEnum.INCOME, FlowingTypeEnum.ALGEBRA);
                     log.info("发放代数奖: userId={} ,amount={} ", wallets.getUserId(), totalIncome);
                 }
             }
@@ -117,7 +117,7 @@ public class AsyncServiceImpl implements AsyncService {
                         ProxyLevelEnum proxyLevelEnum = ProxyLevelEnum.getByLevel(appUsers.getLevel());
                         BigDecimal sendAmount = minProfit.multiply(proxyLevelEnum.getIncomeRatio());
                         wallets.setWalletAmount(wallets.getWalletAmount().add(sendAmount));
-                        walletLogsService.insertWalletLogs(sendAmount, wallets.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.TEAM);
+                        walletLogsService.insertWalletLogs(wallets.getUserId(), sendAmount, FlowingActionEnum.INCOME, FlowingTypeEnum.TEAM);
                         log.info("发放团队奖: userId={} ,amount={} ", wallets.getUserId(), sendAmount);
 
                         //判断代理商等级是否有资格发放特别奖  需要级别在4以上才能分红
@@ -132,7 +132,7 @@ public class AsyncServiceImpl implements AsyncService {
                             }
                             sendAmount = allProfit.multiply(EasyTradeConfig.SPECIAL_AWARD_RATE);
                             wallets.setWalletAmount(wallets.getWalletAmount().add(sendAmount));
-                            walletLogsService.insertWalletLogs(sendAmount, wallets.getUserId(), FlowingActionEnum.INCOME, FlowingTypeEnum.SPECIAL);
+                            walletLogsService.insertWalletLogs(wallets.getUserId(), sendAmount, FlowingActionEnum.INCOME, FlowingTypeEnum.SPECIAL);
                             log.info("发放领导奖: userId={} ,amount={} ", wallets.getUserId(), sendAmount);
                         }
                     }

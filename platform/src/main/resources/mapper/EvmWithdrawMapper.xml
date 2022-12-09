@@ -12,7 +12,7 @@
             app_users u
             ON  w.uid=u.id
         WHERE
-            w.auditStatus>-1
+            w.auditStatus!=1
         <if test="param.email!=null and param.email!=''">
             AND u.email=  #{param.email}
         </if>

@@ -1,6 +1,7 @@
 package com.haoliang.security;
 
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
+import com.haoliang.common.constant.SystemConstants;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.service.SysMenuService;
 import io.jsonwebtoken.Claims;
@@ -32,7 +33,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String tokenKey = request.getHeader(JwtTokenUtil.TOKEN_NAME);
+        final String tokenKey = request.getHeader(SystemConstants.TOKEN_NAME);
         if (tokenKey != null) {
             Claims claims = JwtTokenUtil.getTokenClaim(tokenKey);
             if (claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {

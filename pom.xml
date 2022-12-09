@@ -52,7 +52,7 @@
         <aspectjweaver.version>1.9.4</aspectjweaver.version>
         <p6spy.version>1.0</p6spy.version>
         <druid-boot.version>1.2.14</druid-boot.version>
-        <jsr310.version>2.9.2</jsr310.version>
+        <jsr310.version>2.13.0</jsr310.version>
         <google-zxing.version>3.4.1</google-zxing.version>
         <oshi.version>6.3.0</oshi.version>
         <netty-all.version>4.1.36.Final</netty-all.version>

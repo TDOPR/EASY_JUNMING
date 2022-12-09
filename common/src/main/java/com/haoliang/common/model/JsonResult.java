@@ -48,6 +48,11 @@ public class JsonResult<T> implements Serializable {
         this.setMsg(msg);
     }
 
+    public JsonResult(int code, String msg,Object[] params) {
+        this(code);
+        this.setMsg(msg);
+    }
+
     public JsonResult(int code, String msg, T data) {
         this(code, msg);
         this.setData(data);

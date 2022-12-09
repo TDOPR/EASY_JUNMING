@@ -15,7 +15,7 @@
     </select>
 
     <delete id="deleteByAddress">
-        delete from address_pool where address = #{address}
+        delete from evm_token_address_pool where address = #{address}
     </delete>
 
 </mapper>

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.model.dto.TypeDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.util.JwtTokenUtil;
@@ -17,7 +18,6 @@ import com.haoliang.service.SysNoticeService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @author Dominick Li
@@ -43,21 +43,21 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
     }
 
     @Override
-    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(String token, TypeDTO type) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
-        Page page=new Page<>(type.getCurrentPage(),type.getPageSize());
+    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(TypeDTO type) {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        Page page = new Page<>(type.getCurrentPage(), type.getPageSize());
         IPage iPage;
-        if (type.getType()==1) {
-            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndCN(page,userId);
+        if (type.getType() == 1) {
+            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndCN(page, userId);
         } else {
-            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndEN(page,userId);
+            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndEN(page, userId);
         }
         return JsonResult.successResult(new PageVO<>(iPage));
     }
 
     @Override
-    public JsonResult deleteUserNoticeById(String token, Integer id) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult deleteUserNoticeById(Integer id) {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         sysNoticeUserMapper.delete(new LambdaQueryWrapper<SysNoticeUser>()
                 .eq(SysNoticeUser::getNoticeId, id)
                 .eq(SysNoticeUser::getUserId, userId)

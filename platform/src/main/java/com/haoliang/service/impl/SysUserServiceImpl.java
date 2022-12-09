@@ -13,6 +13,7 @@ import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.SysLoginLog;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.service.SysLoginLogService;
@@ -187,7 +188,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO) {
-        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getSalt, SysUser::getPassword).eq(SysUser::getId, updatePasswordDTO.getUserId()));
+        Integer userId=JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getSalt, SysUser::getPassword).eq(SysUser::getId,userId));
         String oldPwd = RSAUtil.decryptString(updatePasswordDTO.getOldPassword());
         oldPwd = AESUtil.encrypt(oldPwd, sysUser.getSalt());
         if (sysUser.getPassword().equals(oldPwd)) {
@@ -195,7 +197,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
             UpdateWrapper<SysUser> wrapper = Wrappers.update();
             wrapper.lambda()
                     .set(SysUser::getPassword, AESUtil.encrypt(password, sysUser.getSalt()))
-                    .eq(SysUser::getId, updatePasswordDTO.getUserId());
+                    .eq(SysUser::getId, userId);
             update(wrapper);
             return JsonResult.successResult();
         }

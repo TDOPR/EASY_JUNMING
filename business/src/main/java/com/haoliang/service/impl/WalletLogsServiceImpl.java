@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.util.DateUtil;
 import com.haoliang.common.util.GroupByUtil;
 import com.haoliang.common.util.JwtTokenUtil;
@@ -50,7 +51,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean insertWalletLogs(BigDecimal amount, Integer userId, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
+    public boolean insertWalletLogs(Integer userId,BigDecimal amount, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
         //添加钱包流水记录
         WalletLogs walletLogs = WalletLogs.builder()
                 .userId(userId)
@@ -87,8 +88,8 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     }
 
     @Override
-    public JsonResult<WalletLogsDetailVO> getMybillDetails(String token, BillDetailsDTO billDetailsDTO) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult<WalletLogsDetailVO> getMybillDetails( BillDetailsDTO billDetailsDTO) {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
 
         //查询钱包流水中第一笔流水的时间
         DateSection dateSection = walletLogsMapper.getDateSection(userId);
@@ -222,8 +223,8 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     }
 
     @Override
-    public JsonResult<ProfitLogsDetailVO> quantificationDetail(String token, TypeDTO typeDTO) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult<ProfitLogsDetailVO> quantificationDetail(TypeDTO typeDTO) {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
 
         LambdaQueryWrapper<ProfitLogs> lambdaQueryWrapper = new LambdaQueryWrapper<ProfitLogs>()
                 .select(ProfitLogs::getPrincipal, ProfitLogs::getGeneratedAmount, ProfitLogs::getStatus, ProfitLogs::getCreateDate)
@@ -269,8 +270,8 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     }
 
     @Override
-    public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(String token, TypeDTO typeDTO) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult<ProxyWalletLogsDetailVO> proxyDetail(TypeDTO typeDTO) {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         LambdaQueryWrapper<WalletLogs> lambdaQueryWrapper = new LambdaQueryWrapper<WalletLogs>()
                 .select(WalletLogs::getCreateTime, WalletLogs::getAmount, WalletLogs::getType)
                 .eq(WalletLogs::getUserId, userId)

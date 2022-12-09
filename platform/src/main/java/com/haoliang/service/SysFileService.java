@@ -14,7 +14,7 @@ public interface SysFileService extends IService<SysFile> {
 
     JsonResult deleteByIds(List<Integer> idList);
 
-    JsonResult saveAndUpload(String token,MultipartFile file, String fileName, String fileType, String fileDesc);
+    JsonResult saveAndUpload(MultipartFile file, String fileName, String fileType, String fileDesc);
 
     JsonResult updateFileInfo(Integer id, String fileName, String fileType);
 }

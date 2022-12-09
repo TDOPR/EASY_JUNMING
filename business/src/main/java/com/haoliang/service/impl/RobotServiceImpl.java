@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
@@ -52,8 +53,8 @@ public class RobotServiceImpl implements RobotService {
     private UpdateUserLevelTaskService updateUserLevelTaskService;
 
     @Override
-    public JsonResult getRobotList(String token) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult getRobotList() {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getRobotLevel);
         List<RobotDetailVO.RobotVO> robotList = new ArrayList<>();
         RobotEnum hasRobotEnum = RobotEnum.levelOf(wallets.getRobotLevel());
@@ -77,9 +78,9 @@ public class RobotServiceImpl implements RobotService {
 
     @Override
     @Transactional
-    public JsonResult buyRebot(RobotDTO robotDTO, String token) {
+    public JsonResult buyRebot(RobotDTO robotDTO) {
         RobotEnum robotEnum = RobotEnum.levelOf(robotDTO.getLevel());
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getId, Wallets::getWalletAmount, Wallets::getRobotLevel);
         if (wallets.getRobotLevel() > 0) {
             return JsonResult.failureResult(ReturnMessageEnum.REPEAT_PURCHASE_REBOT);
@@ -121,16 +122,16 @@ public class RobotServiceImpl implements RobotService {
         }
 
         //添加钱包流水记录
-        walletLogsService.insertWalletLogs(robotEnum.getPrice(), userId, FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.BUY_ROBOT);
+        walletLogsService.insertWalletLogs(userId,robotEnum.getPrice(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.BUY_ROBOT);
         return JsonResult.successResult();
     }
 
     @Override
     @Transactional
-    public JsonResult upgradeRebot(RobotDTO robotDTO, String token) {
+    public JsonResult upgradeRebot(RobotDTO robotDTO) {
         //获取需要升级的机器人
         RobotEnum robotEnum = RobotEnum.levelOf(robotDTO.getLevel());
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = walletsService.selectColumnsByUserId(userId, Wallets::getRobotAmount, Wallets::getId, Wallets::getWalletAmount);
 
         //校验升级机器人等级是否比原有的等级高
@@ -166,7 +167,7 @@ public class RobotServiceImpl implements RobotService {
         }
 
         //添加钱包流水记录
-        walletLogsService.insertWalletLogs(differencePrice, userId, FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.UPGRADE_ROBOT);
+        walletLogsService.insertWalletLogs(userId,differencePrice, FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.UPGRADE_ROBOT);
         return JsonResult.successResult();
     }
 
@@ -186,6 +187,6 @@ public class RobotServiceImpl implements RobotService {
         walletsService.update(wrapper);
 
         //添加钱包流水记录
-        walletLogsService.insertWalletLogs(rewardAmount, userId, FlowingActionEnum.INCOME, FlowingTypeEnum.ROBOT);
+        walletLogsService.insertWalletLogs(userId,rewardAmount, FlowingActionEnum.INCOME, FlowingTypeEnum.ROBOT);
     }
 }

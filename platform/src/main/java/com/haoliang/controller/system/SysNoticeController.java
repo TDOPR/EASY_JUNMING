@@ -9,7 +9,6 @@ import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.dto.TypeDTO;
 import com.haoliang.common.model.vo.PageVO;
-import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.SysMessage;
 import com.haoliang.model.SysNotice;
 import com.haoliang.model.condition.SysNoticeCondition;
@@ -71,8 +70,8 @@ public class SysNoticeController {
      * 根据用户Id获取公告列表
      */
     @PostMapping("/mylist")
-    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token, @RequestBody TypeDTO type){
-        return sysNoticeService.findMyNoticeList(token,type);
+    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList( @RequestBody TypeDTO type){
+        return sysNoticeService.findMyNoticeList(type);
     }
 
     /**
@@ -80,8 +79,8 @@ public class SysNoticeController {
      * @param id 公告Id
      */
     @DeleteMapping("/{id}")
-    public JsonResult deleteUserNoticeById(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token,@PathVariable Integer id){
-        return sysNoticeService.deleteUserNoticeById(token,id);
+    public JsonResult deleteUserNoticeById(@PathVariable Integer id){
+        return sysNoticeService.deleteUserNoticeById(id);
     }
 
 

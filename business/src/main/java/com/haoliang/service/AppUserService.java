@@ -1,5 +1,6 @@
 package com.haoliang.service;
 
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
@@ -14,6 +15,7 @@ import com.haoliang.model.dto.FindPasswordDTO;
 import com.haoliang.model.vo.AppTokenVO;
 import com.haoliang.model.vo.AppUsersVO;
 import com.haoliang.model.vo.BusinessVO;
+import com.haoliang.model.vo.MyDetailVO;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AppUserService extends IService<AppUsers> {
@@ -24,15 +26,19 @@ public interface AppUserService extends IService<AppUsers> {
 
     JsonResult findPassword(FindPasswordDTO findPasswordDTO);
 
-    JsonResult home(String token);
+    JsonResult home();
 
     JsonResult<PageVO<AppUsersVO>> pageList(PageParam<AppUsers, AppUsersCondition> pageParam);
 
-    JsonResult modifyUserDetail(String token, AppUserDTO appUserDTO);
+    JsonResult modifyUserDetail(AppUserDTO appUserDTO);
 
-    JsonResult uploadHeadImage(String token, MultipartFile file) throws Exception;
+    JsonResult uploadHeadImage(MultipartFile file) throws Exception;
 
     JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO);
 
     BusinessVO getBusinessVO();
+
+    JsonResult<MyDetailVO> getMyDetail();
+
+    AppUsers selectColumnsByUserId(Integer userId, SFunction<AppUsers, ?>... columns);
 }

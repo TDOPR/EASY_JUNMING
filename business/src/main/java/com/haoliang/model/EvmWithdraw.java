@@ -100,7 +100,6 @@ public class EvmWithdraw {
     private Integer step;
 
     /**
-     * 状态 0-待审核;1-成功;5-打币中;6;-待区块确认;7-区块打币失败
      * 状态：0-审核中;1-成功;2-拒绝;3-撤销;4-审核通过;5-打币中;6;-待区块确认;7-区块打币失败
      */
     private Integer status;

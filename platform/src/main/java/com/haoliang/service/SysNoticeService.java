@@ -12,7 +12,7 @@ public interface SysNoticeService extends IService<SysNotice> {
 
     JsonResult saveNotice(SysNotice sysNotice);
 
-    JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(String token, TypeDTO type);
+    JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(TypeDTO type);
 
-    JsonResult deleteUserNoticeById(String token, Integer id);
+    JsonResult deleteUserNoticeById(Integer id);
 }

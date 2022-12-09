@@ -2,10 +2,8 @@ package com.haoliang.common.util;
 
 import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -31,13 +29,14 @@ public class DateUtil {
         }
     }
 
-    public static long parseDate(String dateStr, String format) {
+
+    public static Date parseDate(String dateStr, String format) {
         SimpleDateFormat myFormat = new SimpleDateFormat(format);
         try {
             Date date = myFormat.parse(dateStr);
-            return date.getTime();
+            return date;
         } catch (Exception e) {
-            return 0L;
+            return null;
         }
     }
 
@@ -50,9 +49,10 @@ public class DateUtil {
      * 把LocalDate转成
      */
     public static Date getNowDate() {
-        ZoneId zone = ZoneId.systemDefault();
-        Instant instant = LocalDate.now().atStartOfDay().atZone(zone).toInstant();
-        return Date.from(instant);
+//        ZoneId zone = ZoneId.systemDefault();
+//        Instant instant = LocalDate.now().atStartOfDay().atZone(zone).toInstant();
+//        return Date.from(instant);
+        return parseDate(LocalDate.now().toString(), SIMPLE_DATE_FORMAT);
     }
 
     /**

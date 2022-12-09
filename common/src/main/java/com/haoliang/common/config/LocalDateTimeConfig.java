@@ -25,7 +25,7 @@ public class LocalDateTimeConfig {
 
     @Primary
     @Bean
-    public ObjectMapper getMapper(){
+    public ObjectMapper getMapper() {
         ObjectMapper mapper = new ObjectMapper();
         // 反序列化，未知字段不失败
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -37,6 +37,8 @@ public class LocalDateTimeConfig {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
         timeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(dateTimeFormatter));
         timeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(dateTimeFormatter));
+//        timeModule.addSerializer(LocalDate.class, LocalDateSerializer.INSTANCE);
+//        timeModule.addDeserializer(LocalDate.class, LocalDateDeserializer.INSTANCE);
         mapper.registerModule(timeModule);
         return mapper;
     }

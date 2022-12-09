@@ -9,6 +9,7 @@ import com.haoliang.common.config.AppParam;
 import com.haoliang.common.config.GlobalConfig;
 import com.haoliang.common.enums.ContentTypeEnum;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.util.*;
 import com.haoliang.mapper.SysFileMapper;
 import com.haoliang.model.SysFile;
@@ -49,9 +50,9 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
     }
 
     @Override
-    public JsonResult saveAndUpload(String token, MultipartFile file, String fileName, String fileType, String fileDesc) {
+    public JsonResult saveAndUpload( MultipartFile file, String fileName, String fileType, String fileDesc) {
         try {
-            String userName = JwtTokenUtil.getUserNameFromToken(token);
+            String userName = JwtTokenUtil.getUserNameFromToken(ThreadLocalManager.getToken());
             SysFile sysFile = new SysFile();
             sysFile.setFileType(fileType);
             sysFile.setFileDesc(fileDesc);

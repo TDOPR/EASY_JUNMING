@@ -33,12 +33,10 @@ public class BlockAddressVo {
      */
     private BigDecimal minAmount;
 
-    public BlockAddressVo(String networdName, String address, CoinNetworkSourceEnum coinNetworkSourceEnum) {
-        this.networdName = networdName;
-        this.address = address;
-        if (coinNetworkSourceEnum != null) {
-            this.free = coinNetworkSourceEnum.getFree();
-            this.minAmount = coinNetworkSourceEnum.getMinAmount();
-        }
+    public BlockAddressVo(String address, CoinNetworkSourceEnum coinNetworkSourceEnum) {
+        this.networdName = coinNetworkSourceEnum.getName();
+        this.address = address == null ? "" : address;
+        this.free = coinNetworkSourceEnum.getFree();
+        this.minAmount = coinNetworkSourceEnum.getMinAmount();
     }
 }

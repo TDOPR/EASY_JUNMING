@@ -7,6 +7,7 @@ import com.haoliang.common.constant.OperationAction;
 import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
 import com.haoliang.common.model.vo.PageVO;
@@ -112,8 +113,7 @@ public class SysUserController {
      * 修改密码
      */
     @PostMapping("/updatePassword")
-    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
-        updatePasswordDTO.setUserId(JwtTokenUtil.getUserIdFromToken(token));
+    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
         return sysUserService.updatePassword(updatePasswordDTO);
     }
 
@@ -130,8 +130,8 @@ public class SysUserController {
      * 获取用户的菜单权限
      */
     @GetMapping("/getRouters")
-    public JsonResult<RouterVO> getRouters(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token) {
-        return sysMenuService.findAllByRoleCode(JwtTokenUtil.getRoleCodeFromToken(token));
+    public JsonResult<RouterVO> getRouters() {
+        return sysMenuService.findAllByRoleCode(JwtTokenUtil.getRoleCodeFromToken(ThreadLocalManager.getToken()));
     }
 
     /**

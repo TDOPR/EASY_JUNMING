@@ -25,13 +25,9 @@ public class AppVersions  extends BaseModelCIDNoModifyTime {
 
     /**
      * 功能更新说明
+     * 如需要换行 请再记事本中编辑好再复制到数据库中
      */
     private String updateDesc;
-
-    /**
-     * 平台描述
-     */
-    private String platformDesc;
 
     /**
      * app下载地址
@@ -42,4 +38,9 @@ public class AppVersions  extends BaseModelCIDNoModifyTime {
      * 激活版本  1=当前最新版本  0=旧版本
      */
     private Integer active;
+
+    /**
+     * 是否强制升级  1=强制更新  0=需要确认才能更新
+     */
+    private Integer forceUpdate;
 }

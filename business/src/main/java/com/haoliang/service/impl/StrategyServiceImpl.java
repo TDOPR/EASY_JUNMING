@@ -3,12 +3,10 @@ package com.haoliang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
-import com.haoliang.common.util.DateUtil;
 import com.haoliang.common.util.NumberUtil;
 import com.haoliang.common.util.RandomUtil;
 import com.haoliang.mapper.StrategyMapper;
-import com.haoliang.model.*;
-
+import com.haoliang.model.Strategy;
 import com.haoliang.service.StrategyService;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -18,7 +16,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Dominick Li
@@ -95,7 +95,7 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
                             .eipM(NumberUtil.toTwoDecimal(eipM))
                             .eipN(NumberUtil.toTwoDecimal(eipN))
                             .strategyType(strategyType)
-                            .createDate(DateUtil.getNowDate())
+                            .createDate(LocalDate.now())
                             .sortIndex(i + 1)
                             .bc(bc)
                             .cro(cro)
@@ -121,8 +121,9 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
         if (CollectionUtils.isEmpty(strategyList)) {
             strategyList = insertStrategy(now);
             //根据等级获取对应条数记录
-            strategyList = strategyList.subList(0, robotLevel);
+            strategyList = new ArrayList<>(strategyList.subList(0, robotLevel));
         }
         return strategyList;
     }
+
 }

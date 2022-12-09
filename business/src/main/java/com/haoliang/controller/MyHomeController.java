@@ -2,8 +2,8 @@ package com.haoliang.controller;
 
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.dto.UpdatePasswordDTO;
-import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.dto.AppUserDTO;
+import com.haoliang.model.vo.MyDetailVO;
 import com.haoliang.service.AppUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,27 +22,34 @@ public class MyHomeController {
     private AppUserService appUserService;
 
     /**
+     * 获取用户和平台详细信息
+     */
+    @GetMapping
+    public JsonResult<MyDetailVO> getMyDetail(){
+        return appUserService.getMyDetail();
+    }
+
+    /**
      * 修改个人信息
      */
     @PostMapping("/modifyUserDetail")
-    public JsonResult modifyUserDetail(@RequestHeader(JwtTokenUtil.TOKEN_NAME)String token, @RequestBody AppUserDTO appUserDTO){
-        return  appUserService.modifyUserDetail(token,appUserDTO);
+    public JsonResult modifyUserDetail(@RequestBody AppUserDTO appUserDTO){
+        return  appUserService.modifyUserDetail(appUserDTO);
     }
 
     /**
      * 上传头像
      */
     @PostMapping("/uploadHeadImage")
-    public JsonResult uploadHeadImage(@RequestParam("file")MultipartFile file, @RequestHeader(JwtTokenUtil.TOKEN_NAME)String token) throws Exception{
-        return appUserService.uploadHeadImage(token,file);
+    public JsonResult uploadHeadImage(@RequestParam("file")MultipartFile file) throws Exception{
+        return appUserService.uploadHeadImage(file);
     }
 
     /**
      * 修改密码
      */
     @PostMapping("/updatePassword")
-    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO, @RequestHeader(JwtTokenUtil.TOKEN_NAME)String token) {
-        updatePasswordDTO.setUserId(JwtTokenUtil.getUserIdFromToken(token));
+    public JsonResult updatePassword(@RequestBody UpdatePasswordDTO updatePasswordDTO) {
         return appUserService.updatePassword(updatePasswordDTO);
     }
 

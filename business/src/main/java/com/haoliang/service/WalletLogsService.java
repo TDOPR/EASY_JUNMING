@@ -19,13 +19,13 @@ public interface WalletLogsService extends IService<WalletLogs> {
 
     /**
      * 插入流水记录
-     * @param amount  变更的金额
      * @param userId  用户Id
+     * @param amount  变更的金额
      * @param flowingActionEnum 收入或支出
      * @param flowingTypeEnum 流水类型
      * @return 执行结果
      */
-    boolean insertWalletLogs(BigDecimal amount, Integer userId, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum);
+    boolean insertWalletLogs(Integer userId,BigDecimal amount, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum);
 
     /**
      * 根据流水类型查询流水明细
@@ -44,22 +44,19 @@ public interface WalletLogsService extends IService<WalletLogs> {
 
     /**
      * 获取我的钱包账单明细
-     * @param token
      * @return
      */
-    JsonResult<WalletLogsDetailVO> getMybillDetails(String token, BillDetailsDTO billDetailsDTO);
+    JsonResult<WalletLogsDetailVO> getMybillDetails(BillDetailsDTO billDetailsDTO);
 
     /**
      * 获取量化奖励明细
-     * @param token 身份信息
      * @return
      */
-    JsonResult<ProfitLogsDetailVO> quantificationDetail(String token, TypeDTO typeDTO);
+    JsonResult<ProfitLogsDetailVO> quantificationDetail(TypeDTO typeDTO);
 
     /**
      * 获取动态奖励明细
-     * @param token
      * @return
      */
-    JsonResult<ProxyWalletLogsDetailVO> proxyDetail(String token,TypeDTO typeDTO);
+    JsonResult<ProxyWalletLogsDetailVO> proxyDetail(TypeDTO typeDTO);
 }

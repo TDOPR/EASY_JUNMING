@@ -4,11 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.haoliang.annotation.OperationLog;
 import com.haoliang.common.constant.OperationAction;
 import com.haoliang.common.constant.OperationModel;
+import com.haoliang.common.constant.SystemConstants;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.dto.IntIdListDTO;
 import com.haoliang.common.model.vo.PageVO;
-import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.model.SysFile;
 import com.haoliang.model.condition.SysFileCondition;
 import com.haoliang.service.SysFileService;
@@ -62,8 +62,8 @@ public class SysFileController {
     @OperationLog(module = OperationModel.SYS_FILE, description = OperationAction.ADD_OR_EDIT)
     @PostMapping("/add")
     @PreAuthorize("hasAnyAuthority('sys:file:add')")
-    public JsonResult add(@RequestHeader(JwtTokenUtil.TOKEN_NAME) String token,@RequestParam("file") MultipartFile file,@RequestParam String fileName,@RequestParam String fileType,@RequestParam String fileDesc) {
-        return sysFileService.saveAndUpload(token,file, fileName, fileType, fileDesc);
+    public JsonResult add(@RequestParam("file") MultipartFile file, @RequestParam String fileName, @RequestParam String fileType, @RequestParam String fileDesc) {
+        return sysFileService.saveAndUpload(file, fileName, fileType, fileDesc);
     }
 
     /**

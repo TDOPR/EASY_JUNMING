@@ -18,8 +18,6 @@ import java.util.function.Function;
 @Slf4j
 public class JwtTokenUtil {
 
-    public static final String TOKEN_NAME = "token";
-
     /**
      * 根据身份ID标识，生成Token
      */

@@ -1,23 +1,22 @@
 package com.haoliang.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.ThreadLocalManager;
+import com.haoliang.common.util.IdUtil;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.common.util.NumberUtil;
-import com.haoliang.enums.CoinNetworkSourceEnum;
-import com.haoliang.enums.CoinUnitEnum;
-import com.haoliang.enums.FlowingActionEnum;
-import com.haoliang.enums.FlowingTypeEnum;
+import com.haoliang.constant.EasyTradeConfig;
+import com.haoliang.enums.*;
 import com.haoliang.mapper.AppUserMapper;
-import com.haoliang.mapper.AppUserRechargeMapper;
 import com.haoliang.mapper.EvmAddressPoolMapper;
+import com.haoliang.mapper.EvmRechargeMapper;
 import com.haoliang.mapper.WalletsMapper;
-import com.haoliang.model.AppUsers;
-import com.haoliang.model.EvmUserWallet;
-import com.haoliang.model.WalletLogs;
-import com.haoliang.model.Wallets;
+import com.haoliang.model.*;
 import com.haoliang.model.dto.*;
 import com.haoliang.model.vo.BlockAddressVo;
 import com.haoliang.model.vo.CoinInfoVo;
@@ -35,6 +34,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -50,19 +50,10 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     private WalletLogsService walletLogsService;
 
     @Autowired
-    private EvmWithdrawService evmWithdrawService;
-
-    @Autowired
     private TreePathService treePathService;
 
     @Autowired
     private ProfitLogsService profitLogsService;
-
-    @Resource
-    private AppUserRechargeMapper appUserRechargeMapper;
-
-    @Resource
-    private EvmAddressPoolMapper evmAddressPoolMapper;
 
     @Resource
     private AppUserMapper appUserMapper;
@@ -73,10 +64,15 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Resource
     private EvmUserWalletService evmUserWalletService;
 
+    @Resource
+    private EvmAddressPoolMapper evmAddressPoolMapper;
+
+    @Resource
+    private EvmRechargeMapper evmRechargeMapper;
 
     @Override
-    public JsonResult<MyWalletsVO> getMyWallet(String token) {
-        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
+    public JsonResult<MyWalletsVO> getMyWallet() {
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
         Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getWalletAmount);
         AppUsers appUsers = appUserMapper.selectOne(new LambdaQueryWrapper<AppUsers>().select(AppUsers::getMinTeamAmount, AppUsers::getTeamTotalAmount).eq(AppUsers::getId, userId));
 
@@ -115,17 +111,25 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
 
         //获取我的量化收益 昨天,上周,上月,累计
         MyWalletsVO.Quantification quantification = profitLogsService.getMyQuantification(userId);
+
         //加载货币信息
         CoinInfoVo coinInfoVo = new CoinInfoVo();
         List<EvmUserWallet> evmUserWalletList = evmUserWalletService.list(new LambdaQueryWrapper<EvmUserWallet>()
                 .select(EvmUserWallet::getAddress, EvmUserWallet::getCoinType)
                 .eq(EvmUserWallet::getUserId, userId)
         );
+        if (evmUserWalletList.size() == 0) {
+            //如果用户没有区块链钱包则为他分配一条BSC的区块链钱包记录
+            EvmUserWallet evmUserWallet = getAndSetBlockAddress(userId, CoinNetworkSourceEnum.BSC.getName());
+            if (evmUserWallet != null) {
+                evmUserWalletList.add(evmUserWallet);
+            }
+        }
+
+        Map<String, String> blockAddressMap = evmUserWalletList.stream().collect(Collectors.toMap(EvmUserWallet::getCoinType, EvmUserWallet::getAddress));
         List<BlockAddressVo> blockAddressList = new ArrayList<>(evmUserWalletList.size());
-        CoinNetworkSourceEnum coinNetworkSourceEnum;
-        for (EvmUserWallet evmUserWallet : evmUserWalletList) {
-            coinNetworkSourceEnum = CoinNetworkSourceEnum.nameOf(evmUserWallet.getCoinType());
-            blockAddressList.add(new BlockAddressVo(evmUserWallet.getCoinType(), evmUserWallet.getAddress(), coinNetworkSourceEnum));
+        for (CoinNetworkSourceEnum coinNetworkSourceEnum : CoinNetworkSourceEnum.values()) {
+            blockAddressList.add(new BlockAddressVo(blockAddressMap.get(coinNetworkSourceEnum.getName()), coinNetworkSourceEnum));
         }
         coinInfoVo.setBlockAddressList(blockAddressList);
 
@@ -142,116 +146,59 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
 
     @Override
     @Transactional
-    public JsonResult recharge(WalletOrderDTO walletOrderDTO, String token) {
+    public JsonResult recharge(WalletDTO walletDTO) {
         //法币充值
-//        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
-//        Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getId, Wallets::getBlockAddress);
-//        BigDecimal usdAmount = walletOrderDTO.getAmount().divide(EasyTradeConfig.XPF_2_USD, 7, RoundingMode.FLOOR);
-//        BigDecimal exchangeRate = EasyTradeConfig.XPF_2_USD;
-//        Integer status = 1;
-//
-//        //TODO 法币充值，走第三方支付接口
-//        //把充值的金额往钱包表里余额里增加
-//        this.lookUpdateWallets(userId, usdAmount, FlowingActionEnum.INCOME);
-//
-//        //添加钱包流水记录
-//        walletLogsService.insertWalletLogs(usdAmount, userId, FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
-//
-//        //生成充值记录
-//        AppUserRecharge appUserRecharge = AppUserRecharge.builder()
-//                .exchangeRate(exchangeRate)
-//                .status(status)
-//                .address(wallets.getBlockAddress())
-//                .userId(userId)
-//                .txid(IdUtil.simpleUUID())
-//                .coinUnit(walletOrderDTO.getCoinUnit())
-//                .amount(walletOrderDTO.getAmount())
-//                .usdAmount(usdAmount)
-//                .build();
-//
-//        appUserRechargeMapper.insert(appUserRecharge);
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        //计算汇率后的实际充值USD金额
+        BigDecimal usdAmount = walletDTO.getAmount().multiply(EasyTradeConfig.XPF_2_USD);
+
+        //TODO 法币充值，走第三方支付接口
+        {
+
+        }
+        //把充值的金额往钱包表里余额里增加
+        this.lookUpdateWallets(userId, usdAmount, FlowingActionEnum.INCOME);
+
+        //添加钱包流水记录
+        walletLogsService.insertWalletLogs(userId, usdAmount, FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
+
+        //生成充值记录
+        EvmRecharge evmRecharge = EvmRecharge.builder()
+                .status(RechargeStatusEnum.TO_RECORDED_SUCCESS.getStatus())
+                .userId(userId)
+                .coinId(CoinUnitEnum.FIAT.getId())
+                .coinName(CoinUnitEnum.FIAT.getName())
+                .amount(usdAmount)
+                .actualAmount(usdAmount)
+                .txid(IdUtil.simpleUUID())
+                .build();
+        evmRechargeMapper.insert(evmRecharge);
         return JsonResult.successResult();
     }
-
-    @Override
-    @Transactional
-    public JsonResult withdrawal(WalletOrderDTO walletOrderDTO, String token) {
-
-//
-//        //提现
-//        Integer userId = JwtTokenUtil.getUserIdFromToken(token);
-//        Wallets wallets = this.selectColumnsByUserId(userId, Wallets::getWalletAmount);
-//        CoinUnitEnum coinUnitEnum = CoinUnitEnum.valueOf(walletOrderDTO.getCoinId());
-//
-//        if (walletOrderDTO.getAmount().compareTo(wallets.getWalletAmount()) > 0) {
-//            //提现金额不能大于钱包余额
-//            return JsonResult.failureResult(ReturnMessageEnum.AMOUNT_EXCEEDS_BALANCE);
-//        }
-//
-//        String coinUnit = null;
-//        if (coinUnitEnum.equals(CoinUnitEnum.USDT)) {
-//            EvmUserWallet evmUserWallet = evmUserWalletService.getByAddress(walletOrderDTO.getAddress(), EvmUserWallet::getCoinId, EvmUserWallet::getCoinType);
-//            //区块链支付需要判断提现的金额是否大于最低限制
-//            if (walletOrderDTO.getAmount().compareTo(CoinNetworkSourceEnum.nameOf(evmUserWallet.getCoinType()).getMinAmount()) < 0) {
-//                //TODO
-//                return JsonResult.failureResult();
-//            }
-//            coinUnit = evmUserWallet.getCoinType();
-//        }
-//
-//        //生成提现记录
-//        EvmWithdraw evmWithdraw = EvmWithdraw.builder()
-//                .userId(userId)
-//                .address(walletOrderDTO.getAddress())
-//                .coinName(coinUnitEnum.getName())
-//                .coinUnit(coinUnit)
-//                .amount(walletOrderDTO.getAmount())
-//                .coinId(walletOrderDTO.getCoinId())
-//                .build();
-//
-//
-//        //添加钱包流水记录
-//        walletLogsService.insertWalletLogs(evmWithdraw.getAmount(), evmWithdraw.getUserId(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.WITHDRAWAL);
-//
-//        if (walletOrderDTO.getAmount().subtract(EasyTradeConfig.AMOUNT_CHECK).doubleValue() > 0) {
-//            //需要审核,设置提现任务状态为待审核
-//            evmWithdraw.setStatus(WithdrawStateEnum.UNDER_REVIEW.getState());
-//            evmWithdraw.setAuditStatus(WithdrawStateEnum.UNDER_REVIEW.getState());
-//            evmWithdrawService.save(evmWithdraw);
-//            //待审核的提现任务需要冻结提现金额
-//            walletsMapper.frozenAmount(userId, walletOrderDTO.getAmount());
-//        } else {
-//            //小额不需要审核直接走提现逻辑
-//            evmWithdraw.setAuditStatus(-1);
-//            evmWithdrawService.withdraw(evmWithdraw);
-//        }
-        return JsonResult.successResult();
-    }
-
 
     /**
-     * 判断是否有区块链地址，如果没有则重地址池中取出然后设置到钱包里
-     *
-     * @param wallets
-     * @return
+     * 为用户分配一条区块链钱包
      */
-//    private boolean hasBlockAddress(Wallets wallets) {
-//        String address = wallets.getBlockAddress();
-//        if (address == null) {
-//            address = evmAddressPoolMapper.getAddress();
-//            if (address == null) {
-//                return false;
-//            }
-//            evmAddressPoolMapper.deleteByAddress(address);
-//            wallets.setBlockAddress(address);
-//            UpdateWrapper<Wallets> wrapper = Wrappers.update();
-//            wrapper.lambda()
-//                    .set(Wallets::getBlockAddress, address)
-//                    .eq(Wallets::getId, wallets.getId());
-//            this.update(wrapper);
-//        }
-//        return true;
-//    }
+    public EvmUserWallet getAndSetBlockAddress(Integer userId, String networkName) {
+        EvmAddressPool evmAddressPool = evmAddressPoolMapper.randomGetAddress(networkName);
+        if (evmAddressPool != null) {
+            evmAddressPoolMapper.deleteByAddress(evmAddressPool.getAddress());
+            //添加到区块链用户钱包表
+            EvmUserWallet evmUserWallet = EvmUserWallet.builder()
+                    .address(evmAddressPool.getAddress())
+                    .coinId(evmAddressPool.getCoinId())
+                    .keystore(evmAddressPool.getKeystore())
+                    .valid("E")
+                    .lowerAddress(evmAddressPool.getAddress().toLowerCase())
+                    .coinType(evmAddressPool.getCoinType())
+                    .password(evmAddressPool.getPwd())
+                    .userId(userId)
+                    .build();
+            evmUserWalletService.save(evmUserWallet);
+            return evmUserWallet;
+        }
+        return null;
+    }
 
 
     /**
@@ -270,22 +217,27 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean updateWallet(BigDecimal amount, Integer userId, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
-        this.lookUpdateWallets(userId, amount, flowingActionEnum);
-        //插入流水记录
-        walletLogsService.insertWalletLogs(amount, userId, flowingActionEnum, flowingTypeEnum);
-        return true;
+        boolean flag = this.lookUpdateWallets(userId, amount, flowingActionEnum);
+        if (flag) {
+            //插入流水记录
+            walletLogsService.insertWalletLogs(userId, amount, flowingActionEnum, flowingTypeEnum);
+        }
+        return flag;
     }
 
     @Override
-    public boolean updateWallet(BigDecimal amount, String blockAddress, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateWallet(String blockAddress, BigDecimal amount, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
         EvmUserWallet evmUserWallet = evmUserWalletService.getOne(new LambdaQueryWrapper<EvmUserWallet>().select(EvmUserWallet::getUserId).eq(EvmUserWallet::getAddress, blockAddress));
         if (evmUserWallet == null) {
             return false;
         }
-        this.lookUpdateWallets(evmUserWallet.getUserId(), amount, flowingActionEnum);
-        //插入流水记录
-        walletLogsService.insertWalletLogs(amount, evmUserWallet.getUserId(), flowingActionEnum, flowingTypeEnum);
-        return true;
+        boolean flag = this.lookUpdateWallets(evmUserWallet.getUserId(), amount, flowingActionEnum);
+        if (flag) {
+            //插入流水记录
+            walletLogsService.insertWalletLogs(evmUserWallet.getUserId(), amount, flowingActionEnum, flowingTypeEnum);
+        }
+        return flag;
     }
 
 
@@ -356,6 +308,7 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean lookUpdateWallets(Integer userId, BigDecimal amount, FlowingActionEnum flowingActionEnum) {
         int ret;
         if (flowingActionEnum.equals(FlowingActionEnum.INCOME)) {
@@ -368,22 +321,54 @@ public class WalletsServiceImpl extends ServiceImpl<WalletsMapper, Wallets> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean unFrozenAmount(Integer userId, BigDecimal amount) {
         boolean flag = walletsMapper.unFrozenAmount(userId, amount) == 1;
         if (flag) {
             //添加流水记录
-            return walletLogsService.insertWalletLogs(amount, userId, FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
+            walletLogsService.insertWalletLogs(userId, amount, FlowingActionEnum.INCOME, FlowingTypeEnum.RECHARGE);
         }
         return flag;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean frozenAmount(Integer userId, BigDecimal amount) {
-        return walletsMapper.frozenAmount(userId, amount) == 1;
+        boolean flag = walletsMapper.frozenAmount(userId, amount) == 1;
+        if (flag) {
+            return walletLogsService.insertWalletLogs(userId, amount, FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.WITHDRAWAL);
+        }
+        return flag;
     }
 
     @Override
     public boolean reduceFrozenAmount(Integer userId, BigDecimal amount) {
-        return walletsMapper.reduceFrozenAmount(userId,amount)==1;
+        return walletsMapper.reduceFrozenAmount(userId, amount) == 1;
+    }
+
+    @Override
+    public JsonResult getBlockAddress(String networdName) {
+        CoinNetworkSourceEnum coinNetworkSourceEnum = CoinNetworkSourceEnum.nameOf(networdName);
+        if (coinNetworkSourceEnum == null) {
+            return JsonResult.failureResult(ReturnMessageEnum.UB_SUPPORT_NETWORD);
+        }
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        EvmUserWallet evmUserWallet = evmUserWalletService.getOne(
+                new LambdaQueryWrapper<EvmUserWallet>()
+                        .select(EvmUserWallet::getAddress)
+                        .eq(EvmUserWallet::getUserId, userId)
+                        .eq(EvmUserWallet::getCoinType, networdName)
+        );
+        JSONObject data = new JSONObject();
+        if (evmUserWallet == null) {
+            //为用户分配网络地址
+            evmUserWallet = getAndSetBlockAddress(userId, networdName);
+        }
+        if (evmUserWallet != null) {
+            //如果已存在该网络地址,则使用已存在的
+            data.put("address", evmUserWallet.getAddress());
+            return JsonResult.successResult(data);
+        }
+        return JsonResult.failureResult();
     }
 }

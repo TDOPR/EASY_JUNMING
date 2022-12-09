@@ -7,6 +7,7 @@ import com.haoliang.model.EvmWithdraw;
 import com.haoliang.model.condition.AppUserWithdrawCondition;
 import com.haoliang.model.dto.AuditCheckDTO;
 import com.haoliang.model.dto.UsdtWithdrawalDTO;
+import com.haoliang.model.dto.WalletDTO;
 
 
 public interface EvmWithdrawService extends IService<EvmWithdraw> {
@@ -15,10 +16,12 @@ public interface EvmWithdrawService extends IService<EvmWithdraw> {
 
     JsonResult check(AuditCheckDTO auditCheckDTO);
 
-    /**
-     * 提现逻辑
-     */
-    void withdraw(EvmWithdraw evmWithdraw);
 
-    JsonResult usdtWithdrawal(UsdtWithdrawalDTO userWalletsDTO, String token);
+    JsonResult usdtWithdrawal(UsdtWithdrawalDTO userWalletsDTO);
+
+    /**
+     * 提现到法币账户
+     * @param walletDTO 提现明细
+     */
+    JsonResult fiatWithdrawal(WalletDTO walletDTO);
 }

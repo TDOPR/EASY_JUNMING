@@ -30,8 +30,8 @@ public class UpdateUserLevelScheduledJob {
     /**
      * 每三分钟拉取下有没有任务需要处理
      */
-    @Scheduled(cron = "* 0/3 * * * ?")
-    //@Scheduled(fixedDelay = 10000)//测试每10秒执行一次
+    //@Scheduled(cron = "* 0/3 * * * ?")
+    @Scheduled(fixedDelay = 10000)//测试每10秒执行一次
     @RedisLock
     public void updateUserLevelTask() {
         List<UpdateUserLevelJob> taskList;
@@ -49,9 +49,9 @@ public class UpdateUserLevelScheduledJob {
                     countDownLatch.await();
                 }
             } while (taskList.size() > 0);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            log.error("updateUserLevelTask error:{}",e.getMessage());
+            log.error("updateUserLevelTask error:{}", e.getMessage());
         }
     }
 
