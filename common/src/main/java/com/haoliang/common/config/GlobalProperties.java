@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @CreateTime 2022/10/20 17:08
  **/
 @Component
-public class GlobalConfig {
+public class GlobalProperties {
 
 
     private static long tokenExpire;
@@ -30,7 +30,7 @@ public class GlobalConfig {
 
     @Value("${webSocket.port}")
     public  void setWebSocketPort(Integer webSocketPort) {
-        GlobalConfig.webSocketPort = webSocketPort;
+        GlobalProperties.webSocketPort = webSocketPort;
     }
 
     public static String getWebSocketAddress() {
@@ -39,7 +39,7 @@ public class GlobalConfig {
 
     @Value("${webSocket.address}")
     public  void setWebSocketAddress(String webSocketAddress) {
-        GlobalConfig.webSocketAddress = webSocketAddress;
+        GlobalProperties.webSocketAddress = webSocketAddress;
     }
 
     public static String getVirtualPathURL() {
@@ -48,7 +48,7 @@ public class GlobalConfig {
 
     @Value("${app.virtualPathURL}")
     public  void setVirtualPathURL(String virtualPathURL) {
-        GlobalConfig.virtualPathURL = virtualPathURL;
+        GlobalProperties.virtualPathURL = virtualPathURL;
     }
 
     public static long getTokenExpire() {
@@ -57,7 +57,7 @@ public class GlobalConfig {
 
     @Value("${jwt.expire}")
     public  void setTokenExpire(long tokenExpire) {
-        GlobalConfig.tokenExpire = tokenExpire;
+        GlobalProperties.tokenExpire = tokenExpire;
     }
 
     public static String getTokenSecret() {
@@ -66,7 +66,7 @@ public class GlobalConfig {
 
     @Value("${jwt.secret}")
     public  void setTokenSecret(String tokenSecret) {
-        GlobalConfig.tokenSecret = tokenSecret;
+        GlobalProperties.tokenSecret = tokenSecret;
     }
 
     public static String getTmpSavePath() {
@@ -75,6 +75,6 @@ public class GlobalConfig {
 
     @Value("${app.tmpSavePath}")
     public  void setTmpSavePath(String tmpSavePath) {
-        GlobalConfig.tmpSavePath = tmpSavePath;
+        GlobalProperties.tmpSavePath = tmpSavePath;
     }
 }

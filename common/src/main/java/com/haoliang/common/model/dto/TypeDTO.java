@@ -1,6 +1,5 @@
 package com.haoliang.common.model.dto;
 
-import com.haoliang.common.model.dto.PageDTO;
 import lombok.Data;
 
 /**

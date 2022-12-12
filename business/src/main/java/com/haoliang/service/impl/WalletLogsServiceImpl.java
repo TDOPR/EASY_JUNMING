@@ -3,12 +3,10 @@ package com.haoliang.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.constant.LanguageKeyConstants;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.ThreadLocalManager;
-import com.haoliang.common.util.DateUtil;
-import com.haoliang.common.util.GroupByUtil;
-import com.haoliang.common.util.JwtTokenUtil;
-import com.haoliang.common.util.NumberUtil;
+import com.haoliang.common.util.*;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.mapper.WalletLogsMapper;
@@ -51,7 +49,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean insertWalletLogs(Integer userId,BigDecimal amount, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
+    public boolean insertWalletLogs(Integer userId, BigDecimal amount, FlowingActionEnum flowingActionEnum, FlowingTypeEnum flowingTypeEnum) {
         //添加钱包流水记录
         WalletLogs walletLogs = WalletLogs.builder()
                 .userId(userId)
@@ -88,7 +86,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
     }
 
     @Override
-    public JsonResult<WalletLogsDetailVO> getMybillDetails( BillDetailsDTO billDetailsDTO) {
+    public JsonResult<WalletLogsDetailVO> getMybillDetails(BillDetailsDTO billDetailsDTO) {
         Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
 
         //查询钱包流水中第一笔流水的时间
@@ -184,7 +182,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
                         .createTime(entry.getKey())
                         .amount(NumberUtil.toUSD(dynamicAmount))
                         .type(1)
-                        .name("动态收益存入")
+                        .name(MessageUtil.get(LanguageKeyConstants.FLOWING_TYPE_DYNAMIC, ThreadLocalManager.getLanguage()))
                         .build());
 
             }
@@ -205,9 +203,9 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
      */
     private List<ViewSelectVO> getSelectListByUser(DateSection dateSection) {
         List<ViewSelectVO> viewSelectVOList = new ArrayList<>();
-        viewSelectVOList.add(new ViewSelectVO("All", "-1"));
+        viewSelectVOList.add(new ViewSelectVO(MessageUtil.get(LanguageKeyConstants.All, ThreadLocalManager.getLanguage()), "-1"));
         if (dateSection != null && dateSection.getMaxDate() != null) {
-            viewSelectVOList.add(new ViewSelectVO(DateUtil.getMonthEnglish(dateSection.getMaxDate().getMonthValue()), dateSection.getMaxDate().getYear() + "-" + dateSection.getMaxDate().getMonthValue()));
+            viewSelectVOList.add(new ViewSelectVO(DateUtil.getMonthStrByLanguage(dateSection.getMaxDate().getMonthValue()), dateSection.getMaxDate().getYear() + "-" + dateSection.getMaxDate().getMonthValue()));
             int monthNumber = DateUtil.betweenMonths(dateSection.getMinDate(), dateSection.getMaxDate());
             if (monthNumber > 11) {
                 monthNumber = 11;
@@ -216,7 +214,7 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
             for (int i = 1; i <= monthNumber; i++) {
                 //生成最近12个月的 年-月数据
                 localDate = localDate.minusMonths(1);
-                viewSelectVOList.add(new ViewSelectVO(DateUtil.getMonthEnglish(localDate.getMonthValue()), localDate.getYear() + "-" + localDate.getMonthValue()));
+                viewSelectVOList.add(new ViewSelectVO(DateUtil.getMonthStrByLanguage(localDate.getMonthValue()), localDate.getYear() + "-" + localDate.getMonthValue()));
             }
         }
         return viewSelectVOList;
@@ -241,6 +239,13 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
 
         BigDecimal settled = profitLogsService.getTotalAmountByUserIdAndType(userId, 1);
         BigDecimal noSettled = profitLogsService.getTotalAmountByUserIdAndType(userId, 0);
+        if (settled == null) {
+            settled = BigDecimal.ZERO;
+        }
+
+        if (noSettled == null) {
+            noSettled = BigDecimal.ZERO;
+        }
         for (ProfitLogs profitLogs : page.getRecords()) {
             profitLogsVOList.add(ProfitLogsDetailVO.ProfitLogsVO.builder()
                     .createTime(profitLogs.getCreateDate().toString())
@@ -254,9 +259,9 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         if (typeDTO.isInit()) {
             //首页加载需要返回类型列表
             typeList = new ArrayList<>();
-            typeList.add(new ViewSelectVO("全部", "-1"));
-            typeList.add(new ViewSelectVO("已交割", "1"));
-            typeList.add(new ViewSelectVO("未交割", "0"));
+            typeList.add(new ViewSelectVO(MessageUtil.get(LanguageKeyConstants.All, ThreadLocalManager.getLanguage()), "-1"));
+            typeList.add(new ViewSelectVO(MessageUtil.get(LanguageKeyConstants.QUANTIFICATION_TYPE_ALREADY, ThreadLocalManager.getLanguage()), "1"));
+            typeList.add(new ViewSelectVO(MessageUtil.get(LanguageKeyConstants.QUANTIFICATION_TYPE_NOT, ThreadLocalManager.getLanguage()), "0"));
         }
 
         return JsonResult.successResult(ProfitLogsDetailVO.builder()
@@ -305,11 +310,11 @@ public class WalletLogsServiceImpl extends ServiceImpl<WalletLogsMapper, WalletL
         if (typeDTO.isInit()) {
             //首页加载需要返回类型列表
             List<ViewSelectVO> typeList = new ArrayList<>();
-            typeList.add(new ViewSelectVO("全部", "-1"));
+            typeList.add(new ViewSelectVO(MessageUtil.get(LanguageKeyConstants.All, ThreadLocalManager.getLanguage()), "-1"));
             FlowingTypeEnum flowingTypeEnum;
             for (Integer type : dynamicTypeList) {
                 flowingTypeEnum = FlowingTypeEnum.valueOf(type);
-                typeList.add(new ViewSelectVO(flowingTypeEnum.getDesc(), flowingTypeEnum.getValue().toString()));
+                typeList.add(new ViewSelectVO(flowingTypeEnum.toString(), flowingTypeEnum.getValue().toString()));
             }
             proxyWalletLogsDetailVO.setTypeList(typeList);
         }

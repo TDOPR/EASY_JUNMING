@@ -11,12 +11,15 @@ import com.haoliang.constant.EasyTradeConfig;
 import com.haoliang.enums.FlowingActionEnum;
 import com.haoliang.enums.FlowingTypeEnum;
 import com.haoliang.enums.RobotEnum;
+import com.haoliang.enums.StrategyEnum;
 import com.haoliang.mapper.ProfitLogsMapper;
 import com.haoliang.model.Strategy;
 import com.haoliang.model.Wallets;
 import com.haoliang.model.dto.AmountDTO;
+import com.haoliang.model.vo.StrategyVO;
 import com.haoliang.model.vo.TrusteeshipAmountVO;
 import com.haoliang.service.*;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +60,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
     public JsonResult recharge(AmountDTO amountDTO) {
         //充值到托管金额不能低于10$
         if (amountDTO.getAmount().intValue() < EasyTradeConfig.MIN_AMOUNT) {
-            return JsonResult.failureResult(ReturnMessageEnum.MIN_AMOUNT);
+            return JsonResult.failureResult(ReturnMessageEnum.MIN_AMOUNT.setAndToString(EasyTradeConfig.MIN_AMOUNT));
         }
 
         Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
@@ -71,7 +74,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
         RobotEnum robotEnum = RobotEnum.levelOf(wallets.getRobotLevel());
         if (robotEnum != RobotEnum.FIVE && wallets.getPrincipalAmount().add(amountDTO.getAmount()).compareTo(robotEnum.getRechargeMax()) > 0) {
             //如果机器人等级不是4级并且托管的总金额超过机器人支持的上限 需要托管的总金额超出托管金额上限
-            return JsonResult.failureResult(ReturnMessageEnum.BEYOND_ROBOT_UPPER_LIMIT);
+            return JsonResult.failureResult(ReturnMessageEnum.BEYOND_ROBOT_UPPER_LIMIT.setAndToString(robotEnum.getRechargeMax()));
         }
 
         //重钱包中扣掉余额添加到托管金额中
@@ -83,7 +86,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
         walletsService.update(wrapper);
 
         //添加钱包流水记录
-        walletLogsService.insertWalletLogs(userId,amountDTO.getAmount(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.ENTRUSTMENT);
+        walletLogsService.insertWalletLogs(userId, amountDTO.getAmount(), FlowingActionEnum.EXPENDITURE, FlowingTypeEnum.ENTRUSTMENT);
 
         updateUserLevelTaskService.insertListByUserId(userId);
         return JsonResult.successResult();
@@ -109,7 +112,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
         walletsService.update(wrapper);
 
         //添加钱包流水记录
-        walletLogsService.insertWalletLogs(userId,amountDTO.getAmount(), FlowingActionEnum.INCOME, FlowingTypeEnum.WITHDRAWL_WALLET);
+        walletLogsService.insertWalletLogs(userId, amountDTO.getAmount(), FlowingActionEnum.INCOME, FlowingTypeEnum.WITHDRAWL_WALLET);
         updateUserLevelTaskService.insertListByUserId(userId);
         return JsonResult.successResult();
     }
@@ -129,6 +132,14 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
             robotEnuml = RobotEnum.ZERO;
         }
 
+        List<StrategyVO> strategyVOList = new ArrayList<>();
+        StrategyVO strategyVO;
+        for (Strategy strategy : strategyList) {
+            strategyVO = new StrategyVO();
+            BeanUtils.copyProperties(strategy, strategyVO);
+            strategyVO.setStrategyName(StrategyEnum.typeOf(strategy.getStrategyType()).toString());
+            strategyVOList.add(strategyVO);
+        }
 
         //获取量化总收益
         BigDecimal sum = profitLogsMapper.getTotal(userId);
@@ -144,7 +155,7 @@ public class TrusteeshipServiceImpl implements TrusteeshipService {
                 .profit(NumberUtil.toTwoDecimal(sum))
                 .profitRate(profitRate)
                 .robotLevel(wallets.getRobotLevel())
-                .strategyList(strategyList)
+                .strategyList(strategyVOList)
                 .build());
     }
 

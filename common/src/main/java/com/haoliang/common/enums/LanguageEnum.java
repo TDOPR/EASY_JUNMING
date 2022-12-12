@@ -39,6 +39,7 @@ public enum LanguageEnum {
     }
 
     public static  Locale getLocale(String name){
+        System.out.println("国际化语言="+name+","+nameOf(name).getName());
         return new Locale(nameOf(name).getName());
     }
 }

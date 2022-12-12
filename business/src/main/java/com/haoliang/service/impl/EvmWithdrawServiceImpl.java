@@ -108,8 +108,8 @@ public class EvmWithdrawServiceImpl extends ServiceImpl<EvmWithdrawMapper, EvmWi
         }
 
         //区块链支付需要判断提现的金额是否大于最低限制
-        if (usdtWithdrawalDTO.getAmount().compareTo(CoinNetworkSourceEnum.nameOf(usdtWithdrawalDTO.getNetwordName()).getMinAmount()) < 0) {
-            return JsonResult.failureResult(ReturnMessageEnum.WITHDRAW_MIN_AMOUNT);
+        if (usdtWithdrawalDTO.getAmount().compareTo(coinNetworkSourceEnum.getMinAmount()) < 0) {
+            return JsonResult.failureResult(ReturnMessageEnum.WITHDRAW_MIN_AMOUNT.setAndToString(coinNetworkSourceEnum.getMinAmount()));
         }
 
         //生成提现记录

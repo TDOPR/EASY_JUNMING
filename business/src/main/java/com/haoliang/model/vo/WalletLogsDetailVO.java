@@ -1,6 +1,9 @@
 package com.haoliang.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.haoliang.common.constant.LanguageKeyConstants;
+import com.haoliang.common.model.ThreadLocalManager;
+import com.haoliang.common.util.MessageUtil;
 import com.haoliang.enums.FlowingTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,8 +61,9 @@ public class WalletLogsDetailVO {
      */
     public static List<ViewSelectVO> buildTypeList() {
         List<ViewSelectVO> list = new ArrayList<>();
-        list.add(new ViewSelectVO("全部", "-1"));
-        list.add(new ViewSelectVO("动态收益存入", "0"));
+        String language=ThreadLocalManager.getLanguage();
+        list.add(new ViewSelectVO(MessageUtil.get(LanguageKeyConstants.All, language), "-1"));
+        list.add(new ViewSelectVO(MessageUtil.get(LanguageKeyConstants.FLOWING_TYPE_DYNAMIC,language), "0"));
         for (FlowingTypeEnum flowingTypeEnum : FlowingTypeEnum.values()) {
             if (flowingTypeEnum.getValue() > FlowingTypeEnum.SPECIAL.getValue()) {
                 list.add(new ViewSelectVO(FlowingTypeEnum.getWalletDescByValue(flowingTypeEnum.getValue()), flowingTypeEnum.getValue().toString()));

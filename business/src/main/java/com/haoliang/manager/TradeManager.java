@@ -81,17 +81,21 @@ public class TradeManager {
 
         //当天产生的静态收益
         BigDecimal amount;
-        DayRate dayRate = dayRateService.selectNewDayRate();
+        DayRate dayRate = dayRateService.selectDayRateByLocalDate(localDate);
+        if (dayRate == null) {
+            //避免项目第一次运行是在凌晨 因为没数据到账昨天的记录没有而出现异常
+            return;
+        }
         for (Wallets wallets : walletsList) {
             //根据托管金额和机器人对应的利率计算收益金额
             amount = wallets.getPrincipalAmount().multiply(dayRateService.getDayRateByLevel(dayRate, wallets.getRobotLevel()));
             profitLogsList.add(
                     ProfitLogs.builder()
-                    .userId(wallets.getUserId())
-                    .principal(wallets.getPrincipalAmount())
-                    .generatedAmount(amount)
-                    .createDate(localDate)
-                    .build()
+                            .userId(wallets.getUserId())
+                            .principal(wallets.getPrincipalAmount())
+                            .generatedAmount(amount)
+                            .createDate(localDate)
+                            .build()
             );
         }
         long computeTime = timeInterval.intervalRestart();
@@ -100,7 +104,7 @@ public class TradeManager {
         profitLogsService.saveBatch(profitLogsList);
         //添加当天任务处理成功标识
         BusinessJob businessJob = new BusinessJob();
-        businessJob.setCreateDate(LocalDate.now());
+        businessJob.setCreateDate(localDate);
         businessJobMapper.insert(businessJob);
         long saveTime = timeInterval.intervalRestart();
         log.info("-------------计算日收益任务结束 select times:{} ms ,compute times:{} ms,save times:{} ms,total:{} ms--------------", selectTime, computeTime, saveTime, (selectTime + computeTime + saveTime));

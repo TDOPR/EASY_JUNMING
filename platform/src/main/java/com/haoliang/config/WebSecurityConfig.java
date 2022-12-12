@@ -1,6 +1,6 @@
 package com.haoliang.config;
 
-import com.haoliang.common.config.AppParam;
+import com.haoliang.common.config.AppParamProperties;
 import com.haoliang.security.JwtAuthenticationTokenFilter;
 import com.haoliang.security.MyAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private AppParam appParam;
+    private AppParamProperties appParamProperties;
 
     @Bean
     @Override
@@ -76,8 +76,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        String[] excludesArray = new String[appParam.getSecurityExcludes().size()];
-        appParam.getSecurityExcludes().toArray(excludesArray);
+        String[] excludesArray = new String[appParamProperties.getSecurityExcludes().size()];
+        appParamProperties.getSecurityExcludes().toArray(excludesArray);
         httpSecurity
                 // we don't need CSRF because our token is invulnerable
                 .csrf().disable()

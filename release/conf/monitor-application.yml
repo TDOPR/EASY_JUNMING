@@ -42,4 +42,3 @@ management:
     health:
       show-details: ALWAYS
 
-

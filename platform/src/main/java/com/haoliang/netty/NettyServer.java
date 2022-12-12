@@ -1,6 +1,6 @@
 package com.haoliang.netty;
 
-import com.haoliang.common.config.GlobalConfig;
+import com.haoliang.common.config.GlobalProperties;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -38,7 +38,7 @@ public class NettyServer {
                     // 指定使用的channel
                     .channel(NioServerSocketChannel.class)
                     // 绑定监听端口
-                    .localAddress(GlobalConfig.getWebSocketPort())
+                    .localAddress(GlobalProperties.getWebSocketPort())
                     // 绑定客户端连接时候触发操作
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override

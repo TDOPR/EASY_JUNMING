@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.util.NumberUtil;
 import com.haoliang.common.util.RandomUtil;
+import com.haoliang.enums.StrategyEnum;
 import com.haoliang.mapper.StrategyMapper;
 import com.haoliang.model.Strategy;
 import com.haoliang.service.StrategyService;
@@ -17,7 +18,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,9 +29,10 @@ import java.util.List;
 @CacheConfig(cacheNames = CacheKeyPrefixConstants.ROBOT_STRATEGY)
 public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> implements StrategyService {
 
-
-    public static String[] strategyTypeData = new String[]{"马丁格尔AI策略", "迈凯伦指数策略", "期现套利策略", "波段追踪策略", "频响定投策略", "集中频响策略",
-            "逆周期跟单策略", "低阻抗追踪策略", "波段平衡策略", "阻抗均衡策略"};
+    /**
+     * 策略类型Id
+     */
+    public static List<Integer> strategyIdList = StrategyEnum.getTypeList();
 
     public static String[] qcData = new String[]{"BTC", "LTC", "ETH", "ETC", "XRP", "EOX",
             "ADA", "MANA", "TRX", "MKR", "BCH", "FTM", "SOL", "ATOM", "DOGE", "CEOL", "COMP", "DOT", "UNI",
@@ -53,12 +54,12 @@ public class StrategyServiceImpl extends ServiceImpl<StrategyMapper, Strategy> i
     @CacheEvict(allEntries = true)
     public List<Strategy> insertStrategy(LocalDate localDate) {
 
-        List<String> strategyTypeDataList = new ArrayList<>();
-        Collections.addAll(strategyTypeDataList, strategyTypeData);
+        List<Integer> strategyTypeDataList = new ArrayList<>(strategyIdList);
         Integer length = strategyTypeDataList.size();
         List<Strategy> strategyList = new ArrayList<>();
 
-        String strategyType, qc, bc, cro;
+        Integer strategyType;
+        String qc, bc, cro;
         BigDecimal dern, ti, eipM, eipN, t;
 
         List<Integer> existsQcList = new ArrayList<>();

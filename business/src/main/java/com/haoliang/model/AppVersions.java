@@ -30,6 +30,21 @@ public class AppVersions  extends BaseModelCIDNoModifyTime {
     private String updateDesc;
 
     /**
+     * 英语 功能更新说明
+     */
+    private String enUpdateDesc;
+
+    /**
+     * 葡萄牙语 功能更新说明
+     */
+    private String ptUpdateDesc;
+
+    /**
+     * 西班牙语 功能更新说明
+     */
+    private String esUpdateDesc;
+
+    /**
      * app下载地址
      */
     private String downloadAddress;

@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "app")
-public class AppParam {
+public class AppParamProperties {
 
     private String rootPath;
 

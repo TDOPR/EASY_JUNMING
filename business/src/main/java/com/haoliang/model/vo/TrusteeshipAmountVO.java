@@ -1,6 +1,5 @@
 package com.haoliang.model.vo;
 
-import com.haoliang.model.Strategy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -53,6 +52,6 @@ public class TrusteeshipAmountVO {
     /**
      * 机器人做单策略
      */
-    private List<Strategy>  strategyList;
+    private List<StrategyVO>  strategyList;
 
 }

@@ -19,9 +19,9 @@ public class ViewSelectVO {
 
     private String value;
 
-    public ViewSelectVO(FlowingTypeEnum flowingTypeEnum){
-        this.lable=flowingTypeEnum.getDesc();
-        this.value=flowingTypeEnum.getValue().toString();
+    public ViewSelectVO(FlowingTypeEnum flowingTypeEnum) {
+        this.lable = flowingTypeEnum.toString();
+        this.value = flowingTypeEnum.getValue().toString();
     }
 
 }

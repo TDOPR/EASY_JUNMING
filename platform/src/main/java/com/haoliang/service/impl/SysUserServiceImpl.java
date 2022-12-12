@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haoliang.common.config.GlobalConfig;
+import com.haoliang.common.config.GlobalProperties;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.enums.ContentTypeEnum;
@@ -81,7 +81,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         //校验用户是否被锁定
         if (isLock(loginDTO.getUsername())) {
-            return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_LOCK);
+            return JsonResult.failureResult(ReturnMessageEnum.ACCOUNT_LOCK.setAndToString(loginConfig.getLockTime()));
         }
 
         //校验图片验证码
@@ -123,9 +123,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         if (SysSettingParam.isEnableSso()) {
             RedisUtil.deleteObjects(CacheKeyPrefixConstants.TOKEN + sysUser.getId() + ":*");
         }
-        RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
+        RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalProperties.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(sysUser.getUsername(), clientIp, 1));
-        return JsonResult.successResult(new TokenVO(tokenKey, GlobalConfig.getWebSocketAddress() + adminwsPath));
+        return JsonResult.successResult(new TokenVO(tokenKey, GlobalProperties.getWebSocketAddress() + adminwsPath));
     }
 
     @Override
@@ -188,8 +188,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
     @Override
     public JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO) {
-        Integer userId=JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
-        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getSalt, SysUser::getPassword).eq(SysUser::getId,userId));
+        Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
+        SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getSalt, SysUser::getPassword).eq(SysUser::getId, userId));
         String oldPwd = RSAUtil.decryptString(updatePasswordDTO.getOldPassword());
         oldPwd = AESUtil.encrypt(oldPwd, sysUser.getSalt());
         if (sysUser.getPassword().equals(oldPwd)) {
@@ -298,7 +298,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     public void generateGoogleQRCode(Integer userId, HttpServletResponse response) throws Exception {
         SysUser sysUser = this.getOne(new LambdaQueryWrapper<SysUser>().select(SysUser::getUsername, SysUser::getGoogleSecret).eq(SysUser::getId, userId));
         String url = GoogleAuthenticatorUtil.getQRBarcodeURL(sysUser.getUsername(), loginConfig.getCaptcha().getGoogleHost(), sysUser.getGoogleSecret());
-        String filePath = generateQRCodeImg(GlobalConfig.getTmpSavePath(), url);
+        String filePath = generateQRCodeImg(GlobalProperties.getTmpSavePath(), url);
         ResponseUtil.downloadFileByLocal(response, new File(filePath), ContentTypeEnum.PNG);
     }
 

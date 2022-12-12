@@ -1,6 +1,6 @@
 package com.haoliang.common.util;
 
-import com.haoliang.common.config.GlobalConfig;
+import com.haoliang.common.config.GlobalProperties;
 import com.haoliang.common.util.redis.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -24,14 +24,14 @@ public class JwtTokenUtil {
     public static String getToken(Integer identityId, String username, String roleCode, Integer roleId) {
         Date nowDate = new Date();
         //过期时间
-        Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
+        Date expireDate = new Date(nowDate.getTime() + GlobalProperties.getTokenExpire() * 1000);
         return Jwts.builder()
                 .setHeaderParam("type", "JWT")
                 //放入唯一标识,可以是用户名或者Id
                 .setSubject(identityId.toString())
                 .setIssuedAt(nowDate)
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, GlobalConfig.getTokenSecret())
+                .signWith(SignatureAlgorithm.HS512, GlobalProperties.getTokenSecret())
                 //自定义属性 放入用户拥有请求权限
                 .claim("userName", username)
                 .claim("roleCode", roleCode)
@@ -45,14 +45,14 @@ public class JwtTokenUtil {
     public static String getToken(Integer identityId) {
         Date nowDate = new Date();
         //过期时间
-        Date expireDate = new Date(nowDate.getTime() + GlobalConfig.getTokenExpire() * 1000);
+        Date expireDate = new Date(nowDate.getTime() + GlobalProperties.getTokenExpire() * 1000);
         return Jwts.builder()
                 .setHeaderParam("type", "JWT")
                 //放入唯一标识,可以是用户名或者Id
                 .setSubject(identityId.toString())
                 .setIssuedAt(nowDate)
                 .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, GlobalConfig.getTokenSecret())
+                .signWith(SignatureAlgorithm.HS512, GlobalProperties.getTokenSecret())
                 .compact();
     }
 
@@ -62,7 +62,7 @@ public class JwtTokenUtil {
     public static Claims getTokenClaim(String token) {
         token = RedisUtil.getCacheObject(token);
         if (StringUtils.hasText(token)) {
-            return Jwts.parser().setSigningKey(GlobalConfig.getTokenSecret()).parseClaimsJws(token).getBody();
+            return Jwts.parser().setSigningKey(GlobalProperties.getTokenSecret()).parseClaimsJws(token).getBody();
         }
         return null;
     }

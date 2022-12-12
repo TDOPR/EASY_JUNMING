@@ -130,6 +130,9 @@ CREATE TABLE `app_versions`  (
   `systemName` varchar(255)  NOT NULL DEFAULT '' COMMENT '系统名称 ios 、android',
   `version` varchar(255)  NOT NULL DEFAULT '' COMMENT '版本号',
   `updateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '功能更新说明',
+  `enUpdateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '英语 功能更新说明',
+  `ptUpdateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '葡萄牙 功能更新说明',
+  `esUpdateDesc` varchar(255)  NOT NULL DEFAULT '' COMMENT '西班牙 功能更新说明',
   `downloadAddress` varchar(255)  NOT NULL DEFAULT '' COMMENT 'app下载地址',
   `active` tinyint  NOT NULL DEFAULT 0 COMMENT '最新版本标识 1=是 0=否',
   `forceUpdate` tinyint  NOT NULL DEFAULT 0 COMMENT '强制更新标识 1=是 0=否',
@@ -155,7 +158,7 @@ DROP TABLE IF EXISTS `strategy`;
 CREATE TABLE `strategy`  (
   `createDate` datetime(0)  NOT NULL DEFAULT  CURRENT_TIMESTAMP COMMENT '创建日期',
   `sortIndex` tinyint   NOT NULL DEFAULT 0  COMMENT '排序下标',
-  `strategyType` varchar(255)  NOT NULL DEFAULT '' COMMENT '策略类型',
+  `strategyType` tinyint  NOT NULL DEFAULT 1 COMMENT '策略类型 1=马丁格尔AI;2=迈凯伦指数;3=期现套利;4=波段追踪;5=频响定投;6=集中频响;7=逆周期跟单;8=低阻抗追踪;9=波段平衡;10=阻抗均衡;',
   `qc` varchar(255)  NOT NULL DEFAULT '' COMMENT '基准货币',
   `bc` varchar(255)  NOT NULL DEFAULT '' COMMENT '计价货币',
   `cro` varchar(255)  NOT NULL DEFAULT '' COMMENT '交叉货币对',

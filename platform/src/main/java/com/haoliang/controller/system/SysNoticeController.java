@@ -7,6 +7,7 @@ import com.haoliang.common.constant.OperationModel;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.PageParam;
 import com.haoliang.common.model.dto.IntIdListDTO;
+import com.haoliang.common.model.dto.PageDTO;
 import com.haoliang.common.model.dto.TypeDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.model.SysMessage;
@@ -70,8 +71,8 @@ public class SysNoticeController {
      * 根据用户Id获取公告列表
      */
     @PostMapping("/mylist")
-    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList( @RequestBody TypeDTO type){
-        return sysNoticeService.findMyNoticeList(type);
+    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList( @RequestBody PageDTO pageDTO){
+        return sysNoticeService.findMyNoticeList(pageDTO);
     }
 
     /**

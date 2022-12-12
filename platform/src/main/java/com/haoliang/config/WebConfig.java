@@ -1,7 +1,8 @@
 package com.haoliang.config;
 
 
-import com.haoliang.common.config.AppParam;
+import com.haoliang.common.config.AppParamProperties;
+import com.haoliang.common.filter.HttpInterceptor;
 import com.haoliang.common.util.OsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.unit.DataSize;
 import org.springframework.util.unit.DataUnit;
 import org.springframework.web.context.request.async.TimeoutCallableProcessingInterceptor;
-import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 import javax.servlet.MultipartConfigElement;
 
@@ -23,7 +21,7 @@ import javax.servlet.MultipartConfigElement;
 public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
-    private AppParam appParam;
+    private AppParamProperties appParamProperties;
 
     /**
      * 文件上传配置
@@ -32,9 +30,9 @@ public class WebConfig implements WebMvcConfigurer {
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
         //单个文件最大100M
-        factory.setMaxFileSize(DataSize.of(appParam.getFileMaxSize(), DataUnit.MEGABYTES));
+        factory.setMaxFileSize(DataSize.of(appParamProperties.getFileMaxSize(), DataUnit.MEGABYTES));
         //最大请求大小
-        factory.setMaxRequestSize(DataSize.of(appParam.getFileMaxSize(), DataUnit.MEGABYTES));
+        factory.setMaxRequestSize(DataSize.of(appParamProperties.getFileMaxSize(), DataUnit.MEGABYTES));
         /// 设置文件上传的临时目录
         // factory.setLocation(picSavePath+ File.separator+"tmp");
         return factory.createMultipartConfig();
@@ -42,11 +40,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String filePath = appParam.getRootPath();
+        String filePath = appParamProperties.getRootPath();
         if (OsUtil.isWindowOs()) {
             filePath = filePath.replaceAll("/", "\\\\");
         }
-        String pathPatterns=  appParam.getVirtualPathPrefix()+"/**";
+        String pathPatterns=  appParamProperties.getVirtualPathPrefix()+"/**";
         registry.addResourceHandler(pathPatterns).addResourceLocations("file:" + filePath);
         log.info("资源映射加载 --- {} --> {} ",pathPatterns,filePath);
     }
@@ -71,6 +69,13 @@ public class WebConfig implements WebMvcConfigurer {
                 .maxAge(3600)
                 .allowCredentials(true);
     }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry interceptor) {
+        interceptor.addInterceptor(new HttpInterceptor()).addPathPatterns("/**");
+
+    }
+
 
 
 

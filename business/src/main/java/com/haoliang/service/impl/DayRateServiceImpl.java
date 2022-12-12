@@ -119,5 +119,8 @@ public class DayRateServiceImpl extends ServiceImpl<DayRateMapper, DayRate> impl
         }
     }
 
-
+    @Override
+    public DayRate selectDayRateByLocalDate(LocalDate localDate) {
+        return this.getOne(new LambdaQueryWrapper<DayRate>().eq(DayRate::getCreateDate, localDate));
+    }
 }

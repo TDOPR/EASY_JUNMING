@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haoliang.common.enums.LanguageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.ThreadLocalManager;
-import com.haoliang.common.model.dto.TypeDTO;
+import com.haoliang.common.model.dto.PageDTO;
 import com.haoliang.common.model.vo.PageVO;
 import com.haoliang.common.util.JwtTokenUtil;
 import com.haoliang.mapper.SysNoticeMapper;
@@ -43,14 +44,21 @@ public class SysNoticeServiceImpl extends ServiceImpl<SysNoticeMapper, SysNotice
     }
 
     @Override
-    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(TypeDTO type) {
+    public JsonResult<PageVO<SysNoticeVO>> findMyNoticeList(PageDTO pageDTO) {
         Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
-        Page page = new Page<>(type.getCurrentPage(), type.getPageSize());
+        Page page = new Page<>(pageDTO.getCurrentPage(), pageDTO.getPageSize());
         IPage iPage;
-        if (type.getType() == 1) {
-            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndCN(page, userId);
-        } else {
+
+        //系统消息需要根据国际化语言判断
+        String language=ThreadLocalManager.getLanguage();
+        if(LanguageEnum.EN_US.getName().equals(language)){
             iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndEN(page, userId);
+        }else if(LanguageEnum.ES_ES.getName().equals(language)){
+            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndES(page, userId);
+        }else if(LanguageEnum.PT_PT.getName().equals(language)){
+            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndPT(page, userId);
+        }else{
+            iPage = sysNoticeUserMapper.findMyNoticeListByUserIdAndCN(page, userId);
         }
         return JsonResult.successResult(new PageVO<>(iPage));
     }

@@ -1,5 +1,7 @@
 package com.haoliang.common.util;
 
+import com.haoliang.common.model.ThreadLocalManager;
+
 import java.lang.management.ManagementFactory;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ public class DateUtil {
     public static final String SIMPLE_DATETIME_FORMAT = "yyyy-MM-dd HH:ss";
     public static final String DETAIL_FORMAT_NO_UNIT = "yyyyMMddHHmmssSSS";
 
+    private static final String LANGUAGE_KEY_PREFIX = "month.";
 
     /**
      * 把日期字符转换成时间戳
@@ -172,6 +175,14 @@ public class DateUtil {
 
 
     /**
+     * 获取昨天的时间
+     * @return
+     */
+    public static LocalDate getAverLocalDate() {
+        return LocalDate.now().minusDays(1);
+    }
+
+    /**
      * 检查日期是否失效了
      */
     public static boolean checkIsInvalid(Date dealine) {
@@ -209,35 +220,12 @@ public class DateUtil {
         return (int) ChronoUnit.MONTHS.between(start, end);
     }
 
-    public static String getMonthEnglish(Integer month) {
-        switch (month) {
-            case 1:
-                return "Jan";
-            case 2:
-                return "Feb";
-            case 3:
-                return "Mar";
-            case 4:
-                return "Apr";
-            case 5:
-                return "May";
-            case 6:
-                return "Jun";
-            case 7:
-                return "Jul";
-            case 8:
-                return "Aug";
-            case 9:
-                return "Sept";
-            case 10:
-                return "Oct";
-            case 11:
-                return "Nov";
-            case 12:
-                return "Dec";
-            default:
-                return "";
-        }
+    /**
+     * 根据国际化语言获取对应的月份名称
+     */
+    public static String getMonthStrByLanguage(Integer month) {
+        String key = LANGUAGE_KEY_PREFIX + month;
+        return MessageUtil.get(key, ThreadLocalManager.getLanguage());
     }
 
 

@@ -32,9 +32,6 @@ public class JsonResult<T> implements Serializable {
 
     private static final long serialVersionUID = -7268040542410707954L;
 
-    protected static String successMessage = ReturnMessageEnum.OK.getKey();
-
-    protected static String errorMessage = ReturnMessageEnum.ERROR.getKey();
 
     public JsonResult() {
     }
@@ -48,22 +45,17 @@ public class JsonResult<T> implements Serializable {
         this.setMsg(msg);
     }
 
-    public JsonResult(int code, String msg,Object[] params) {
-        this(code);
-        this.setMsg(msg);
-    }
-
     public JsonResult(int code, String msg, T data) {
         this(code, msg);
         this.setData(data);
     }
 
     public static JsonResult build(boolean flag) {
-        return new JsonResult(flag ? HttpStatus.OK.value() : HttpStatus.INTERNAL_SERVER_ERROR.value(), flag ? successMessage : errorMessage);
+        return new JsonResult(flag ? HttpStatus.OK.value() : HttpStatus.INTERNAL_SERVER_ERROR.value(), flag ? ReturnMessageEnum.OK.toString() : ReturnMessageEnum.FAILED.toString());
     }
 
     public static JsonResult successResult() {
-        return new JsonResult(HttpStatus.OK.value(), successMessage);
+        return new JsonResult(HttpStatus.OK.value(),  ReturnMessageEnum.OK.toString());
     }
 
     public static JsonResult successResult(String msg) {
@@ -72,7 +64,7 @@ public class JsonResult<T> implements Serializable {
 
 
     public static <T> JsonResult<T> successResult(T obj) {
-        return new JsonResult(HttpStatus.OK.value(), successMessage, obj);
+        return new JsonResult(HttpStatus.OK.value(),  ReturnMessageEnum.OK.toString(), obj);
     }
 
 
@@ -82,7 +74,7 @@ public class JsonResult<T> implements Serializable {
 
 
     public static JsonResult failureResult() {
-        return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorMessage);
+        return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), ReturnMessageEnum.FAILED.toString());
     }
 
     public static JsonResult failureResult(Integer code, String msg) {
@@ -97,18 +89,18 @@ public class JsonResult<T> implements Serializable {
         return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), defautlErrorMsg(msg));
     }
     public static JsonResult failureResult(ReturnMessageEnum returnMessageEnum) {
-        return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(),returnMessageEnum.getKey());
+        return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(),returnMessageEnum.toString());
     }
 
     public static JsonResult failureResult(Object data) {
-        return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), errorMessage, data);
+        return new JsonResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), ReturnMessageEnum.FAILED.toString(), data);
     }
 
     protected static String defautlErrorMsg(String msg) {
         if (StringUtil.isNotEmpty(msg)) {
             return msg;
         } else {
-            return errorMessage;
+            return ReturnMessageEnum.FAILED.toString();
         }
     }
 
@@ -116,7 +108,7 @@ public class JsonResult<T> implements Serializable {
         if (StringUtil.isNotEmpty(msg)) {
             return msg;
         } else {
-            return successMessage;
+            return ReturnMessageEnum.OK.toString();
         }
     }
 

@@ -3,7 +3,9 @@ package com.haoliang.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RepeatSubmit;
 import com.haoliang.common.enums.BooleanEnum;
+import com.haoliang.common.enums.LanguageEnum;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.model.ThreadLocalManager;
 import com.haoliang.common.util.IpAddrUtil;
 import com.haoliang.mapper.AppVersionsMapper;
 import com.haoliang.model.AppVersions;
@@ -107,11 +109,24 @@ public class HomeController {
             );
         }
 
+        //更新说明需要根据国际化语言判断
+        String language=ThreadLocalManager.getLanguage();
+        String updateDesc;
+        if(LanguageEnum.EN_US.getName().equals(language)){
+            updateDesc=appVersions.getEnUpdateDesc();
+        }else if(LanguageEnum.ES_ES.getName().equals(language)){
+            updateDesc=appVersions.getEsUpdateDesc();
+        }else if(LanguageEnum.PT_PT.getName().equals(language)){
+            updateDesc=appVersions.getPtUpdateDesc();
+        }else{
+            updateDesc=appVersions.getUpdateDesc();
+        }
+
         return JsonResult.successResult(
                 CheckVersionVO.builder()
                         .flag(true)
                         .version(appVersions.getVersion())
-                        .updateDesc(appVersions.getUpdateDesc())
+                        .updateDesc(updateDesc)
                         .downloadAddress(appVersions.getDownloadAddress())
                         .force(BooleanEnum.TRUE.getIntValue().equals(appVersions.getForceUpdate()))
                         .build()

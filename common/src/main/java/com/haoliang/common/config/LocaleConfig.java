@@ -25,4 +25,14 @@ public class LocaleConfig {
         return source;
     }
 
+//    @Bean
+//    public ReloadableResourceBundleMessageSource messageSource() {
+//        Locale.setDefault(Locale.CHINA);
+//        ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
+//        source.setBasename("classpath:i18n/messages");
+//        source.setUseCodeAsDefaultMessage(true);
+//        source.setDefaultEncoding("UTF-8");
+//        return source;
+//    }
+
 }

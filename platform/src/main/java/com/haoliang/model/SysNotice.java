@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * @author Dominick Li
- * @Description 系统公告
+ * @Description 系统公告  TODO  需要新增西班牙语和葡萄牙语
  * @CreateTime 2022/11/7 11:02
  **/
 @Data
@@ -71,5 +71,37 @@ public class SysNotice extends BaseModelCID {
     @NotEmpty
     private String enDescription;
 
+    /**
+     * 西班牙语标题
+     */
+    @NotEmpty
+    private String esTitle;
+
+    /**
+     * 西班牙语内容
+     */
+    @NotEmpty
+    private String esText;
+
+    /**
+     * 西班牙语简介
+     */
+    @NotEmpty
+    private String esDescription;
+
+    /**
+     * 葡萄牙语标题
+     */
+    private String ptTitle;
+
+    /**
+     * 葡萄牙语内容
+     */
+    private String ptText;
+
+    /**
+     * 葡萄牙语简介
+     */
+    private String ptDescription;
 
 }

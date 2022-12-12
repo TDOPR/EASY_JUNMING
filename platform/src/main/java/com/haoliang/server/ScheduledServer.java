@@ -4,8 +4,8 @@ import cn.hutool.core.io.FileUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.haoliang.common.annotation.RedisLock;
-import com.haoliang.common.config.AppParam;
-import com.haoliang.common.config.GlobalConfig;
+import com.haoliang.common.config.AppParamProperties;
+import com.haoliang.common.config.GlobalProperties;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.model.SysErrorLog;
 import com.haoliang.common.model.SysLoginLog;
@@ -45,7 +45,7 @@ public class ScheduledServer {
     private EmailTemplateDTO monitorInfoTemplate;
 
     @Autowired
-    private AppParam appParam;
+    private AppParamProperties appParamProperties;
 
     @Autowired
     private SysErrorLogService sysErrorLogService;
@@ -82,7 +82,7 @@ public class ScheduledServer {
             sysOperationLogService.remove(new LambdaQueryWrapper<SysOperationLog>().le(SysOperationLog::getCreateTime, DateUtil.getDateStrIncrement(localDate, -SysSettingParam.getOperationLogSaveDay(), TimeUnit.DAYS)));
         }
         //清理临时文件
-        FileUtil.del(new File(GlobalConfig.getTmpSavePath()));
+        FileUtil.del(new File(GlobalProperties.getTmpSavePath()));
     }
 
     /**
@@ -93,7 +93,7 @@ public class ScheduledServer {
         if (!enableMail) {
             return;
         }
-        String savePath = appParam.getRootPath();
+        String savePath = appParamProperties.getRootPath();
         //设置硬盘使用率超过多少发送邮件通知
         WorkspaceHarDiskInfo workspaceHarDiskInfo = GetWorkspaceHarDiskInfoUtil.getWorkspaceHarDiskInfo(savePath);
         //WorkspaceHarDiskInfo workspaceHarDiskInfo = new WorkspaceHarDiskInfo("dev/mapper/centos-root", "453G", "176G", "81%");
@@ -105,7 +105,7 @@ public class ScheduledServer {
         if (Integer.parseInt(workspaceHarDiskInfo.getUse().substring(0, workspaceHarDiskInfo.getUse().length() - 1)) > SysSettingParam.getThresholdSize()) {
             log.error("已超过阔值" + SysSettingParam.getThresholdSize() + "%,请及时处理，避免服务因存储不足导致异常的情况");
             String content = monitorInfoTemplate.getContent();
-            content = content.replace("{{serverName}}", appParam.getServerName());
+            content = content.replace("{{serverName}}", appParamProperties.getServerName());
             content = content.replace("{{info}}", String.format("所属文件系统: %s  ,硬盘使用: %s/%s ,使用率达到：%s", workspaceHarDiskInfo.getFilesystem(), workspaceHarDiskInfo.getUsed(), workspaceHarDiskInfo.getSize(), workspaceHarDiskInfo.getUse()));
             content = content.replace("{{rate}}", SysSettingParam.getThresholdSize() + "%");
             monitorInfoTemplate.setContent(content);

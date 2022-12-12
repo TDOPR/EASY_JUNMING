@@ -5,6 +5,7 @@
     <insert id="insertBatch">
         INSERT INTO sys_notice_user(noticeId,userId) SELECT #{noticeId} ,id from app_users
     </insert>
+
     <select id="findMyNoticeListByUserIdAndCN" resultType="com.haoliang.model.vo.SysNoticeVO">
         SELECT
             n.id,n.cnTitle title,n.cnText text,n.createTime,n.cnDescription description
@@ -21,9 +22,44 @@
             n.sortIndex,
             n.createTime DESC
     </select>
+
     <select id="findMyNoticeListByUserIdAndEN" resultType="com.haoliang.model.vo.SysNoticeVO">
         SELECT
-            n.id,n.enTitle title,n.enText text,n.createTime,n.cnDescription description
+            n.id,n.enTitle title,n.enText text,n.createTime,n.enDescription description
+        FROM
+           sys_notice n
+        LEFT join
+           sys_notice_user nu
+           ON n.id=nu.noticeId
+        WHERE
+            nu.userId=#{userId}
+            AND
+            n.display=1
+        ORDER BY
+            n.sortIndex,
+            n.createTime DESC
+    </select>
+
+    <select id="findMyNoticeListByUserIdAndES" resultType="com.haoliang.model.vo.SysNoticeVO">
+        SELECT
+            n.id,n.esTitle title,n.esText text,n.createTime,n.esDescription description
+        FROM
+           sys_notice n
+        LEFT join
+           sys_notice_user nu
+           ON n.id=nu.noticeId
+        WHERE
+            nu.userId=#{userId}
+            AND
+            n.display=1
+        ORDER BY
+            n.sortIndex,
+            n.createTime DESC
+    </select>
+
+    <select id="findMyNoticeListByUserIdAndPT" resultType="com.haoliang.model.vo.SysNoticeVO">
+        SELECT
+            n.id,n.ptTitle title,n.ptText text,n.createTime,n.ptDescription description
         FROM
            sys_notice n
         LEFT join

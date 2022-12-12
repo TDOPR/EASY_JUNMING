@@ -1,7 +1,6 @@
 package com.haoliang.common.util;
 
 
-import com.haoliang.common.enums.LanguageEnum;
 import org.springframework.context.MessageSource;
 
 import java.util.Locale;
@@ -15,23 +14,35 @@ public class MessageUtil {
 
     /**
      * 根据key信息获取对应语言的内容
-     * @param key
-     * @param language
+     * @param key 消息key值
+     * @param language 语言_国家
      * @return
      */
     public static String get(String key, String language) {
-        return get(key, LanguageEnum.getLocale(language));
+        if (StringUtil.isNotBlank(language)) {
+            String arrs[] = language.split("_");
+            if (arrs.length == 2) {
+                return get(key, new Locale(arrs[0], arrs[1]));
+            }
+        }
+        return get(key, Locale.getDefault());
     }
 
-    public static String get(String key, Locale language) {
+    private static String get(String key, Locale language) {
         return getInstance().getMessage(key, new String[0], language);
     }
 
     public static String get(String key, Object[] params, String language) {
-        return get(key, params, LanguageEnum.getLocale(language));
+        if (StringUtil.isNotBlank(language)) {
+            String arrs[] = language.split("_");
+            if (arrs.length == 2) {
+                return get(key, params, new Locale(arrs[0], arrs[1]));
+            }
+        }
+        return get(key, params, Locale.getDefault());
     }
 
-    public static String get(String key, Object[] params, Locale language) {
+    private static String get(String key, Object[] params, Locale language) {
         return getInstance().getMessage(key, params, language);
     }
 
@@ -45,4 +56,5 @@ public class MessageUtil {
     private static class Lazy {
         private static final MessageSource messageSource = SpringUtil.getBean(MessageSource.class);
     }
+
 }

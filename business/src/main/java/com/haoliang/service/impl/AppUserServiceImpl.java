@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haoliang.common.config.AppParam;
-import com.haoliang.common.config.GlobalConfig;
+import com.haoliang.common.config.AppParamProperties;
+import com.haoliang.common.config.GlobalProperties;
 import com.haoliang.common.config.SysSettingParam;
 import com.haoliang.common.constant.CacheKeyPrefixConstants;
 import com.haoliang.common.constant.LanguageKeyConstants;
@@ -71,7 +71,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     private TreePathService treePathService;
 
     @Autowired
-    private AppParam appParam;
+    private AppParamProperties appParamProperties;
 
     @Resource
     private EvmAddressPoolMapper evmAddressPoolMapper;
@@ -160,7 +160,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
 
         //把token存储到缓存中
         String tokenKey = CacheKeyPrefixConstants.APP_TOKEN + appUsers.getId() + ":" + IdUtil.simpleUUID();
-        RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalConfig.getTokenExpire()));
+        RedisUtil.setCacheObject(tokenKey, token, Duration.ofSeconds(GlobalProperties.getTokenExpire()));
         sysLoginLogService.save(new SysLoginLog(appUsers.getEmail(), localIp, 2));
 
         //返回token给客户端
@@ -306,10 +306,16 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
     public JsonResult uploadHeadImage(MultipartFile file) throws Exception {
         Integer userId = JwtTokenUtil.getUserIdFromToken(ThreadLocalManager.getToken());
 
+        AppUsers appUsers = this.selectColumnsByUserId(userId, AppUsers::getHeadImage);
+        String headName = appUsers.getHeadImage().substring(appUsers.getHeadImage().lastIndexOf("/")+1);
+
         String suffix = FileUtil.getSuffix(file.getOriginalFilename());
-        String fileName = userId + "." + suffix;
-        String savePath = appParam.getImageSavePath();
-        String url = GlobalConfig.getVirtualPathURL() + StringUtil.replace(appParam.getImageSavePath(), appParam.getRootPath(), "") + fileName;
+        String fileName = userId + "_" + IdUtil.getSnowflakeNextId()+"." + suffix;
+        String savePath = appParamProperties.getImageSavePath();
+        FileUtil.del(new File(savePath,headName));
+
+
+        String url = GlobalProperties.getVirtualPathURL() + StringUtil.replace(appParamProperties.getImageSavePath(), appParamProperties.getRootPath(), "") + fileName;
         //复制文件流到本地文件
         FileUtils.copyInputStreamToFile(file.getInputStream(), new File(savePath, fileName));
         UpdateWrapper<AppUsers> updateWrapper = Wrappers.update();
@@ -325,6 +331,7 @@ public class AppUserServiceImpl extends ServiceImpl<AppUserMapper, AppUsers> imp
         }
         return JsonResult.failureResult();
     }
+
 
     @Override
     public JsonResult updatePassword(UpdatePasswordDTO updatePasswordDTO) {

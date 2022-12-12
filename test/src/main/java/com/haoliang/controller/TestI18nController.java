@@ -1,6 +1,5 @@
 package com.haoliang.controller;
 
-import com.haoliang.common.enums.LanguageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.util.MessageUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +25,6 @@ public class TestI18nController {
         Object[] params = new Object[2];
         params[0] = "敏";
         params[1] = "啊";
-        return JsonResult.successResult(MessageUtil.get("test", params, LanguageEnum.getLocale(language)));
+        return JsonResult.successResult(MessageUtil.get("test", params,language));
     }
 }

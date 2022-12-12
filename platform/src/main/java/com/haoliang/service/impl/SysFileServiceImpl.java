@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haoliang.common.config.AppParam;
-import com.haoliang.common.config.GlobalConfig;
+import com.haoliang.common.config.AppParamProperties;
+import com.haoliang.common.config.GlobalProperties;
 import com.haoliang.common.enums.ContentTypeEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.model.ThreadLocalManager;
@@ -31,7 +31,7 @@ import java.util.List;
 public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> implements SysFileService {
 
     @Resource
-    private AppParam appParam;
+    private AppParamProperties AppParamProperties;
 
     @Override
     public void downloadFile(Integer id, HttpServletResponse httpServletResponse) throws Exception {
@@ -62,8 +62,8 @@ public class SysFileServiceImpl extends ServiceImpl<SysFileMapper, SysFile> impl
 
             String suffix = FileUtil.getSuffix(file.getOriginalFilename());
             String saveFileName = IdUtil.simpleUUID() + "." + suffix;
-            String savePath = appParam.getSysfileSavePath();
-            String url = GlobalConfig.getVirtualPathURL() + StringUtil.replace(appParam.getSysfileSavePath(), appParam.getRootPath(), "") + saveFileName;
+            String savePath = AppParamProperties.getSysfileSavePath();
+            String url = GlobalProperties.getVirtualPathURL() + StringUtil.replace(AppParamProperties.getSysfileSavePath(), AppParamProperties.getRootPath(), "") + saveFileName;
             //复制文件流到本地文件
             org.apache.commons.io.FileUtils.copyInputStreamToFile(file.getInputStream(), new File(savePath, saveFileName));
             sysFile.setFilePath(savePath+saveFileName);

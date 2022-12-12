@@ -1,5 +1,6 @@
 package com.haoliang.server;
 
+import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
 import com.haoliang.common.util.ErrorLogUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Slf4j
 public class GlobalExceptionAdvice {
 
-    private static final String ERROR_MESSAGE = "系统内部错误,请联系管理员！";
 
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
@@ -29,7 +29,7 @@ public class GlobalExceptionAdvice {
         }
         log.error("globale exception  msg={}", e);
         ErrorLogUtil.save(e);
-        return JsonResult.failureResult(ERROR_MESSAGE);
+        return JsonResult.failureResult(ReturnMessageEnum.ERROR);
     }
 
     @ResponseBody

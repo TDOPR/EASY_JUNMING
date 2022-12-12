@@ -22,6 +22,12 @@ public interface DayRateService extends IService<DayRate> {
     DayRate selectNewDayRate();
 
     /**
+     * 查看指定日期的收益率行
+     * @return 最新的收益
+     */
+    DayRate selectDayRateByLocalDate(LocalDate localDate);
+
+    /**
      * 根据机器人等级获取今日收益
      * @param robotLevel 机器人等级
      * @return 日收益率

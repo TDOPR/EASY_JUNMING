@@ -1,7 +1,6 @@
 package com.haoliang.common.filter;
 
 import com.haoliang.common.model.ThreadLocalManager;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,10 +8,9 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Dominick Li
- * @Description
+ * @Description 需要注册到 webmvc中
  * @CreateTime 2022/12/8 17:59
  **/
-@Component
 public class HttpInterceptor  implements HandlerInterceptor {
 
     @Override

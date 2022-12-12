@@ -2,6 +2,7 @@ package com.haoliang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.haoliang.model.SysNoticeUser;
 import com.haoliang.model.SysUser;
 import com.haoliang.model.vo.SysNoticeVO;
@@ -15,4 +16,8 @@ public interface SysNoticeUserMapper extends BaseMapper<SysNoticeUser> {
     IPage<SysNoticeVO> findMyNoticeListByUserIdAndCN(IPage<SysUser> page,@Param("userId")Integer userId);
 
     IPage<SysNoticeVO> findMyNoticeListByUserIdAndEN(IPage<SysUser> page,@Param("userId")Integer userId);
+
+    IPage<SysNoticeVO> findMyNoticeListByUserIdAndES(Page page, Integer userId);
+
+    IPage<SysNoticeVO> findMyNoticeListByUserIdAndPT(Page page, Integer userId);
 }

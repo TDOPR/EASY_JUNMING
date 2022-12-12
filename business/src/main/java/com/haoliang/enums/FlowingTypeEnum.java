@@ -1,16 +1,15 @@
 package com.haoliang.enums;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.haoliang.common.constant.LanguageKeyConstants;
+import com.haoliang.common.model.ThreadLocalManager;
+import com.haoliang.common.util.MessageUtil;
 
 /**
  * @author Dominick Li
  * @Description 钱包流水类型枚举
  * @CreateTime 2022/11/1 10:30
  **/
-@Getter
-@AllArgsConstructor
 public enum FlowingTypeEnum {
 
     ALGEBRA(1, "代数奖励"),
@@ -28,12 +27,30 @@ public enum FlowingTypeEnum {
 
     private Integer value;
 
-    private String desc;
+    private String name;
+
+    private String key;
+
+    public Integer getValue() {
+        return value;
+    }
+
+    /**
+     * 国际化信息文件里的Key前缀
+     */
+    private final static String prefix = "flowingType.";
+
+    FlowingTypeEnum(Integer value, String name) {
+        this.value = value;
+        this.name = name;
+        this.key = prefix + value;
+    }
+
 
     public static String getDescByValue(Integer value) {
         for (FlowingTypeEnum flowingTypeEnum : values()) {
             if (flowingTypeEnum.getValue().equals(value)) {
-                return flowingTypeEnum.getDesc();
+                return flowingTypeEnum.toString();
             }
         }
         return "";
@@ -51,19 +68,23 @@ public enum FlowingTypeEnum {
 
     public static String getWalletDescByValue(Integer value) {
         if (value.equals(RECHARGE.value)) {
-            return RECHARGE.desc;
+            return RECHARGE.toString();
         } else if (value.equals(WITHDRAWAL.value)) {
-            return WITHDRAWAL.desc;
+            return WITHDRAWAL.toString();
         } else if (value.equals(ENTRUSTMENT.value)) {
-            return ENTRUSTMENT.desc;
+            return ENTRUSTMENT.toString();
         } else if (value.equals(WITHDRAWL_WALLET.value)) {
-            return WITHDRAWL_WALLET.desc;
+            return WITHDRAWL_WALLET.toString();
         } else if (value.equals(STATIC.value)) {
-            return "量化收益存入";
+            return MessageUtil.get(LanguageKeyConstants.FLOWING_TYPE_STATIC, ThreadLocalManager.getLanguage());
         } else if (value.equals(BUY_ROBOT.value) || value.equals(UPGRADE_ROBOT.value)) {
-            return BUY_ROBOT.desc;
+            return BUY_ROBOT.toString();
         }
-        return "动态收益存入";
+        return "";
     }
 
+    @Override
+    public String toString() {
+        return MessageUtil.get(key, ThreadLocalManager.getLanguage());
+    }
 }

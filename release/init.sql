@@ -182,6 +182,12 @@ CREATE TABLE `sys_notice`  (
   `enTitle` varchar(255)  NOT NULL DEFAULT '' COMMENT '英文标题',
   `enDescription` varchar(255)  NOT NULL DEFAULT '' COMMENT '英文简介',
   `enText` text   NULL COMMENT '英文内容',
+  `esTitle` varchar(255)  NOT NULL DEFAULT '' COMMENT '西班牙语标题',
+  `esDescription` varchar(255)  NOT NULL DEFAULT '' COMMENT '西班牙语简介',
+  `esText` text   NULL COMMENT '西班牙语内容',
+  `ptTitle` varchar(255)  NOT NULL DEFAULT '' COMMENT '葡萄牙语标题',
+  `ptDescription` varchar(255)  NOT NULL DEFAULT '' COMMENT '葡萄牙语简介',
+  `ptText` text   NULL COMMENT '葡萄牙语内容',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT ='系统公告' ROW_FORMAT = Dynamic;
 

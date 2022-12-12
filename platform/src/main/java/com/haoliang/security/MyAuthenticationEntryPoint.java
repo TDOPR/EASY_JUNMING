@@ -1,7 +1,10 @@
 package com.haoliang.security;
 
 import com.alibaba.fastjson.JSONObject;
+import com.haoliang.common.constant.SystemConstants;
+import com.haoliang.common.enums.ReturnMessageEnum;
 import com.haoliang.common.model.JsonResult;
+import com.haoliang.common.util.MessageUtil;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -25,7 +28,9 @@ public class MyAuthenticationEntryPoint implements AuthenticationEntryPoint, jav
                          AuthenticationException authException) throws IOException {
         // This is invoked when sysUser tries to access a secured REST resource without supplying any credentials
         // We should just send a 401 Unauthorized response because there is no 'login page' to redirect to
-        JsonResult jsonResult= JsonResult.failureResult(401,"Unauthorized");
+        String language = request.getHeader(SystemConstants.LANGUAGE);
+        JsonResult jsonResult = JsonResult.failureResult(401, MessageUtil.get(ReturnMessageEnum.UNAUTHORIZED.getKey(), language));
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().println(JSONObject.toJSONString(jsonResult));
     }
 
