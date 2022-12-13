@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.TreePathMapper">
+
+    <insert id="insertTreePath">
+    INSERT INTO tree_paths (ancestor, descendant, LEVEL)
+        SELECT t.ancestor,
+               #{uid},
+               LEVEL + 1
+        FROM tree_paths AS t
+        WHERE t.descendant = #{pid}
+        UNION
+            ALL
+        SELECT #{pid},
+               #{uid},
+               1
+    </insert>
+
+    <select id="getTreeAmountByUserId" resultType="com.haoliang.model.dto.TreePathAmountDTO">
+        SELECT
+         w.principalAmount,w.robotAmount,t.descendant
+        FROM tree_paths t
+        LEFT JOIN
+            wallets w
+            ON t.descendant=w.userId
+        WHERE t.ancestor=#{uid}
+    </select>
+
+</mapper>

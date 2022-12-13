@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.SysNoticeUserMapper">
+
+    <insert id="insertBatch">
+        INSERT INTO sys_notice_user(noticeId,userId) SELECT #{noticeId} ,id from app_users
+    </insert>
+    <select id="findMyNoticeListByUserIdAndCN" resultType="com.haoliang.model.vo.SysNoticeVO">
+        SELECT
+            n.id,n.cnTitle title,n.cnText text,n.createTime
+        FROM
+           sys_notice n
+        LEFT join
+           sys_notice_user nu
+           ON n.id=nu.noticeId
+        WHERE
+            nu.userId=#{userId}
+            AND
+            n.display=1
+        ORDER BY
+            n.sortIndex,
+            n.createTime DESC
+    </select>
+    <select id="findMyNoticeListByUserIdAndEN" resultType="com.haoliang.model.vo.SysNoticeVO">
+        SELECT
+            n.id,n.enTitle title,n.enText text,n.createTime
+        FROM
+           sys_notice n
+        LEFT join
+           sys_notice_user nu
+           ON n.id=nu.noticeId
+        WHERE
+            nu.userId=#{userId}
+            AND
+            n.display=1
+        ORDER BY
+            n.sortIndex,
+            n.createTime DESC
+    </select>
+
+</mapper>

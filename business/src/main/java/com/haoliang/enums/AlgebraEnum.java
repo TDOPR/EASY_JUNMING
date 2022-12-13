@@ -14,8 +14,7 @@ public enum AlgebraEnum {
 
     FIRST(1, new BigDecimal("0.25")),
     SECOND(2, new BigDecimal("0.15")),
-    THIRD(3, new BigDecimal("0.05")),
-    ;
+    THIRD(3, new BigDecimal("0.05"));
 
     /**
      * 代数

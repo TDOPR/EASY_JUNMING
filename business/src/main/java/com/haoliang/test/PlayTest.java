@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.haoliang.common.util.HttpUtil;
 import com.haoliang.model.play.Transaction;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * @Description  https://sandbox-portal.facilitapay.com/#/docs
  * @Author Dominick Li
@@ -104,5 +106,7 @@ public class PlayTest {
         //BRL_2_USD();
         USD_2_BRL();
     }
+
+
 
 }

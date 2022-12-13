@@ -47,6 +47,4 @@ public class PageParam<T,C extends BaseCondition> {
         }
         return page;
     }
-
-
 }

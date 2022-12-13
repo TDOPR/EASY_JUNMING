@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
  * @author Dominick Li
  * @description 操作日志切入点
  **/
+
 @Aspect
 @Component
 public class OperationLogAspect {
@@ -55,6 +56,4 @@ public class OperationLogAspect {
         }
         return resultMethod;
     }
-
-
 }

@@ -25,8 +25,9 @@ spring:
     #字典缓存订阅的主题
     topic: refreshDictionary
     #redis服务器的ip
-    host: 127.0.0.1
-    port: 6379
+    host: rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com
+    port: 6480
+    password: iGrFRhs0tdNgpbHS
     jedis:
       pool:
         max-active: 8

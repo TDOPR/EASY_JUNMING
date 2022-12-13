@@ -32,3 +32,4 @@ npm run dev
 mvn smart-doc:markdown -Dfile.encoding=UTF-8  -pl :platform -am
 访问地址: http://localhost:9090/apidoc/api.html
 
+# Easy_JUNMING

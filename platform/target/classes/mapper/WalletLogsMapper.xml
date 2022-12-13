@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haoliang.mapper.WalletLogsMapper">
+
+    <select id="getMyProxyWalletLogs" resultType="com.haoliang.model.WalletLogs">
+        SELECT
+            type,sum(amount)
+        FROM wallet_logs
+        WHERE
+            userId=#{userId}
+            AND type in
+        <foreach collection="typeList" item="type" separator="," open="(" close=")">
+            #{type}
+        </foreach>
+        GROUP BY TYPE;
+    </select>
+
+    <select id="getDateSection" resultType="com.haoliang.model.dto.DateSection">
+        SELECT min(createTime) minDate,max(createTime) maxDate  FROM wallet_logs  WHERE userId=#{userId}
+    </select>
+
+    <select id="sumTotalAmountByType" resultType="java.math.BigDecimal">
+        SELECT sum(amount) FROM wallet_logs  WHERE type=#{type}
+    </select>
+
+
+
+</mapper>

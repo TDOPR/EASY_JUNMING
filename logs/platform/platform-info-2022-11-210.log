@@ -1,0 +1,82 @@
+2022-11-21 16:27:24 [background-preinit] - HV000001: Hibernate Validator 6.2.0.Final
+2022-11-21 16:27:24 [main] - Starting PlatformApplication using Java 17.0.3 on WIN-0LIEQ3UH00U with PID 22992 (D:\Request\easyTrade-java-main\platform\target\classes started by Administrator in D:\Request\easyTrade-java-main)
+2022-11-21 16:27:24 [main] - No active profile set, falling back to default profiles: default
+2022-11-21 16:27:24 [main] - Multiple Spring Data modules found, entering strict repository configuration mode!
+2022-11-21 16:27:24 [main] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2022-11-21 16:27:25 [main] - Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
+2022-11-21 16:27:25 [main] - Bean 'asyncExecutorConfig' of type [com.haoliang.config.AsyncExecutorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:27:25 [main] - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@2b80e5a9' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:27:25 [main] - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:27:25 [main] - Tomcat initialized with port(s): 9090 (http)
+2022-11-21 16:27:25 [main] - Initializing ProtocolHandler ["http-nio-9090"]
+2022-11-21 16:27:25 [main] - Starting service [Tomcat]
+2022-11-21 16:27:25 [main] - Starting Servlet engine: [Apache Tomcat/9.0.54]
+2022-11-21 16:27:25 [main] - Initializing Spring embedded WebApplicationContext
+2022-11-21 16:27:25 [main] - Root WebApplicationContext: initialization completed in 1207 ms
+2022-11-21 16:27:25 [main] - Init DruidDataSource
+2022-11-21 16:27:28 [main] - {dataSource-1} inited
+2022-11-21 16:27:30 [main] - 初始化把字典信息加入缓存中...
+2022-11-21 16:27:30 [main] - {dataSource-1} closing ...
+2022-11-21 16:27:30 [main] - {dataSource-1} closed
+2022-11-21 16:27:30 [main] - Stopping service [Tomcat]
+2022-11-21 16:27:30 [main] - 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2022-11-21 16:28:15 [background-preinit] - HV000001: Hibernate Validator 6.2.0.Final
+2022-11-21 16:28:15 [main] - Starting PlatformApplication using Java 17.0.3 on WIN-0LIEQ3UH00U with PID 21576 (D:\Request\easyTrade-java-main\platform\target\classes started by Administrator in D:\Request\easyTrade-java-main)
+2022-11-21 16:28:15 [main] - No active profile set, falling back to default profiles: default
+2022-11-21 16:28:15 [main] - Multiple Spring Data modules found, entering strict repository configuration mode!
+2022-11-21 16:28:15 [main] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2022-11-21 16:28:15 [main] - Finished Spring Data repository scanning in 16 ms. Found 0 Redis repository interfaces.
+2022-11-21 16:28:16 [main] - Bean 'asyncExecutorConfig' of type [com.haoliang.config.AsyncExecutorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:28:16 [main] - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@4877919f' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:28:16 [main] - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:28:16 [main] - Tomcat initialized with port(s): 9090 (http)
+2022-11-21 16:28:16 [main] - Initializing ProtocolHandler ["http-nio-9090"]
+2022-11-21 16:28:16 [main] - Starting service [Tomcat]
+2022-11-21 16:28:16 [main] - Starting Servlet engine: [Apache Tomcat/9.0.54]
+2022-11-21 16:28:16 [main] - Initializing Spring embedded WebApplicationContext
+2022-11-21 16:28:16 [main] - Root WebApplicationContext: initialization completed in 1161 ms
+2022-11-21 16:28:16 [main] - Init DruidDataSource
+2022-11-21 16:28:20 [main] - {dataSource-1} inited
+2022-11-21 16:28:21 [main] - 初始化把字典信息加入缓存中...
+2022-11-21 16:28:22 [main] - Redisson 3.17.6
+2022-11-21 16:28:23 [redisson-netty-2-5] - 1 connections initialized for 127.0.0.1/127.0.0.1:6379
+2022-11-21 16:28:23 [redisson-netty-2-19] - 24 connections initialized for 127.0.0.1/127.0.0.1:6379
+2022-11-21 16:28:23 [main] - Exposing 13 endpoint(s) beneath base path '/actuator'
+2022-11-21 16:28:23 [main] - Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@796dff96, org.springframework.security.web.context.SecurityContextPersistenceFilter@28e12bc5, org.springframework.security.web.header.HeaderWriterFilter@52813ba4, org.springframework.web.filter.CorsFilter@27d7ee42, org.springframework.security.web.authentication.logout.LogoutFilter@4c24063c, com.haoliang.security.JwtAuthenticationTokenFilter@6c0bf8f4, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@74940388, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@470b7fcf, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7167ca15, org.springframework.security.web.session.SessionManagementFilter@63c31664, org.springframework.security.web.access.ExceptionTranslationFilter@4228a2f6, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@639d8311]
+2022-11-21 16:28:24 [main] - Starting ProtocolHandler ["http-nio-9090"]
+2022-11-21 16:28:24 [main] - Tomcat started on port(s): 9090 (http) with context path ''
+2022-11-21 16:28:24 [main] - Started PlatformApplication in 9.206 seconds (JVM running for 9.496)
+2022-11-21 16:28:24 [main] - serverIp=192.168.2.123 ,hostName=WIN-0LIEQ3UH00U
+2022-11-21 16:29:42 [SpringApplicationShutdownHook] - {dataSource-1} closing ...
+2022-11-21 16:29:42 [SpringApplicationShutdownHook] - {dataSource-1} closed
+2022-11-21 16:29:46 [background-preinit] - HV000001: Hibernate Validator 6.2.0.Final
+2022-11-21 16:29:46 [main] - Starting PlatformApplication using Java 17.0.3 on WIN-0LIEQ3UH00U with PID 2584 (D:\Request\easyTrade-java-main\platform\target\classes started by Administrator in D:\Request\easyTrade-java-main)
+2022-11-21 16:29:46 [main] - No active profile set, falling back to default profiles: default
+2022-11-21 16:29:47 [main] - Multiple Spring Data modules found, entering strict repository configuration mode!
+2022-11-21 16:29:47 [main] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2022-11-21 16:29:47 [main] - Finished Spring Data repository scanning in 15 ms. Found 0 Redis repository interfaces.
+2022-11-21 16:29:47 [main] - Bean 'asyncExecutorConfig' of type [com.haoliang.config.AsyncExecutorConfig] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:29:47 [main] - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@4877919f' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:29:47 [main] - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2022-11-21 16:29:47 [main] - Tomcat initialized with port(s): 9090 (http)
+2022-11-21 16:29:47 [main] - Initializing ProtocolHandler ["http-nio-9090"]
+2022-11-21 16:29:47 [main] - Starting service [Tomcat]
+2022-11-21 16:29:47 [main] - Starting Servlet engine: [Apache Tomcat/9.0.54]
+2022-11-21 16:29:47 [main] - Initializing Spring embedded WebApplicationContext
+2022-11-21 16:29:47 [main] - Root WebApplicationContext: initialization completed in 1137 ms
+2022-11-21 16:29:47 [main] - Init DruidDataSource
+2022-11-21 16:29:51 [main] - {dataSource-1} inited
+2022-11-21 16:29:52 [main] - 初始化把字典信息加入缓存中...
+2022-11-21 16:29:53 [main] - Redisson 3.17.6
+2022-11-21 16:29:54 [redisson-netty-2-6] - 1 connections initialized for 127.0.0.1/127.0.0.1:6379
+2022-11-21 16:29:54 [redisson-netty-2-19] - 24 connections initialized for 127.0.0.1/127.0.0.1:6379
+2022-11-21 16:29:54 [main] - Exposing 13 endpoint(s) beneath base path '/actuator'
+2022-11-21 16:29:54 [main] - Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7f9224e1, org.springframework.security.web.context.SecurityContextPersistenceFilter@572d1f18, org.springframework.security.web.header.HeaderWriterFilter@2728e305, org.springframework.web.filter.CorsFilter@6915e5ca, org.springframework.security.web.authentication.logout.LogoutFilter@5effc15d, com.haoliang.security.JwtAuthenticationTokenFilter@1ef7e4c7, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@77d80294, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@1a42da0a, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@71a8a354, org.springframework.security.web.session.SessionManagementFilter@5765cd21, org.springframework.security.web.access.ExceptionTranslationFilter@3d5a6849, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@125ce4b7]
+2022-11-21 16:29:55 [main] - Starting ProtocolHandler ["http-nio-9090"]
+2022-11-21 16:29:55 [main] - Tomcat started on port(s): 9090 (http) with context path ''
+2022-11-21 16:29:55 [main] - Started PlatformApplication in 8.986 seconds (JVM running for 9.289)
+2022-11-21 16:29:55 [main] - serverIp=192.168.2.123 ,hostName=WIN-0LIEQ3UH00U
+2022-11-21 16:32:04 [SpringApplicationShutdownHook] - {dataSource-1} closing ...
+2022-11-21 16:32:04 [SpringApplicationShutdownHook] - {dataSource-1} closed

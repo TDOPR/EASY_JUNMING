@@ -1,0 +1,216 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: platform
+  cache:
+    type: redis
+  boot:
+    admin:
+      client:
+        # 启动注册到监控中心(设置true则需要启动monitor项目)
+        enabled: true
+        #监控中心地址,多个以逗号隔开,并把localhost换成ip
+        url: http://localhost:9092
+        instance:
+          prefer-ip: true
+        register-once: true
+        username: admin
+        password: 123456
+  redis:
+    #字典缓存订阅的主题
+    topic: refreshDictionary
+    #redis服务器的ip
+    host: 127.0.0.1
+    port: 6379
+    jedis:
+      pool:
+        max-active: 8
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    #    username: root
+    #    password: 123456
+    url: jdbc:mysql://rm-j6c9017o3vcxquxf2qo.mysql.rds.aliyuncs.com:3306/easytrade?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=GMT%2b8&characterEncoding=utf8&connectTimeout=1000&socketTimeout=15000&autoReconnect=true&cachePrepStmts=true&useServerPrepStmts=true
+    username: root
+    password: LXYx29K1rJhiOWtc
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 数据连接池配置
+    druid:
+      #连接池最大连接数  (cpu核数量 * 2 + 硬盘数量)
+      max-active: 30
+      #获取连接的最大等待时间
+      max-wait: 6000
+      #连接池最小连接数
+      min-idle: 10
+      #连接池初始化大小
+      initial-size: 10
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+      #打开PSCache，并且指定每个连接上PSCache的大小
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      # 借用连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
+      test-on-borrow: false
+      # 归还连接时执行validationQuery检测连接是否有效，做了这个配置会降低性能
+      test-on-return: false
+      # 连接空闲时检测，如果连接空闲时间大于timeBetweenEvictionRunsMillis指定的毫秒，执行validationQuery指定的SQL来检测连接是否有效
+      test-while-idle: true
+      # 检测连接是否有效时执行的sql命令
+      validation-query:  SELECT 1
+      #单位秒默认30分钟 设置成5分钟
+      min-evictable-idle-time-millis: 300000
+      #空闲连接检查、废弃连接清理、空闲连接池大小调整的操作时间间隔，单位是毫秒(1分钟)
+      time-between-eviction-runs-millis: 60000
+      #监控信息   localhost:${server.port}/druid/login.html
+      stat-view-servlet:
+        login-username: admin
+        login-password: 123456
+        #允许哪个机器登录
+        allow: 192.168.2.128
+        #sql监控开关
+        enabled: true
+      #url监控
+      web-stat-filter:
+        #是否开启url监控
+        enabled: false
+        #是否开启session监控
+        session-stat-enable: false
+      filter:
+        stat:
+          enabled: true
+          log-slow-sql: true
+          #慢sql的毫秒
+          slow-sql-millis: 400
+
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+    deserialization:
+      accept_empty_string_as_null_object: true
+
+#########################  mybatis-plus配置  #########################
+mybatis-plus:
+  # xml扫描，多个目录用逗号或者分号分隔（告诉 Mapper 所对应的 XML 文件位置）
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    # 是否开启自动驼峰命名规则映射:从数据库列名到Java属性驼峰命名的类似映射
+    map-underscore-to-camel-case: false
+    # 如果查询结果中包含空值的列，则 MyBatis 在映射的时候，不会映射这个字段
+    call-setters-on-nulls: true
+    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#########################  java Web Token 配置  #########################
+jwt:
+  # 加密密钥
+  secret: iwqjhda8232bjgh432[cicada-smile]
+  # token有效时长(单位: 秒) 设置为一天
+  expire: 8640000000000000
+  #请求头参数
+  tokenName: token
+
+######################  Actuator 监控端点的配置项  ######################
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+
+#########################  登录配置 ####################################
+login:
+  #是否开启密码错误锁定
+  enableErrorLock: true
+  #锁定时间(单位:秒) 默认设置3分钟
+  lockTime: 180
+  #登录错误几次开始锁定
+  maxErrorNumber: 3
+  captcha:
+    #是否启动验证码
+    enable: false
+    # 使用使用谷歌认证器   true=使用  false=使用后台算法生成图片验证码
+    google: true
+    #谷歌认证的host地址
+    googleHost: trade.google.com
+    # 图片验证码类型 math=数字计算 char=字符验证  random=随机策略  请填写大写字母 ,移动端只发送字符验证
+    type: RANDOM
+    #图片验证码 图像干扰策略  line=线段干扰 circle=圆圈干扰 shear=扭曲干扰  random=随机策略
+    category: RANDOM
+    #图片验证码 数字验证码位数
+    numberLength: 1
+    #图片验证码 字符验证码长度
+    charLength: 4
+    #图片验证码 失效时间(单位:分钟)
+    expirationTime: 30
+
+#########################  邮件配置 ##################################
+mail:
+  #是否开启邮件预警功能
+  enable: true
+  enableSSL: false
+  #  host: smtp.qq.com
+  #  port: 25
+  #  username: 826853123@qq.com
+  #  password: eddwoukjplfbbdba
+  host: smtp.gmail.com
+  port: 587
+  username: zbowen856@gmail.com
+  password: qexsuvodarlbtqav
+  formName: easyTrade
+
+#########################  异步线程池配置 ##################################
+
+asyncExecutor:
+  prefixName: async-task-
+  #最小线程数
+  codeSize: 50
+  #最大线程数
+  maxSize: 100
+  #队列大小
+  queueSize: -1
+
+#########################  应用其它配置   ############################
+app:
+  version: v1.0.0
+  #文件存储根路径
+  rootPath: D:\data\
+  #临时文件存储
+  tmpSavePath: ${app.rootPath}tmp/
+  #头像存储路径
+  imageSavePath: ${app.rootPath}userImage/
+  #系统文件存储路径
+  sysfileSavePath: ${app.rootPath}sysfile/
+  #虚拟路径前缀
+  virtualPathPrefix: /virtual
+  #虚拟路径URL
+  virtualPathURL: http://127.0.0.1:${server.port}${app.virtualPathPrefix}/
+  #文件上传限制 MB
+  fileMaxSize: 30
+  #服务名称
+  serverName: easyTrade
+  #是否加载redisson的RateLimit限流相关Bean   依赖reids
+  enableRateLimit: false
+  #限流模式  single=单实例限流,all=全局限流(分布式限流)
+  rateLimitModel: all
+  #是否加载表单去重提交验证  依赖reids
+  enableRepeatSubmit: true
+  #是否启动分布式锁  依赖reids
+  enableRedisLock: flase
+  #过滤不需要security验证的接口
+  securityExcludes:
+    - /user/login
+    - /test/**
+    - /apidoc/**
+    - /actuator
+    - /actuator/**
+    - /captchaImage
+    - /sendCaptchaToEmail/*
+    - /home
+    - /home/*
+    - /druid/**
+    - ${app.virtualPathPrefix}/**
